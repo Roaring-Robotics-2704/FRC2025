@@ -82,7 +82,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         try {
             local().ppconfig = RobotConfig.fromGUISettings();
         } catch (IOException | ParseException e) {
-            local().ppconfig = DriveConstants.ppConfig;
+            e.printStackTrace();
         }
 
         // Usage reporting for swerve template

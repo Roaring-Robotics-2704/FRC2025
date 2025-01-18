@@ -19,6 +19,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -26,6 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.ChutePos;
+import frc.robot.Constants.ScoringPos;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +54,10 @@ public class Robot extends LoggedRobot {
     private final Field2d telefield = new Field2d();
     private String autoName;
     private Timer timer = new Timer();
+
+    private static int scoringMode = 1;
+    private static int pickupMode = 0;
+    private static int chutePos = 0;
 
     public Robot() {
         // Record metadata
@@ -116,7 +123,9 @@ public class Robot extends LoggedRobot {
         // This must be called from the robot's periodic block in order for anything in
         // the Command-based framework to work.
         CommandScheduler.getInstance().run();
-
+        SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+        Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
+        SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
         // Return to normal thread priority
         Threads.setCurrentThreadPriority(false, 10);
     }
@@ -202,6 +211,62 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
         robotContainer.displaySimFieldToAdvantageScope();
+    }
+
+    public static boolean isRedAlliance() {
+        return DriverStation.getAlliance()
+                .filter(value -> value == DriverStation.Alliance.Red)
+                .isPresent();
+    }
+
+    public static ScoringPos getScoringMode() {
+        return switch (scoringMode) {
+            case 0 -> ScoringPos.Front;
+            case 1 -> ScoringPos.FrontLeft;
+            case 2 -> ScoringPos.FrontRight;
+            case 3 -> ScoringPos.BackLeft;
+            case 4 -> ScoringPos.BackRight;
+            case 5 -> ScoringPos.Back;
+            default -> ScoringPos.Back;
+        };
+    }
+
+    public static void setScoringMode(ScoringPos mode) {
+        switch (mode) {
+            case Front -> scoringMode = 0;
+            case FrontLeft -> scoringMode = 1;
+            case FrontRight -> scoringMode = 2;
+            case BackLeft -> scoringMode = 3;
+            case BackRight -> scoringMode = 4;
+            case Back -> scoringMode = 5;
+            default -> scoringMode = 5;
+        }
+        Logger.recordOutput("ScoringMode", scoringMode);
+    }
+
+    public static ChutePos getChutePos() {
+        return switch (chutePos) {
+            case 0 -> ChutePos.FarLeft;
+            case 1 -> ChutePos.MidLeft;
+            case 2 -> ChutePos.NearLeft;
+            case 3 -> ChutePos.NearRight;
+            case 4 -> ChutePos.MidRight;
+            case 5 -> ChutePos.FarRight;
+            default -> ChutePos.FarRight;
+        };
+    }
+
+    public static void setChutePos(ChutePos pos) {
+        switch (pos) {
+            case FarLeft -> chutePos = 0;
+            case MidLeft -> chutePos = 1;
+            case NearLeft -> chutePos = 2;
+            case NearRight -> chutePos = 3;
+            case MidRight -> chutePos = 4;
+            case FarRight -> chutePos = 5;
+            default -> chutePos = 0;
+        }
+        Logger.recordOutput("ChutePos", chutePos);
     }
 
     @SuppressWarnings("CallToPrintStackTrace")

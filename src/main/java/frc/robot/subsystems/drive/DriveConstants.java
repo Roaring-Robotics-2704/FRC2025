@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -39,11 +37,11 @@ public class DriveConstants {
 
     public static final int FRONT_LEFT_DRIVE_CAN_ID = 1;
     public static final int BACK_LEFT_DRIVE_CAN_ID = 3;
-    public static final int FRONT_RIGHT_DRIVE_CAN_ID = 5;
-    public static final int BACK_RIGHT_DRIVE_CAN_ID = 7;
+    public static final int FRONT_RIGHT_DRIVE_CAN_ID = 2;
+    public static final int BACK_RIGHT_DRIVE_CAN_ID = 4;
 
-    public static final int FRONT_LEFT_TURN_CAN_ID = 2;
-    public static final int BACK_LEFT_TURN_CAN_ID = 4;
+    public static final int FRONT_LEFT_TURN_CAN_ID = 5;
+    public static final int BACK_LEFT_TURN_CAN_ID = 7;
     public static final int FRONT_RIGHT_TURN_CAN_ID = 6;
     public static final int BACK_RIGHT_TURN_CAN_ID = 8;
 
@@ -93,17 +91,17 @@ public class DriveConstants {
     public static final double ROBOT_MASS = Units.lbsToKilograms(125); // KG
     public static final double ROBOT_MOI = 6.883;
     public static final double WHEEL_COF = 1.2;
-    public static final RobotConfig ppConfig = new RobotConfig(
-            ROBOT_MASS,
-            ROBOT_MOI,
-            new ModuleConfig(
-                    WHEEL_RADIUS,
-                    MAX_SPEED,
-                    WHEEL_COF,
-                    DRIVE_GEARBOX.withReduction(DRIVE_REDUCTION),
-                    DRIVE_CURRENT_LIMIT,
-                    1),
-            moduleTranslations);
+    //     public static final RobotConfig ppConfig = new RobotConfig(
+    //             ROBOT_MASS,
+    //             ROBOT_MOI,
+    //             new ModuleConfig(
+    //                     WHEEL_RADIUS,
+    //                     MAX_SPEED,
+    //                     WHEEL_COF,
+    //                     DRIVE_GEARBOX.withReduction(DRIVE_REDUCTION),
+    //                     DRIVE_CURRENT_LIMIT,
+    //                     1),
+    //             moduleTranslations);
 
     public static final DriveTrainSimulationConfig mapleSimConfig = DriveTrainSimulationConfig.Default()
             .withCustomModuleTranslations(moduleTranslations)
