@@ -6,6 +6,7 @@ import static frc.robot.subsystems.drive.DriveConstants.MAX_SPEED;
 import static frc.robot.subsystems.drive.DriveConstants.moduleTranslations;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -37,10 +38,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -79,11 +78,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         modules[2] = new Module(blModuleIO, 2);
         modules[3] = new Module(brModuleIO, 3);
 
-        try {
-            local().ppconfig = RobotConfig.fromGUISettings();
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+        local().ppconfig = DriveConstants.ppConfig;
+        // try {
+        //     local().ppconfig = RobotConfig.fromGUISettings();
+        // } catch (IOException | ParseException e) {
+        //     e.printStackTrace();
+        // }
 
         // Usage reporting for swerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -106,6 +106,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
         PathPlannerLogging.setLogTargetPoseCallback(
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
+        FollowPathCommand.warmupCommand().schedule();
         PathfindingCommand.warmupCommand().schedule();
 
         // Configure SysId

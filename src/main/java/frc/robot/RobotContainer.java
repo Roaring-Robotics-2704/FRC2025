@@ -13,12 +13,13 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
-import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -36,15 +37,19 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -55,6 +60,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
+    private final Elevator elevator;
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
@@ -68,6 +74,7 @@ public class RobotContainer {
         switch (Constants.CURRENT_MODE) {
             case REAL -> {
                 // Real robot, instantiate hardware IO implementations
+                this.elevator = new Elevator(new ElevatorIOSpark());
                 drive = new Drive(
                         new GyroIOPigeon2(),
                         new ModuleIOSpark(0),
@@ -81,6 +88,7 @@ public class RobotContainer {
                         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
             }
             case SIM -> {
+                elevator = new Elevator(new ElevatorIOSim());
                 // create a maple-sim swerve drive simulation instance
                 this.driveSimulation =
                         new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
@@ -102,6 +110,7 @@ public class RobotContainer {
                                 camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
             }
             default -> {
+                elevator = new Elevator(new ElevatorIO() {});
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
