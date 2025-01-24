@@ -1,21 +1,10 @@
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Encoder;
 import static frc.robot.subsystems.elevator.ElevatorConstants.CURRENT_LIMIT;
 import static frc.robot.subsystems.elevator.ElevatorConstants.DISTANCE_PER_PULSE;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ELEVATOR_KD;
@@ -24,6 +13,17 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.ELEVATOR_KP;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ENCODER_A;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ENCODER_B;
 import static frc.robot.util.SparkUtil.tryUntilOk;
+
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class ElevatorIOSpark implements ElevatorIO {
 
@@ -55,16 +55,18 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.position.mut_replace(m_encoder.getDistance(), Meters);        
+        inputs.position.mut_replace(m_encoder.getDistance(), Meters);
         inputs.velocity.mut_replace(m_encoder.getRate(), MetersPerSecond);
         inputs.appliedVolts.mut_replace(motor1.getAppliedOutput() * 12.0, Volts);
         inputs.supplyCurrent.mut_replace(motor1.getOutputCurrent(), Amps);
         inputs.torqueCurrent.mut_replace(motor1.getOutputCurrent(), Amps);
-    }    @Override
+    }
+
+    @Override
     public void runVolts(Voltage volts) {
-    double clampedEffort = MathUtil.clamp(volts.in(Volts), -12, 12);
-      motor1.setVoltage(clampedEffort);
-      motor2.setVoltage(clampedEffort);
+        double clampedEffort = MathUtil.clamp(volts.in(Volts), -12, 12);
+        motor1.setVoltage(clampedEffort);
+        motor2.setVoltage(clampedEffort);
     }
 
     @Override
