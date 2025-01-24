@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -77,7 +78,7 @@ public class DriveConstants {
     public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
     // Turn encoder configuration
-    public static final boolean TURN_ENCODER_INVERTED = false;
+    public static final boolean TURN_ENCODER_INVERTED = true;
     public static final double TURN_POSITION_FACTOR = 2 * Math.PI; // Rotations -> Radians
     public static final double TURN_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
@@ -119,4 +120,5 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI);
 }

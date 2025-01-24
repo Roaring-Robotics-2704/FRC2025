@@ -11,8 +11,8 @@ import edu.wpi.first.math.util.Units;
 public class ElevatorConstants {
 
     // Motor IDs
-    public static final int ELEVATOR_MOTOR_1 = 10;
-    public static final int ELEVATOR_MOTOR_2 = 11;
+    public static final int ELEVATOR_MOTOR_1 = 12;
+    public static final int ELEVATOR_MOTOR_2 = 13;
 
     // Encoder ports
     public static final int ENCODER_A = 0;

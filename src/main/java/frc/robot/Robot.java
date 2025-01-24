@@ -6,6 +6,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -21,6 +22,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -36,6 +38,7 @@ public class Robot extends LoggedRobot {
     private final RobotContainer robotContainer;
     private final Field2d autofield = new Field2d();
     private final Field2d telefield = new Field2d();
+    LoggedPowerDistribution pdh;
     private String autoName;
 
     public Robot() {
@@ -73,6 +76,7 @@ public class Robot extends LoggedRobot {
 
         // Initialize URCL
         Logger.registerURCL(URCL.startExternal());
+        pdh = LoggedPowerDistribution.getInstance(10, ModuleType.kRev);
 
         // Start AdvantageKit logger
         Logger.start();
