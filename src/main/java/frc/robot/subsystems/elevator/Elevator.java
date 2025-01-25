@@ -4,25 +4,34 @@
 
 package frc.robot.subsystems.elevator;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
-  public Elevator() {}
-    private final CANSparkMax FRONT_ELEVATOR;
-    private final CANSparkMax RIGHT_ELEVATOR;
+    private final ElevatorIO io;
+    private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+    private MutDistance setpoint = Inches.mutable(0);
+  
+public Elevator(ElevatorIO io) {
+    double ElevatorMotorPosition = 0.0;
+    this.io = io;
+    io.init();
+    
+  } 
 
-    private final AbsoluteEncoder FRONT_ELEVATOR_ENCODER;
-    private final AbsoluteEncoder LEFT_ELEVATOR_ENCODER;
-
-    double frontElevatorSetPoint = 0;
-    double backElevatorSetPoint = 0;
-
+    
   @Override
   public void periodic() {
+    this.io.updateInputs(inputs);
+    Logger.processInputs("Elevator", inputs);
+    this.io.runSetpoint(setpoint);
     // This method will be called once per scheduler run
   }
 
