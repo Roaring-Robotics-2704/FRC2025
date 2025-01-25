@@ -4,14 +4,23 @@
 
 package frc.robot.subsystems.algaeArm;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class algaeArmIO extends SubsystemBase {
-  /** Creates a new algaeArmIO. */
-  public algaeArmIO() {}
+public interface algaeArmIO {
+  class algaeArmIOInputs{
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    public boolean algaeArmConnected = false;
+    public double algaeArmPositionRad = 0.0;
+    public double algaeArmVelocity = 0.0;
+    public double algaeArmAppliedVolts = 0.0;
+    public double algaeArmCurrentAmps = 0.0;
   }
+  
+  default void updateInputs(algaeArmIOInputs inputs) {}
+
+  default void setAlgaeArmVoltage(double voltage) {}
+
+  default void setAlgaeArmPosition(double positionRad) {}
+
+  default void setAlgaeArmVelocity(double velocityRadPerSec) {}
+
 }
