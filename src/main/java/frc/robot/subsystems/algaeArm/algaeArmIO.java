@@ -4,23 +4,30 @@
 
 package frc.robot.subsystems.algaeArm;
 
+import org.littletonrobotics.junction.AutoLog;
 
-public interface algaeArmIO {
-  class algaeArmIOInputs{
+public interface AlgaeArmIO {
+  @AutoLog
+  class AlgaeArmIOInputs{
 
-    public boolean algaeArmConnected = false;
-    public double algaeArmPositionRad = 0.0;
-    public double algaeArmVelocity = 0.0;
-    public double algaeArmAppliedVolts = 0.0;
-    public double algaeArmCurrentAmps = 0.0;
+    public double algaePivotPositionRad = 0.0;
+    public double algaePivotVelocity = 0.0;
+    public double algaePivotAppliedVolts = 0.0;
+    public double algaePivotAmps = 0.0;
+    public double algaeRollerVelocity = 0.0;
+    public double algaeRollerAmps = 0.0;
+    public double algaeRollerVoltage = 0.0;
+    public double algaeRollerSpeed = 0.0;
   }
   
-  default void updateInputs(algaeArmIOInputs inputs) {}
+  default void updateInputs(AlgaeArmIOInputs inputs) {}
 
   default void setAlgaeArmVoltage(double voltage) {}
 
   default void setAlgaeArmPosition(double positionRad) {}
 
-  default void setAlgaeArmVelocity(double velocityRadPerSec) {}
+  default void setRollerSpeed(double speed) {}
+
+
 
 }
