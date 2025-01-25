@@ -18,8 +18,8 @@ public class Elevator extends SubsystemBase {
     private final AbsoluteEncoder FRONT_ELEVATOR_ENCODER;
     private final AbsoluteEncoder LEFT_ELEVATOR_ENCODER;
 
-    double 
-
+    double frontElevatorSetPoint = 0;
+    double backElevatorSetPoint = 0;
 
   @Override
   public void periodic() {
