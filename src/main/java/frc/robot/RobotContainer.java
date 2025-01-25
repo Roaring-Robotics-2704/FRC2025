@@ -27,9 +27,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Auto.Choosers.ReefChooser;
+import frc.robot.Auto.Choosers.SourceChooser;
 import frc.robot.commands.DriveCommands;
-import frc.robot.locations.ReefChooser;
-import frc.robot.locations.SourceChooser;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -88,7 +88,6 @@ public class RobotContainer {
                         drive, new VisionIOLimelight(VisionConstants.CAMERA_0_NAME, drive::getRotation)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
-            
             }
             case SIM -> {
                 elevator = new Elevator(new ElevatorIOSim());
