@@ -1,10 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -14,10 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -29,8 +20,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
- * described in the TimedRobot documentation. If you change the name of this class or the package after creating this
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as
+ * described in the TimedRobot documentation. If you change the name of this
+ * class or the package after creating this
  * project, you must also update the build.gradle file in the project.
  */
 public class Robot extends LoggedRobot {
@@ -63,7 +56,7 @@ public class Robot extends LoggedRobot {
             }
 
             case SIM -> // Running a physics simulator, log to NT
-            Logger.addDataReceiver(new NT4Publisher());
+                Logger.addDataReceiver(new NT4Publisher());
 
             case REPLAY -> {
                 // Replaying a log, set up replay source
@@ -121,15 +114,20 @@ public class Robot extends LoggedRobot {
     @Override
     @SuppressWarnings("CallToPrintStackTrace")
     public void disabledPeriodic() {
-        String newAutoName;
-        newAutoName = robotContainer.getAutonomousCommand().getName();
-        if (autoName == null ? (newAutoName != null) : !autoName.equals(newAutoName)) {
-            autoName = newAutoName;
-            updateAutoDisplay(autoName);
-        }
+
+        // String newAutoName;
+        // newAutoName = robotContainer.getAutonomousCommand().getName();
+        // if (autoName == null ? (newAutoName != null) : !autoName.equals(newAutoName))
+        // {
+        // autoName = newAutoName;
+        // // updateAutoDisplay(autoName);
+        // }
     }
 
-    /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+    /**
+     * This autonomous runs the autonomous command selected by your
+     * {@link RobotContainer} class.
+     */
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
@@ -176,11 +174,13 @@ public class Robot extends LoggedRobot {
 
     /** This function is called periodically during test mode. */
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+    }
 
     /** This function is called once when the robot is first started up. */
     @Override
-    public void simulationInit() {}
+    public void simulationInit() {
+    }
 
     /** This function is called periodically whilst in simulation. */
     @Override
@@ -195,26 +195,27 @@ public class Robot extends LoggedRobot {
                 .isPresent();
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
-    public void updateAutoDisplay(String name) {
-        if (AutoBuilder.getAllAutoNames().contains(name)) {
-            System.out.println("Displaying " + name);
-            List<PathPlannerPath> pathPlannerPaths;
-            try {
-                pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(name);
+    // @SuppressWarnings("CallToPrintStackTrace")
+    // public void updateAutoDisplay(String name) {
+    // if (AutoBuilder.getAllAutoNames().contains(name)) {
+    // System.out.println("Displaying " + name);
+    // List<PathPlannerPath> pathPlannerPaths;
+    // try {
+    // pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(name);
 
-                List<Pose2d> poses = new ArrayList<>();
-                for (PathPlannerPath path : pathPlannerPaths) {
-                    poses.addAll(path.getAllPathPoints().stream()
-                            .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
-                            .collect(Collectors.toList()));
-                }
-                autofield.getObject("path").setPoses(poses);
-                robotContainer.resetPose(poses.get(0));
+    // List<Pose2d> poses = new ArrayList<>();
+    // for (PathPlannerPath path : pathPlannerPaths) {
+    // poses.addAll(path.getAllPathPoints().stream()
+    // .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new
+    // Rotation2d()))
+    // .collect(Collectors.toList()));
+    // }
+    // autofield.getObject("path").setPoses(poses);
+    // robotContainer.resetPose(poses.get(0));
 
-            } catch (IOException | org.json.simple.parser.ParseException e) {
-                DriverStation.reportError(e.getMessage(), false);
-            }
-        }
-    }
+    // } catch (IOException | org.json.simple.parser.ParseException e) {
+    // DriverStation.reportError(e.getMessage(), false);
+    // }
+    // }
+    // }
 }

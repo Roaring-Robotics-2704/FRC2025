@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.Auto.Choosers;
+package frc.robot.Auto.networktables;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Auto.Constants.ReefLocations;
+import frc.robot.Auto.constants.ReefLocations;
 
 /** Add your docs here. */
 public class ReefChooser {

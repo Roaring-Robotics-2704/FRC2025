@@ -31,6 +31,7 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+    private static final String VISION_CAMERA_PREFIX = "Vision/Camera";
     private final VisionConsumer consumer;
     private final VisionIO[] io;
     private final VisionIOInputsAutoLogged[] inputs;
@@ -66,7 +67,7 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         for (int i = 0; i < io.length; i++) {
-            io[i].updateInputs(inputs[i]);
+            Logger.processInputs(String.format(VISION_CAMERA_PREFIX + "%d", i), inputs[i]);
             Logger.processInputs(String.format("Vision/Camera%d", i), inputs[i]);
         }
 
@@ -127,8 +128,8 @@ public class Vision extends SubsystemBase {
                 double linearStdDev = linearStdDevBaseline * stdDevFactor;
                 double angularStdDev = angularStdDevBaseline * stdDevFactor;
                 if (observation.type() == PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= linearStdDevMegatag2Factor;
-                    angularStdDev *= angularStdDevMegatag2Factor;
+                    linearStdDev *= LINEAR_STD_DEV_MEGATAG_2_FACTOR;
+                    angularStdDev *= ANGULAR_STD_DEV_MEGATAG_2_FACTOR;
                 }
                 if (cameraIndex < cameraStdDevFactors.length) {
                     linearStdDev *= cameraStdDevFactors[cameraIndex];
@@ -142,13 +143,12 @@ public class Vision extends SubsystemBase {
                         VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
             }
 
-            // Log camera datadata
-            Logger.recordOutput("Vision/Camera" + cameraIndex + "/TagPoses", tagPoses.toArray(Pose3d[]::new));
-            Logger.recordOutput("Vision/Camera" + cameraIndex + "/RobotPoses", robotPoses.toArray(Pose3d[]::new));
+            Logger.recordOutput(VISION_CAMERA_PREFIX + cameraIndex + "/TagPoses", tagPoses.toArray(Pose3d[]::new));
+            Logger.recordOutput(VISION_CAMERA_PREFIX + cameraIndex + "/RobotPoses", robotPoses.toArray(Pose3d[]::new));
             Logger.recordOutput(
-                    "Vision/Camera" + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(Pose3d[]::new));
+                    VISION_CAMERA_PREFIX + cameraIndex + "/RobotPosesAccepted", robotPosesAccepted.toArray(Pose3d[]::new));
             Logger.recordOutput(
-                    "Vision/Camera" + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(Pose3d[]::new));
+                    VISION_CAMERA_PREFIX + cameraIndex + "/RobotPosesRejected", robotPosesRejected.toArray(Pose3d[]::new));
             allTagPoses.addAll(tagPoses);
             allRobotPoses.addAll(robotPoses);
             allRobotPosesAccepted.addAll(robotPosesAccepted);
