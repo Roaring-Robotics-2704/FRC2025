@@ -13,25 +13,33 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 /** Add your docs here. */
 public class ElevatorIOSpark implements ElevatorIO{
 
-	private final SparkMax leftElevator;
-    private final SparkMax rightElevator;
-    private final  PIDController pidController;
+	private final SparkMax leftElevatorMotor;
+    private final SparkMax rightElevatorMotor;
+    private  PIDController pidController;
     private final AnalogEncoder elevatorEncoder;
 
 	public ElevatorIOSpark(){
-		leftElevator = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_1, MotorType.kBrushless);
-		rightElevator = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_2, MotorType.kBrushless);
+		leftElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_1, MotorType.kBrushless);
+		rightElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_2, MotorType.kBrushless);
 		elevatorEncoder = new AnalogEncoder(ElevatorConstants.ANALOG_INPUT);
 		pidController = new PIDController(ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD);
 	}
 
 	@Override
 	public void setElevatorHeight(double height) {
-		
+		//ill figure it out later
 	}
 
 	@Override
-		public void updateInputs(ElevatorIOInputs inputs) {}
+		public void updateInputs(ElevatorIOInputs inputs) {
+			inputs.elevatorConnected = (!leftElevatorMotor.getFaults().can && !rightElevatorMotor.getFaults().can);
+			inputs.elevatorHeight = leftElevatorMotor.getEncoder().getPosition();
+			inputs.elevatorVelocity = leftElevatorMotor.getEncoder().getVelocity();
+			inputs.leftElevatorCurrentAmps = leftElevatorMotor.getOutputCurrent();
+			inputs.rightElevatorCurrentAmps = rightElevatorMotor.getOutputCurrent();
+			inputs.leftElevatorCurrentAmps = leftElevatorMotor.getOutputCurrent();
+			inputs.rightElevatorCurrentAmps = rightElevatorMotor.getOutputCurrent();
+		}
 }
 
 

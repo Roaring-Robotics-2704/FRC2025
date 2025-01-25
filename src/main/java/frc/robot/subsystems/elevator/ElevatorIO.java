@@ -12,8 +12,10 @@ public interface ElevatorIO {
         public boolean elevatorConnected = false;
         public double elevatorHeight = 0.0;
         public double elevatorVelocity = 0.0;
-        public double elevatorAppliedVolts = 0.0;
-        public double elevatorCurrentAmps = 0.0;
+        public double rightElevatorAppliedVolts = 0.0;
+        public double leftElevatorAppliedVolts = 0.0;
+        public double rightElevatorCurrentAmps = 0.0;
+        public double leftElevatorCurrentAmps = 0.0;
     }
 
     /** Updates the set of loggable inputs. */
