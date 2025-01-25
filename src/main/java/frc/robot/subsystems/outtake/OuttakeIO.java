@@ -9,6 +9,7 @@ public interface OuttakeIO {
         public double velocityRadPerSec = 0.0;
         public double voltage = 0.0;
         public double currentAmps = 0.0;
+        public boolean outtakeLoaded= false;
     }
 
     default void setSpeed(double speed) {}
