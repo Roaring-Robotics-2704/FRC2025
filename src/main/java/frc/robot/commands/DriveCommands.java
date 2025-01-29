@@ -202,7 +202,6 @@ public class DriveCommands {
                             double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
                             NumberFormat formatter = new DecimalFormat("#0.00000");
-
                             System.out.println("********** Drive FF Characterization Results **********");
                             System.out.println("\tkS: " + formatter.format(kS));
                             System.out.println("\tkV: " + formatter.format(kV));

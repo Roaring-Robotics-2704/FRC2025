@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,16 +6,14 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.ChutePos;
-import frc.robot.Constants.ScoringPos;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +22,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -52,12 +38,8 @@ public class Robot extends LoggedRobot {
     private final RobotContainer robotContainer;
     private final Field2d autofield = new Field2d();
     private final Field2d telefield = new Field2d();
+    LoggedPowerDistribution pdh;
     private String autoName;
-    private Timer timer = new Timer();
-
-    private static int scoringMode = 1;
-    private static int pickupMode = 0;
-    private static int chutePos = 0;
 
     public Robot() {
         // Record metadata
@@ -94,6 +76,7 @@ public class Robot extends LoggedRobot {
 
         // Initialize URCL
         Logger.registerURCL(URCL.startExternal());
+        pdh = LoggedPowerDistribution.getInstance(10, ModuleType.kRev);
 
         // Start AdvantageKit logger
         Logger.start();
@@ -104,8 +87,6 @@ public class Robot extends LoggedRobot {
         }
         SmartDashboard.putData("Auto Field", autofield);
         SmartDashboard.putData("teleop Field", telefield);
-        timer.start();
-
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
@@ -140,11 +121,6 @@ public class Robot extends LoggedRobot {
     @Override
     @SuppressWarnings("CallToPrintStackTrace")
     public void disabledPeriodic() {
-        if (timer.hasElapsed(Constants.RECHECK_SECONDS)) {
-            updateAutoDisplay(autoName);
-            timer.restart();
-        }
-
         String newAutoName;
         newAutoName = robotContainer.getAutonomousCommand().getName();
         if (autoName == null ? (newAutoName != null) : !autoName.equals(newAutoName)) {
@@ -217,56 +193,6 @@ public class Robot extends LoggedRobot {
         return DriverStation.getAlliance()
                 .filter(value -> value == DriverStation.Alliance.Red)
                 .isPresent();
-    }
-
-    public static ScoringPos getScoringMode() {
-        return switch (scoringMode) {
-            case 0 -> ScoringPos.Front;
-            case 1 -> ScoringPos.FrontLeft;
-            case 2 -> ScoringPos.FrontRight;
-            case 3 -> ScoringPos.BackLeft;
-            case 4 -> ScoringPos.BackRight;
-            case 5 -> ScoringPos.Back;
-            default -> ScoringPos.Back;
-        };
-    }
-
-    public static void setScoringMode(ScoringPos mode) {
-        switch (mode) {
-            case Front -> scoringMode = 0;
-            case FrontLeft -> scoringMode = 1;
-            case FrontRight -> scoringMode = 2;
-            case BackLeft -> scoringMode = 3;
-            case BackRight -> scoringMode = 4;
-            case Back -> scoringMode = 5;
-            default -> scoringMode = 5;
-        }
-        Logger.recordOutput("ScoringMode", scoringMode);
-    }
-
-    public static ChutePos getChutePos() {
-        return switch (chutePos) {
-            case 0 -> ChutePos.FarLeft;
-            case 1 -> ChutePos.MidLeft;
-            case 2 -> ChutePos.NearLeft;
-            case 3 -> ChutePos.NearRight;
-            case 4 -> ChutePos.MidRight;
-            case 5 -> ChutePos.FarRight;
-            default -> ChutePos.FarRight;
-        };
-    }
-
-    public static void setChutePos(ChutePos pos) {
-        switch (pos) {
-            case FarLeft -> chutePos = 0;
-            case MidLeft -> chutePos = 1;
-            case NearLeft -> chutePos = 2;
-            case NearRight -> chutePos = 3;
-            case MidRight -> chutePos = 4;
-            case FarRight -> chutePos = 5;
-            default -> chutePos = 0;
-        }
-        Logger.recordOutput("ChutePos", chutePos);
     }
 
     @SuppressWarnings("CallToPrintStackTrace")

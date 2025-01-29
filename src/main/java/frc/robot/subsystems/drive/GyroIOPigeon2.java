@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.ODOMETRY_FREQUENCY;
-import static frc.robot.subsystems.drive.DriveConstants.PIGEON_CAN_ID;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -16,16 +15,19 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-    private final Pigeon2 pigeon = new Pigeon2(PIGEON_CAN_ID);
-    private final StatusSignal<Angle> yaw = pigeon.getYaw();
+    private final Pigeon2 pigeon;
+    private final StatusSignal<Angle> yaw;
     private final Queue<Double> yawPositionQueue;
     private final Queue<Double> yawTimestampQueue;
-    private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
+    private final StatusSignal<AngularVelocity> yawVelocity;
 
-    public GyroIOPigeon2() {
+    public GyroIOPigeon2(int canID) {
+        pigeon = new Pigeon2(canID);
+        yaw = pigeon.getYaw();
         pigeon.getConfigurator().apply(new Pigeon2Configuration());
         pigeon.getConfigurator().setYaw(0.0);
         yaw.setUpdateFrequency(ODOMETRY_FREQUENCY);
+        yawVelocity = pigeon.getAngularVelocityZWorld();
         yawVelocity.setUpdateFrequency(50.0);
         pigeon.optimizeBusUtilization();
         yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();

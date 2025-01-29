@@ -2,6 +2,7 @@ package frc.robot.subsystems.outtake;
 
 import org.littletonrobotics.junction.AutoLog;
 
+                                               //Sets up outtake variables
 public interface OuttakeIO {
     @AutoLog
     class OuttakeIOInputs {

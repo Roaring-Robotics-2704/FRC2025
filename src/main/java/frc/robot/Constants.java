@@ -25,9 +25,10 @@ public final class Constants {
     public static final int RECHECK_SECONDS = 12;
 
     public enum TargetHeightPos {
-        Left,
-        Center,
-        Right
+        L1,
+        L2,
+        L3,
+        L4
     }
 
     public enum ScoringPos {

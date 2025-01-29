@@ -4,18 +4,20 @@
 
 package frc.robot.subsystems.outtake;
 import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_SPEED;
+import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_TIME;
 import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_SPEED;
+import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_TIME;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
-    private OuttakeIO outtake;
+    private OuttakeIO outtake; //Creates a new outtake
 
     private final OuttakeIOInputsAutoLogged outtakeInputs = new OuttakeIOInputsAutoLogged();
 
-    /** Creates a new Outtake. */
+                            // Defines the new outtake
     public Outtake(OuttakeIO outtake) {
         this.outtake = outtake;
     }
@@ -26,14 +28,18 @@ public class Outtake extends SubsystemBase {
 
     }
 
-    Command outtakeCommand(){
+    Command outtakeOutCmd(){    //Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
 
-        return new RunCommand(()-> outtake.setSpeed(OUTTAKE_SPEED));
+        return new RunCommand(()-> outtake.setSpeed(OUTTAKE_SPEED)).repeatedly().withTimeout(OUTTAKE_TIME);
     }
 
-    Command intakeCommand(){
+    Command outtakeInCmd(){
 
-        return new RunCommand(()-> outtake.setSpeed(INTAKE_SPEED));
+        return new RunCommand(()-> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
     }
 
+    Command outtakeOutSlowCmd(){    //Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+
+        return new RunCommand(()-> outtake.setSpeed(OUTTAKE_SPEED*.5)).repeatedly().withTimeout(OUTTAKE_TIME*2);
+    }
 }

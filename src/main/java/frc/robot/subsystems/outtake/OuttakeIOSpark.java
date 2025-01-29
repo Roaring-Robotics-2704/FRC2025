@@ -4,11 +4,14 @@ import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_ID;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.revrobotics.spark.SparkMax;
 import frc.robot.subsystems.outtake.OuttakeConstants.*;
 import frc.robot.subsystems.outtake.OuttakeIO.OuttakeIOInputs;
+
+//Defines the Outtake Class for spark motors and its prtoperties 
 
 public class OuttakeIOSpark implements OuttakeIO {
     private SparkMax motor;
