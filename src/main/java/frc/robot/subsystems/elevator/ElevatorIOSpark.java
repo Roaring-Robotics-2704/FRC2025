@@ -5,6 +5,9 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import static edu.wpi.first.units.Units.Inches;
+
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
 
@@ -23,11 +26,14 @@ public class ElevatorIOSpark implements ElevatorIO{
 		rightElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_2, MotorType.kBrushless);
 		elevatorEncoder = new AnalogEncoder(ElevatorConstants.ANALOG_INPUT);
 		pidController = new PIDController(ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD);
+		pidController.enableContinuousInput(-Math.PI, Math.PI);
 	}
 
 	@Override
 	public void setElevatorHeight(double height) {
-		//ill figure it out later
+		leftElevatorMotor.set(pidController.calculate(elevatorEncoder.get(), height));
+		rightElevatorMotor.set(pidController.calculate(elevatorEncoder.get(), height));
+		//figure out if .get() returns radians or vertical distance
 	}
 
 	@Override
