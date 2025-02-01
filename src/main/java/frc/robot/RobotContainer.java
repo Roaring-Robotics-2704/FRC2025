@@ -30,10 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.auto.networktables.ReefChooser;
 import frc.robot.auto.networktables.SourceChooser;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -66,8 +64,8 @@ public class RobotContainer {
     private final Vision vision;
     private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
-    private static ReefChooser reefChooser = new ReefChooser();
-    private DynamicAuto dynamicAuto;
+    // private static ReefChooser reefChooser = new ReefChooser();
+    // private DynamicAuto dynamicAuto;
 
     private static SwerveDriveSimulation driveSimulation = null;
 
@@ -93,7 +91,7 @@ public class RobotContainer {
                         drive, new VisionIOLimelight(VisionConstants.CAMERA_0_NAME, drive::getRotation)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
-                dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
                 elevator = new Elevator(new ElevatorIOSim());
@@ -115,7 +113,7 @@ public class RobotContainer {
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
                                 CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
-                dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
                 elevator = new Elevator(new ElevatorIO() {});
@@ -123,7 +121,7 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
                 vision = new Vision(drive, new VisionIO() {});
-                dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
         }
 

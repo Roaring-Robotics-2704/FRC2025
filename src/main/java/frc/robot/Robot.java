@@ -31,7 +31,6 @@ public class Robot extends LoggedRobot {
     private final Field2d autofield = new Field2d();
     private final Field2d telefield = new Field2d();
     LoggedPowerDistribution pdh;
-    private String autoName;
 
     public Robot() {
         // Record metadata
