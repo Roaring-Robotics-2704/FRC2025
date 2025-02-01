@@ -45,18 +45,19 @@ public class DynamicAuto extends Command {
 
     @Override
     public void execute() {
-        Command currentCommand = m_selectedCommand;
-        Command nextCommand = getNextCommand(atReef);
-        if (!currentCommand.isFinished()) {
-            currentCommand.execute();
-        } else {
-            currentCommand.cancel();
-            atReef = !atReef;
-            nextCommand = getNextCommand(atReef);
-            nextCommand.initialize();
-            nextCommand.execute();
-        }
-        m_selectedCommand = nextCommand;
+
+        // Command currentCommand = m_selectedCommand;
+        // Command nextCommand = getNextCommand(atReef);
+        // if (!currentCommand.isFinished()) {
+        //     currentCommand.execute();
+        // } else {
+        //     currentCommand.cancel();
+        //     atReef = !atReef;
+        //     nextCommand = getNextCommand(atReef);
+        //     nextCommand.initialize();
+        //     nextCommand.execute();
+        // }
+        // m_selectedCommand = nextCommand;
     }
 
     @Override

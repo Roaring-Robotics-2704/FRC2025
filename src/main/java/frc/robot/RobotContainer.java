@@ -20,6 +20,7 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -68,7 +69,7 @@ public class RobotContainer {
     private static ReefChooser reefChooser = new ReefChooser();
     private DynamicAuto dynamicAuto;
 
-    private SwerveDriveSimulation driveSimulation = null;
+    private static SwerveDriveSimulation driveSimulation = null;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -112,7 +113,8 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                        new VisionIOPhotonVisionSim(
+                                CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
@@ -127,11 +129,12 @@ public class RobotContainer {
 
         // Set up auto routines
 
-        autoChooser = new LoggedDashboardChooser<>(
-                "Auto Choices",
-                AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Boolean.TRUE.equals(Constants.COMPETITION)
-                        ? stream.filter(auto -> auto.getName().startsWith("comp"))
-                        : stream));
+        // autoChooser = new LoggedDashboardChooser<>(
+        //         "Auto Choices",
+        //         AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Boolean.TRUE.equals(Constants.COMPETITION)
+        //                 ? stream.filter(auto -> auto.getName().startsWith("comp"))
+        //                 : stream));
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
@@ -187,7 +190,9 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return dynamicAuto;
+        PathPlannerAuto auto = new PathPlannerAuto(autoChooser.get());
+        return Commands.runOnce(() -> resetSimulationField(auto.getStartingPose()))
+                .andThen(auto);
     }
 
     public void resetSimulationField() {
@@ -198,9 +203,15 @@ public class RobotContainer {
         drive.resetOdometry(new Pose2d(8.125, 7.35, new Rotation2d()));
     }
 
-    public void displaySimFieldToAdvantageScope() {
+    public static void resetSimulationField(Pose2d pose) {
         if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
 
+        driveSimulation.setSimulationWorldPose(pose);
+        // drive.resetOdometry(pose);
+    }
+
+    public void displaySimFieldToAdvantageScope() {
+        if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
