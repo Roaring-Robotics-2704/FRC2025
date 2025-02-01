@@ -26,14 +26,15 @@ public class VisionConstants {
     public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     // Camera names, must match names configured on coprocessor
-    public static final String CAMERA_0_NAME = "apriltag_0";
-    public static final String CAMERA_1_NAME = "camera_1";
+    public static final String CAMERA_0_NAME = "camera_1";
+    public static final String CAMERA_1_NAME = "camera_2";
+    public static final String CAMERA_2_NAME = "camera_3";
+    public static final String CAMERA_3_NAME = "camera_4";
 
     // Robot to camera transforms
     // (Not used by Limelight, configure in web UI instead)
-    public static final Transform3d robotToCamera0 =
-            new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, Units.degreesToRadians(-35), 0.0));
-    public static final Transform3d robotToCamera1 = new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+    public static final Transform3d robotToCamera0 = new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -Units.degreesToRadians(0), 0.0));
+    public static final Transform3d robotToCamera1 = new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -Units.degreesToRadians(0), Math.PI));
 
     // Basic filtering thresholds
     public static final double MAX_AMBIGUITY = 0.3;
@@ -53,5 +54,6 @@ public class VisionConstants {
 
     // Multipliers to apply for MegaTag 2 observations
     public static final double LINEAR_STD_DEV_MEGATAG_2_FACTOR = 0.5; // More stable than full 3D solve
-    public static final double ANGULAR_STD_DEV_MEGATAG_2_FACTOR = Double.POSITIVE_INFINITY; // No rotation data available
+    public static final double ANGULAR_STD_DEV_MEGATAG_2_FACTOR =
+            Double.POSITIVE_INFINITY; // No rotation data available
 }

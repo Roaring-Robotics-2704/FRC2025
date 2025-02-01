@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -20,10 +21,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
 /**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as
- * described in the TimedRobot documentation. If you change the name of this
- * class or the package after creating this
+ * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
+ * described in the TimedRobot documentation. If you change the name of this class or the package after creating this
  * project, you must also update the build.gradle file in the project.
  */
 public class Robot extends LoggedRobot {
@@ -56,7 +55,7 @@ public class Robot extends LoggedRobot {
             }
 
             case SIM -> // Running a physics simulator, log to NT
-                Logger.addDataReceiver(new NT4Publisher());
+            Logger.addDataReceiver(new NT4Publisher());
 
             case REPLAY -> {
                 // Replaying a log, set up replay source
@@ -107,6 +106,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit() {
+        PathfindingCommand.warmupCommand();
         robotContainer.resetSimulationField();
     }
 
@@ -124,10 +124,7 @@ public class Robot extends LoggedRobot {
         // }
     }
 
-    /**
-     * This autonomous runs the autonomous command selected by your
-     * {@link RobotContainer} class.
-     */
+    /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
@@ -174,13 +171,11 @@ public class Robot extends LoggedRobot {
 
     /** This function is called periodically during test mode. */
     @Override
-    public void testPeriodic() {
-    }
+    public void testPeriodic() {}
 
     /** This function is called once when the robot is first started up. */
     @Override
-    public void simulationInit() {
-    }
+    public void simulationInit() {}
 
     /** This function is called periodically whilst in simulation. */
     @Override
