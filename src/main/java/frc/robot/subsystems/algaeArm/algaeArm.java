@@ -7,9 +7,13 @@ package frc.robot.subsystems.algaeArm;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 
 public class AlgaeArm extends SubsystemBase {
     private AlgaeArmIO algaeArmIO;
+    private final AlgaeArmIOInputsAutoLogged inputs = new AlgaeArmIOInputsAutoLogged();
+
+    
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
@@ -19,26 +23,9 @@ public class AlgaeArm extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        algaeArmIO.updateInputs(inputs);
     }
-
-    Command pivotCommand() {
-
-        int pivotChecker = 0;
-        pivotChecker++;
-        if ((pivotChecker % 2) == 0) {
-            return new RunCommand(() -> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED))
-                    .repeatedly()
-                    .withTimeout(1);
-        } else {
-            return new RunCommand(() -> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED * -1))
-                    .repeatedly()
-                    .withTimeout(1);
-        }
-    }
-
-    Command rollerCommand() {
-        return new RunCommand(() -> algaeArmIO.setRollerSpeed(AlgaeArmConstants.ROLLERS_SPEED))
-                .repeatedly()
-                .withTimeout(1);
+    public void setPivotAngle(Double angle) {
+        algaeArmIO.setAlgaeArmPosition(angle);
     }
 }
