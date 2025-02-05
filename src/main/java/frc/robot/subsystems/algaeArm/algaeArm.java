@@ -9,36 +9,36 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeArm extends SubsystemBase {
-  private AlgaeArmIO algaeArmIO;
-
-
+    private AlgaeArmIO algaeArmIO;
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
     }
-    
 
-  /** Creates a new algaeArm. */
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  } 
-
-  Command pivotCommand() {
-
-    int pivotChecker= 0;
-    pivotChecker++;
-    if((pivotChecker % 2)== 0){
-    return new RunCommand(()-> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED)).repeatedly().withTimeout(1);
+    /** Creates a new algaeArm. */
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
     }
 
-    else{
-    return new RunCommand(()-> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED*-1)).repeatedly().withTimeout(1);
-    }
-  } 
+    Command pivotCommand() {
 
-  Command rollerCommand() {
-    return new RunCommand(()-> algaeArmIO.setRollerSpeed(AlgaeArmConstants.ROLLERS_SPEED)).repeatedly().withTimeout(1);
-  }
+        int pivotChecker = 0;
+        pivotChecker++;
+        if ((pivotChecker % 2) == 0) {
+            return new RunCommand(() -> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED))
+                    .repeatedly()
+                    .withTimeout(1);
+        } else {
+            return new RunCommand(() -> algaeArmIO.setAlgaeArmPosition(AlgaeArmConstants.PIVOT_SPEED * -1))
+                    .repeatedly()
+                    .withTimeout(1);
+        }
+    }
+
+    Command rollerCommand() {
+        return new RunCommand(() -> algaeArmIO.setRollerSpeed(AlgaeArmConstants.ROLLERS_SPEED))
+                .repeatedly()
+                .withTimeout(1);
+    }
 }
