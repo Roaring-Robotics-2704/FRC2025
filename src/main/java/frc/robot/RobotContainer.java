@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -20,7 +22,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,10 +29,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.auto.networktables.SourceChooser;
-import frc.robot.commands.DriveCommands;
+import frc.robot.auto.reef.Branch.Level;
+import frc.robot.auto.reef.Reef;
+import frc.robot.auto.source.SourceChooser;
+import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -71,6 +75,7 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
+    private Reef reef = new Reef();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -159,6 +164,7 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        elevator.setDefaultCommand(new RunCommand(() -> elevator.setSetpoint(Inches.of(12)), elevator));
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
@@ -188,9 +194,18 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        PathPlannerAuto auto = new PathPlannerAuto(autoChooser.get());
-        return Commands.runOnce(() -> resetSimulationField(auto.getStartingPose()))
-                .andThen(auto);
+        // PathPlannerAuto auto = new PathPlannerAuto(autoChooser.get());
+        // return Commands.runOnce(() -> resetSimulationField(auto.getStartingPose()))
+        //         .andThen(auto);
+        if (AutoBuilder.isPathfindingConfigured()) {
+            System.out.println("Pathfinding configured");
+            AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS)
+                    .addRequirements(drive);
+            return AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS);
+        } else {
+            System.out.println("Pathfinding not configured");
+            return autoChooser.get();
+        }
     }
 
     public void resetSimulationField() {

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.auto.constants;
+package frc.robot.auto.reef;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -11,6 +11,7 @@ public class Branch {
     private Boolean L4 = false;
     private Boolean L3 = false;
     private Boolean L2 = false;
+    private Boolean L1 = false;
     private Pose2d pose;
     Side side = null;
 
@@ -27,7 +28,8 @@ public class Branch {
     public enum Level {
         L4,
         L3,
-        L2
+        L2,
+        L1
     }
 
     public Side getSide() {
@@ -45,6 +47,9 @@ public class Branch {
             case L2:
                 L2 = status;
                 break;
+            case L1:
+                L1 = status;
+                break;
         }
     }
 
@@ -56,6 +61,8 @@ public class Branch {
                 return L3;
             case L2:
                 return L2;
+            case L1:
+                return false;
             default:
                 return false;
         }
