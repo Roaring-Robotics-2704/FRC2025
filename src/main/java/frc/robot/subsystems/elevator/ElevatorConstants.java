@@ -6,17 +6,16 @@ package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogAccelerometer;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 /** Add your docs here. */
 public class ElevatorConstants {
+    private ElevatorConstants() {}
 
     // Motor IDs
     public static final int ELEVATOR_MOTOR_1 = 12;
     public static final int ELEVATOR_MOTOR_2 = 13;
-	public static final AnalogInput ANALOG_INPUT = new AnalogInput(0);
+    public static final AnalogInput ANALOG_INPUT = new AnalogInput(0);
 
     // Encoder ports
     public static final int ENCODER_A = 0;

@@ -1,9 +1,7 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -21,21 +19,15 @@ public interface ElevatorIO {
     /** Updates the set of loggable inputs. */
     default void updateInputs(ElevatorIOInputs inputs) {}
 
-    default void setElevatorHeight(double outputs) {}
+    default void setElevatorPosition(double outputs) {}
 
     default void setElevatorVelocity(double velocityRadperSec) {}
 
-    default void runVolts(Voltage volts) {}
-    ;
+    default void runVolts(Voltage volts) {};
 
-    default void runSetpoint(Distance position) {}
-    ;
+    default void runSetpoint(Distance position) {};
 
-    default void stop() {}
-    ;
+    default void stop() {};
 
-    default void init() {}
-    ;
+    default void init() {};
 }
-  
-

@@ -56,7 +56,6 @@ public class Robot extends LoggedRobot {
     private Timer timer = new Timer();
 
     private static int scoringMode = 1;
-    private static int pickupMode = 0;
     private static int chutePos = 0;
 
     public Robot() {
@@ -281,7 +280,7 @@ public class Robot extends LoggedRobot {
                 for (PathPlannerPath path : pathPlannerPaths) {
                     poses.addAll(path.getAllPathPoints().stream()
                             .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
-                            .collect(Collectors.toList()));
+                            .toList());
                 }
                 autofield.getObject("path").setPoses(poses);
                 robotContainer.resetPose(poses.get(0));
