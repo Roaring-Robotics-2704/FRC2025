@@ -26,7 +26,7 @@ public class Reef {
         faces[5] = new Face(FR_LEFT, FR_RIGHT);
     }
 
-    class Face {
+    public class Face {
         Branch rightBranch;
         Branch leftBranch;
         Boolean isSelected = true;
@@ -51,6 +51,15 @@ public class Reef {
         public Boolean getSelected() {
             return isSelected;
         }
+    }
+
+    public enum Faces {
+        FRONT,
+        FRONT_LEFT,
+        FRONT_RIGHT,
+        BACK_LEFT,
+        BACK_RIGHT,
+        BACK
     }
 
     public Branch[] checkHeightAvailability(Level level) {
@@ -95,28 +104,28 @@ public class Reef {
     }
 
     // Front Left Reef locations
-    public static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60));
-    public static final Pose2d FL_LEFT = new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60));
+    private static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60));
+    private static final Pose2d FL_LEFT = new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60));
 
     // Front Reef locations
-    public static final Pose2d F_LEFT = new Pose2d(3.2, 4.19, Rotation2d.fromDegrees(0));
-    public static final Pose2d F_RIGHT = new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0));
+    private static final Pose2d F_LEFT = new Pose2d(3.2, 4.19, Rotation2d.fromDegrees(0));
+    private static final Pose2d F_RIGHT = new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0));
 
     // Front Right Reef locations
-    public static final Pose2d FR_LEFT = new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60));
-    public static final Pose2d FR_RIGHT = new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60));
+    private static final Pose2d FR_LEFT = new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60));
+    private static final Pose2d FR_RIGHT = new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60));
 
     // Back Left Reef locations
-    public static final Pose2d BL_LEFT = new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120));
-    public static final Pose2d BL_RIGHT = new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120));
+    private static final Pose2d BL_LEFT = new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120));
+    private static final Pose2d BL_RIGHT = new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120));
 
     // Back Reef locations
-    public static final Pose2d B_LEFT = new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180));
-    public static final Pose2d B_RIGHT = new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180));
+    private static final Pose2d B_LEFT = new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180));
+    private static final Pose2d B_RIGHT = new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180));
 
     // Back Right Reef locations
-    public static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120));
-    public static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120));
+    private static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120));
+    private static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120));
 
     // private static CoralStatus[] getHeightPriority(CoralStatus priority1) {
     //     // CoralStatus[] priorities = {CoralStatus.L3, CoralStatus.L2, CoralStatus.L1,
@@ -139,5 +148,22 @@ public class Reef {
         } else {
             return Level.L3;
         }
+    }
+
+    public Face getReefSide(Faces face) {
+        if (face == Faces.FRONT) {
+            return faces[0];
+        } else if (face == Faces.FRONT_LEFT) {
+            return faces[1];
+        } else if (face == Faces.BACK_LEFT){
+            return faces[2];
+        } else if (face == Faces.BACK) {
+            return faces[3];
+        } else if (face == Faces.BACK_RIGHT) {
+            return faces[4];
+        } else if (face == Faces.FRONT_RIGHT) {
+            return faces[5];
+        } else return faces[0];
+        
     }
 }

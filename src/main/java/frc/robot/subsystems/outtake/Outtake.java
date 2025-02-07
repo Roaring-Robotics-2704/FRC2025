@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.outtake;
+
 import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_SPEED;
 import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_TIME;
 import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_SPEED;
@@ -13,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
-    private OuttakeIO outtake; //Creates a new outtake
+    private OuttakeIO outtake; // Creates a new outtake
 
     private final OuttakeIOInputsAutoLogged outtakeInputs = new OuttakeIOInputsAutoLogged();
 
-                            // Defines the new outtake
+    // Defines the new outtake
     public Outtake(OuttakeIO outtake) {
         this.outtake = outtake;
     }
@@ -28,18 +29,23 @@ public class Outtake extends SubsystemBase {
 
     }
 
-    Command outtakeOutCmd(){    //Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+    Command outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
 
-        return new RunCommand(()-> outtake.setSpeed(OUTTAKE_SPEED)).repeatedly().withTimeout(OUTTAKE_TIME);
+        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
+                .repeatedly()
+                .withTimeout(OUTTAKE_TIME);
     }
 
-    Command outtakeInCmd(){
+    Command outtakeInCmd() {
 
-        return new RunCommand(()-> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
+        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
     }
 
-    Command outtakeOutSlowCmd(){    //Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+    Command outtakeOutSlowCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
+        // change)
 
-        return new RunCommand(()-> outtake.setSpeed(OUTTAKE_SPEED*.5)).repeatedly().withTimeout(OUTTAKE_TIME*2);
+        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED * .5))
+                .repeatedly()
+                .withTimeout(OUTTAKE_TIME * 2);
     }
 }
