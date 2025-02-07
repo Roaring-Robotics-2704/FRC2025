@@ -23,29 +23,4 @@ public final class Constants {
     }
 
     public static final int RECHECK_SECONDS = 12;
-
-    public enum TargetHeightPos {
-        L1,
-        L2,
-        L3,
-        L4
-    }
-
-    public enum ScoringPos {
-        Back,
-        BackLeft,
-        BackRight,
-        FrontLeft,
-        FrontRight,
-        Front
-    }
-
-    public enum ChutePos {
-        FarLeft,
-        MidLeft,
-        NearLeft,
-        FarRight,
-        MidRight,
-        NearRight
-    }
 }

@@ -55,5 +55,6 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     public void updateInputs(VisionIOInputs inputs) {
         visionSim.update(poseSupplier.get());
         super.updateInputs(inputs);
+        inputs.connected = true;
     }
 }

@@ -49,7 +49,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
         Voltage controllerVoltage = Volts.of(controller.calculate(currentHeight.in(Inches), position.in(Inches)));
 
-        runVolts(controllerVoltage);
+        runVolts(Volts.zero().minus(controllerVoltage));
     }
 
     @Override

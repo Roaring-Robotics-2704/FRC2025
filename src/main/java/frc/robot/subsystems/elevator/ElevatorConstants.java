@@ -27,7 +27,7 @@ public class ElevatorConstants {
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(50);
     // PID Constants
-    public static final double ELEVATOR_KP = 0.0;
+    public static final double ELEVATOR_KP = 10;
     public static final double ELEVATOR_KI = 0.0;
     public static final double ELEVATOR_KD = 0.0;
     public static final double ELEVATOR_KS = 0.0;
