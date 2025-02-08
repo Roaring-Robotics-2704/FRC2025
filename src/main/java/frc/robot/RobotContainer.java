@@ -40,9 +40,6 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -62,7 +59,6 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
-    private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
@@ -81,7 +77,6 @@ public class RobotContainer {
         switch (Constants.CURRENT_MODE) {
             case REAL -> {
                 // Real robot, instantiate hardware IO implementations
-                this.elevator = new Elevator(new ElevatorIOSim());
                 drive = new Drive(
                         new GyroIOPigeon2(DriveConstants.PIGEON_CAN_ID),
                         new ModuleIOSpark(0),
@@ -95,7 +90,6 @@ public class RobotContainer {
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
-                elevator = new Elevator(new ElevatorIOSim());
                 // create a maple-sim swerve drive simulation instance
                 this.driveSimulation =
                         new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
@@ -117,7 +111,6 @@ public class RobotContainer {
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
-                elevator = new Elevator(new ElevatorIO() {});
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
@@ -159,7 +152,6 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        elevator.setDefaultCommand(new RunCommand(() -> elevator.setSetpoint(Inches.of(12)), elevator));
         // Default command, normal field-relative drive
 
         drive.setDefaultCommand(DriveCommands.joystickDrive(
