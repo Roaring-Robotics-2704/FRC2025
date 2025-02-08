@@ -1,10 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -14,10 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -39,7 +30,6 @@ public class Robot extends LoggedRobot {
     private final Field2d autofield = new Field2d();
     private final Field2d telefield = new Field2d();
     LoggedPowerDistribution pdh;
-    private String autoName;
 
     public Robot() {
         // Record metadata
@@ -121,12 +111,14 @@ public class Robot extends LoggedRobot {
     @Override
     @SuppressWarnings("CallToPrintStackTrace")
     public void disabledPeriodic() {
-        String newAutoName;
-        newAutoName = robotContainer.getAutonomousCommand().getName();
-        if (autoName == null ? (newAutoName != null) : !autoName.equals(newAutoName)) {
-            autoName = newAutoName;
-            updateAutoDisplay(autoName);
-        }
+
+        // String newAutoName;
+        // newAutoName = robotContainer.getAutonomousCommand().getName();
+        // if (autoName == null ? (newAutoName != null) : !autoName.equals(newAutoName))
+        // {
+        // autoName = newAutoName;
+        // // updateAutoDisplay(autoName);
+        // }
     }
 
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -195,26 +187,27 @@ public class Robot extends LoggedRobot {
                 .isPresent();
     }
 
-    @SuppressWarnings("CallToPrintStackTrace")
-    public void updateAutoDisplay(String name) {
-        if (AutoBuilder.getAllAutoNames().contains(name)) {
-            System.out.println("Displaying " + name);
-            List<PathPlannerPath> pathPlannerPaths;
-            try {
-                pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(name);
+    // @SuppressWarnings("CallToPrintStackTrace")
+    // public void updateAutoDisplay(String name) {
+    // if (AutoBuilder.getAllAutoNames().contains(name)) {
+    // System.out.println("Displaying " + name);
+    // List<PathPlannerPath> pathPlannerPaths;
+    // try {
+    // pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(name);
 
-                List<Pose2d> poses = new ArrayList<>();
-                for (PathPlannerPath path : pathPlannerPaths) {
-                    poses.addAll(path.getAllPathPoints().stream()
-                            .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new Rotation2d()))
-                            .collect(Collectors.toList()));
-                }
-                autofield.getObject("path").setPoses(poses);
-                robotContainer.resetPose(poses.get(0));
+    // List<Pose2d> poses = new ArrayList<>();
+    // for (PathPlannerPath path : pathPlannerPaths) {
+    // poses.addAll(path.getAllPathPoints().stream()
+    // .map(point -> new Pose2d(point.position.getX(), point.position.getY(), new
+    // Rotation2d()))
+    // .collect(Collectors.toList()));
+    // }
+    // autofield.getObject("path").setPoses(poses);
+    // robotContainer.resetPose(poses.get(0));
 
-            } catch (IOException | org.json.simple.parser.ParseException e) {
-                DriverStation.reportError(e.getMessage(), false);
-            }
-        }
-    }
+    // } catch (IOException | org.json.simple.parser.ParseException e) {
+    // DriverStation.reportError(e.getMessage(), false);
+    // }
+    // }
+    // }
 }

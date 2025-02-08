@@ -51,15 +51,15 @@ public class DriveConstants {
     // Drive motor configuration
     public static final int DRIVE_CURRENT_LIMIT = 60;
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.5); // meters
-    public static final double DRIVE_REDUCTION =
-            (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+    public static final double DRIVE_REDUCTION = (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
+    // and 22 spur teeth
     public static final DCMotor DRIVE_GEARBOX = DCMotor.getNEO(1);
 
     // Drive encoder configuration
-    public static final double DRIVE_POSITION_FACTOR =
-            2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel Radians
-    public static final double DRIVE_VELOCITY_FACTOR =
-            (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel Rad/Sec
+    public static final double DRIVE_POSITION_FACTOR = 2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel
+    // Radians
+    public static final double DRIVE_VELOCITY_FACTOR = (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel
+    // Rad/Sec
 
     // Drive PID configuration
     public static final double DRIVE_KP = 0.0;
@@ -120,5 +120,6 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI);
+    public static final PathConstraints CONSTRAINTS =
+            new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 }

@@ -6,11 +6,10 @@ import static frc.robot.subsystems.drive.DriveConstants.MAX_SPEED;
 import static frc.robot.subsystems.drive.DriveConstants.moduleTranslations;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -36,8 +35,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -97,17 +96,15 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 local()::resetOdometry,
                 local()::getChassisSpeeds,
                 local()::runVelocity,
-                new PPHolonomicDriveController(new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+                new PPHolonomicDriveController(new PIDConstants(7.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
                 local().ppconfig,
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 local());
-        Pathfinding.setPathfinder(new LocalADStarAK());
+        Pathfinding.setPathfinder(new LocalADStar());
         PathPlannerLogging.setLogActivePathCallback(
                 activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
         PathPlannerLogging.setLogTargetPoseCallback(
                 targetPose -> Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose));
-        FollowPathCommand.warmupCommand().schedule();
-        PathfindingCommand.warmupCommand().schedule();
 
         // Configure SysId
         sysId = new SysIdRoutine(
@@ -187,6 +184,26 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
      */
     public void runVelocity(ChassisSpeeds speeds) {
         // Calculate module setpoints
+        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
+
+        // Log unoptimized setpoints
+        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+        Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);
+
+        // Send setpoints to modules
+        for (int i = 0; i < 4; i++) {
+            modules[i].runSetpoint(setpointStates[i]);
+        }
+
+        // Log optimized setpoints (runSetpoint mutates each state)
+        Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    }
+
+    public void runVelocityInverted(ChassisSpeeds speeds) {
+        // Calculate module setpoints
+        speeds = new ChassisSpeeds().minus(speeds);
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
@@ -296,6 +313,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     /** Resets the current odometry pose. */
     public void resetOdometry(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
+            RobotContainer.resetSimulationField(pose);
+        }
     }
 
     /** Adds a new timestamped vision measurement. */

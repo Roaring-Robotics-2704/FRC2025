@@ -7,7 +7,6 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 /** Add your docs here. */
 public class PoseUtil {
@@ -15,11 +14,11 @@ public class PoseUtil {
     private PoseUtil() {}
 
     public static Pose2d offsetPose(Pose2d originalPose, double relXOffset, double relYOffset) {
-        Transform2d transform2d =
-                new Transform2d(new Translation2d(relXOffset, relYOffset), originalPose.getRotation());
 
-        // Apply the rotated offset to the original pose's translation
-        return originalPose.plus(transform2d);
+        Transform2d transform = new Transform2d(relXOffset, relYOffset, new Rotation2d());
+
+        // Apply the transform to the original pose
+        return originalPose.plus(transform);
     }
 
     public static Pose2d averagePose(Pose2d pose1, Pose2d pose2) {
