@@ -1,5 +1,8 @@
 package frc.robot.commands.drive;
 
+import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -275,5 +278,9 @@ public class DriveCommands {
         private double[] positions = new double[4];
         private Rotation2d lastAngle = new Rotation2d();
         private double gyroDelta = 0.0;
+    }
+
+    public static Command pathfindPose(Supplier<Pose2d> pose) {
+        return AutoBuilder.pathfindToPose(pose.get(), CONSTRAINTS);
     }
 }

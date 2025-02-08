@@ -14,7 +14,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 
@@ -31,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
+import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -113,7 +113,7 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
                 // new VisionIOPhotonVisionSim(
-                //         CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
@@ -129,10 +129,11 @@ public class RobotContainer {
         // Set up auto routines
 
         // autoChooser = new LoggedDashboardChooser<>(
-        //         "Auto Choices",
-        //         AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Boolean.TRUE.equals(Constants.COMPETITION)
-        //                 ? stream.filter(auto -> auto.getName().startsWith("comp"))
-        //                 : stream));
+        // "Auto Choices",
+        // AutoBuilder.buildAutoChooserWithOptionsModifier(stream ->
+        // Boolean.TRUE.equals(Constants.COMPETITION)
+        // ? stream.filter(auto -> auto.getName().startsWith("comp"))
+        // : stream));
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
@@ -175,8 +176,12 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
         // gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        controller.y().whileTrue(AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS));
-        controller.a().whileTrue(AutoBuilder.pathfindToPose(sourceChooser.getSourcePose(), CONSTRAINTS));
+
+        controller.a().whileTrue(DriveCommands.pathfindPose(sourceChooser::getSourcePose));
+        controller
+                .y()
+                .whileTrue(
+                        DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
     }
 
     /**
@@ -185,7 +190,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return new DynamicAuto(reef, sourceChooser).repeatedly();
     }
 
     public void resetSimulationField() {
@@ -193,6 +198,7 @@ public class RobotContainer {
 
         driveSimulation.setSimulationWorldPose(new Pose2d(8.125, 7.35, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
+
         drive.resetOdometry(new Pose2d(8.125, 7.35, new Rotation2d()));
     }
 
