@@ -1,5 +1,8 @@
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
+import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -17,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.text.DecimalFormat;
@@ -62,9 +66,9 @@ public class DriveCommands {
                     // Get linear velocity
                     Translation2d linearVelocity =
                             getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
+                    linearVelocity = linearVelocity.times(Constants.DRIVE_SPEED);
                     // Apply rotation deadband
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * Constants.TURN_SPEED;
 
                     // Square rotation value for more precise control
                     omega = Math.copySign(omega * omega, omega);
@@ -202,7 +206,6 @@ public class DriveCommands {
                             double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
                             NumberFormat formatter = new DecimalFormat("#0.00000");
-
                             System.out.println("********** Drive FF Characterization Results **********");
                             System.out.println("\tkS: " + formatter.format(kS));
                             System.out.println("\tkV: " + formatter.format(kV));
@@ -275,5 +278,9 @@ public class DriveCommands {
         private double[] positions = new double[4];
         private Rotation2d lastAngle = new Rotation2d();
         private double gyroDelta = 0.0;
+    }
+
+    public static Command pathfindPose(Supplier<Pose2d> pose) {
+        return AutoBuilder.pathfindToPose(pose.get(), CONSTRAINTS);
     }
 }
