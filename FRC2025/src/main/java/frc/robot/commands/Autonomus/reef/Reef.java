@@ -1,16 +1,11 @@
 package frc.robot.commands.Autonomus.reef;
 
-import frc.robot.Locations.ReefChooser;
-import frc.robot.Locations.ReefLocations;
-import frc.robot.commands.Autonomus.reef.Branch.Level;
-import frc.robot.commands.Autonomus.reef.Branch.Side;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import frc.robot.commands.Autonomus.reef.Branch.Level;
+import frc.robot.commands.Autonomus.reef.Branch.Side;
 import java.util.ArrayList;
 import java.util.List;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Reef {
@@ -145,5 +140,4 @@ public class Reef {
             return Level.L3;
         }
     }
-    
 }
