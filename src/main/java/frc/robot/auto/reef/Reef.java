@@ -2,14 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.auto.constants;
+package frc.robot.auto.reef;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.auto.constants.Branch.Level;
-import frc.robot.auto.constants.Branch.Side;
+import frc.robot.auto.reef.Branch.Level;
+import frc.robot.auto.reef.Branch.Side;
 import java.util.ArrayList;
 import java.util.List;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Add your docs here. */
 public class Reef {
@@ -17,6 +18,7 @@ public class Reef {
 
     // Private constructor to hide the implicit public one
     public Reef() {
+
         faces[0] = new Face(F_LEFT, F_RIGHT);
         faces[1] = new Face(FL_LEFT, FL_RIGHT);
         faces[2] = new Face(BL_LEFT, BL_RIGHT);
@@ -58,10 +60,10 @@ public class Reef {
             if (face.getSelected()) {
                 Branch rightBranch = face.getBranch(Side.RIGHT);
                 Branch leftBranch = face.getBranch(Side.LEFT);
-                if (rightBranch.getCoralStatus(level)) {
+                if (!rightBranch.getCoralStatus(level)) {
                     branches.add(rightBranch);
                 }
-                if (leftBranch.getCoralStatus(level)) {
+                if (!leftBranch.getCoralStatus(level)) {
                     branches.add(leftBranch);
                 }
             }
@@ -83,11 +85,32 @@ public class Reef {
         return closestBranch;
     }
 
+    @AutoLogOutput
     public Pose2d getclosestPose(Pose2d currentPose, Level level) {
-        return getClosestBranch(currentPose, checkHeightAvailability(level)).getPose();
+        Level currentLevel = level;
+        Branch[] branches = checkHeightAvailability(currentLevel);
+        while (branches.length == 0) {
+            currentLevel = getLesserLevel(currentLevel);
+            branches = checkHeightAvailability(currentLevel);
+        }
+        System.out.println(getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .getPose()
+                .toString());
+        return getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .getPose();
     }
 
-    
+    public Branch getclosestBranch2(Pose2d currentPose, Level level) {
+        Level currentLevel = level;
+        Branch[] branches = checkHeightAvailability(currentLevel);
+        while (branches.length == 0) {
+            currentLevel = getLesserLevel(currentLevel);
+            branches = checkHeightAvailability(currentLevel);
+        }
+        System.out.println(getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .toString());
+        return getClosestBranch(currentPose, checkHeightAvailability(currentLevel));
+    }
 
     // Front Left Reef locations
     public static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60));
@@ -122,17 +145,17 @@ public class Reef {
     //     return new CoralStatus[] { priority1, priority2, priority3, priority4 };
     // }
 
-    // private static CoralStatus getLesserPriority(CoralStatus priority) {
-    //     if (priority == CoralStatus.L4) {
-    //         return CoralStatus.L3;
-    //     } else if (priority == CoralStatus.L3) {
-    //         return CoralStatus.L2;
-    //     } else if (priority == CoralStatus.L2) {
-    //         return CoralStatus.L1;
-    //     } else if (priority == CoralStatus.L1) {
-    //         return CoralStatus.L4;
-    //     } else {
-    //         return CoralStatus.L3;
-    //     }
-
+    private static Level getLesserLevel(Level priority) {
+        if (priority == Level.L4) {
+            return Level.L3;
+        } else if (priority == Level.L3) {
+            return Level.L2;
+        } else if (priority == Level.L2) {
+            return Level.L4;
+        } else if (priority == Level.L1) {
+            return Level.L4;
+        } else {
+            return Level.L3;
+        }
+    }
 }
