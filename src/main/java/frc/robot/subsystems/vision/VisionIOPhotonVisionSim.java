@@ -41,7 +41,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
 
         // Initialize vision sim
         if (visionSim == null) {
-            visionSim = new VisionSystemSim("main");
+            visionSim = new VisionSystemSim(name);
             visionSim.addAprilTags(TAG_LAYOUT);
         }
 
@@ -55,6 +55,5 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     public void updateInputs(VisionIOInputs inputs) {
         visionSim.update(poseSupplier.get());
         super.updateInputs(inputs);
-        inputs.connected = true;
     }
 }

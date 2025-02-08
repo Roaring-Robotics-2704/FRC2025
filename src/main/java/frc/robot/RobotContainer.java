@@ -14,14 +14,9 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
-import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -30,8 +25,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.auto.networktables.SourceChooser;
-import frc.robot.commands.DriveCommands;
+import frc.robot.auto.reef.Branch.Level;
+import frc.robot.auto.reef.Reef;
+import frc.robot.auto.source.SourceChooser;
+import frc.robot.commands.autonomous.autos.DynamicAuto;
+import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -40,9 +38,6 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -62,7 +57,6 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
-    private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
@@ -71,6 +65,7 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
+    private Reef reef = new Reef();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -80,7 +75,6 @@ public class RobotContainer {
         switch (Constants.CURRENT_MODE) {
             case REAL -> {
                 // Real robot, instantiate hardware IO implementations
-                this.elevator = new Elevator(new ElevatorIOSim());
                 drive = new Drive(
                         new GyroIOPigeon2(DriveConstants.PIGEON_CAN_ID),
                         new ModuleIOSpark(0),
@@ -94,7 +88,6 @@ public class RobotContainer {
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
-                elevator = new Elevator(new ElevatorIOSim());
                 // create a maple-sim swerve drive simulation instance
                 this.driveSimulation =
                         new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
@@ -110,13 +103,12 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
-                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                // new VisionIOPhotonVisionSim(
+                // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
-                elevator = new Elevator(new ElevatorIO() {});
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
@@ -128,10 +120,11 @@ public class RobotContainer {
         // Set up auto routines
 
         // autoChooser = new LoggedDashboardChooser<>(
-        //         "Auto Choices",
-        //         AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Boolean.TRUE.equals(Constants.COMPETITION)
-        //                 ? stream.filter(auto -> auto.getName().startsWith("comp"))
-        //                 : stream));
+        // "Auto Choices",
+        // AutoBuilder.buildAutoChooserWithOptionsModifier(stream ->
+        // Boolean.TRUE.equals(Constants.COMPETITION)
+        // ? stream.filter(auto -> auto.getName().startsWith("comp"))
+        // : stream));
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
@@ -149,8 +142,6 @@ public class RobotContainer {
         // dynamicAuto.schedule();
         // Configure the button bindings
         configureButtonBindings();
-        FollowPathCommand.warmupCommand();
-        PathfindingCommand.warmupCommand();
     }
 
     /**
@@ -160,14 +151,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
+
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-
-        // Lock to 0° when A button is held
-        controller
-                .a()
-                .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), Rotation2d::new));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -180,6 +166,12 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
         // gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+        controller.a().whileTrue(DriveCommands.pathfindPose(sourceChooser::getSourcePose));
+        controller
+                .y()
+                .whileTrue(
+                        DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
     }
 
     /**
@@ -188,9 +180,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        PathPlannerAuto auto = new PathPlannerAuto(autoChooser.get());
-        return Commands.runOnce(() -> resetSimulationField(auto.getStartingPose()))
-                .andThen(auto);
+        return new DynamicAuto(reef, sourceChooser).repeatedly();
     }
 
     public void resetSimulationField() {
@@ -198,6 +188,7 @@ public class RobotContainer {
 
         driveSimulation.setSimulationWorldPose(new Pose2d(8.125, 7.35, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
+
         drive.resetOdometry(new Pose2d(8.125, 7.35, new Rotation2d()));
     }
 
@@ -205,7 +196,6 @@ public class RobotContainer {
         if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(pose);
-        // drive.resetOdometry(pose);
     }
 
     public void displaySimFieldToAdvantageScope() {
