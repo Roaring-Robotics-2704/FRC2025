@@ -17,6 +17,8 @@ public class ChasePose extends Command {
     private Drive swerve;
     private Supplier<Pose2d> desiredPoseSupplier;
     private BooleanSupplier cancelSupplier;
+    private static final double POSITION_TOLERANCE = 0.1; // Example tolerance value
+    private static final double ANGLE_TOLERANCE = 5.0; // Example tolerance value in degrees
 
     /** Creates a new ChasePose. */
     public ChasePose(Drive swerve, Supplier<Pose2d> poseSupplier, BooleanSupplier cancelSupplier) {
@@ -30,7 +32,6 @@ public class ChasePose extends Command {
     public ChasePose(Drive swerve, Supplier<Pose2d> poseSupplier) {
         this(swerve, poseSupplier, () -> false);
     }
-
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
@@ -51,6 +52,14 @@ public class ChasePose extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return cancelSupplier.getAsBoolean(); // TODO add a cancel if robot is at desired pose
+        Pose2d currentPose = AutoBuilder.getCurrentPose();
+        double positionError = currentPose
+                .getTranslation()
+                .getDistance(desiredPoseSupplier.get().getTranslation());
+        double angleError = Math.abs(currentPose.getRotation().getDegrees()
+                - desiredPoseSupplier.get().getRotation().getDegrees());
+
+        return (positionError <= POSITION_TOLERANCE && angleError <= ANGLE_TOLERANCE)
+                || cancelSupplier.getAsBoolean(); // TODO add a cancel if robot is at desired pose
     }
 }

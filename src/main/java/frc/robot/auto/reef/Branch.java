@@ -8,10 +8,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /** Add your docs here. */
 public class Branch {
-    private Boolean L4 = false;
-    private Boolean L3 = false;
-    private Boolean L2 = false;
-    private Boolean L1 = false;
+    private Boolean l4 = false;
+    private Boolean l3 = false;
+    private Boolean l2 = false;
+    private Boolean l1 = false;
     private Pose2d pose;
     Side side = null;
 
@@ -39,16 +39,16 @@ public class Branch {
     public void setCoralStatus(Level level, Boolean status) {
         switch (level) {
             case L4:
-                L4 = status;
+                l4 = status;
                 break;
             case L3:
-                L3 = status;
+                l3 = status;
                 break;
             case L2:
-                L2 = status;
+                l2 = status;
                 break;
             case L1:
-                L1 = status;
+                l1 = status;
                 break;
         }
     }
@@ -56,11 +56,11 @@ public class Branch {
     public Boolean getCoralStatus(Level level) {
         switch (level) {
             case L4:
-                return L4;
+                return l4;
             case L3:
-                return L3;
+                return l3;
             case L2:
-                return L2;
+                return l2;
             case L1:
                 return false;
             default:

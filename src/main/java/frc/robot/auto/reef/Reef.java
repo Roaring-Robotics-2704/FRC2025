@@ -10,6 +10,7 @@ import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import java.util.ArrayList;
 import java.util.List;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Add your docs here. */
 public class Reef {
@@ -84,6 +85,7 @@ public class Reef {
         return closestBranch;
     }
 
+    @AutoLogOutput
     public Pose2d getclosestPose(Pose2d currentPose, Level level) {
         Level currentLevel = level;
         Branch[] branches = checkHeightAvailability(currentLevel);
@@ -91,6 +93,9 @@ public class Reef {
             currentLevel = getLesserLevel(level);
             branches = checkHeightAvailability(currentLevel);
         }
+        System.out.println(getClosestBranch(currentPose, checkHeightAvailability(level))
+                .getPose()
+                .toString());
         return getClosestBranch(currentPose, checkHeightAvailability(level)).getPose();
     }
 

@@ -230,7 +230,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     /** Stops the drive. */
     public void stop() {
-        runVelocity(new ChassisSpeeds());
+        // runVelocity(new ChassisSpeeds());
+        stopWithX(); // TODO Do we NEED to stop in X pose, is it part of our strategy
     }
 
     /**

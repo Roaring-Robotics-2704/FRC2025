@@ -16,13 +16,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
-import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -115,9 +111,9 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
-                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                // new VisionIOPhotonVisionSim(
+                //         CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
@@ -154,8 +150,6 @@ public class RobotContainer {
         // dynamicAuto.schedule();
         // Configure the button bindings
         configureButtonBindings();
-        FollowPathCommand.warmupCommand();
-        PathfindingCommand.warmupCommand();
     }
 
     /**
@@ -166,14 +160,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         elevator.setDefaultCommand(new RunCommand(() -> elevator.setSetpoint(Inches.of(12)), elevator));
         // Default command, normal field-relative drive
+
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-
-        // Lock to 0° when A button is held
-        controller
-                .a()
-                .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), Rotation2d::new));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -186,6 +175,8 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
         // gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.y().whileTrue(AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS));
+        controller.a().whileTrue(AutoBuilder.pathfindToPose(sourceChooser.getSourcePose(), CONSTRAINTS));
     }
 
     /**
@@ -194,18 +185,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // PathPlannerAuto auto = new PathPlannerAuto(autoChooser.get());
-        // return Commands.runOnce(() -> resetSimulationField(auto.getStartingPose()))
-        //         .andThen(auto);
-        if (AutoBuilder.isPathfindingConfigured()) {
-            System.out.println("Pathfinding configured");
-            AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS)
-                    .addRequirements(drive);
-            return AutoBuilder.pathfindToPose(reef.getclosestPose(getPose(), Level.L3), CONSTRAINTS);
-        } else {
-            System.out.println("Pathfinding not configured");
-            return autoChooser.get();
-        }
+        return autoChooser.get();
     }
 
     public void resetSimulationField() {
@@ -220,7 +200,6 @@ public class RobotContainer {
         if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(pose);
-        // drive.resetOdometry(pose);
     }
 
     public void displaySimFieldToAdvantageScope() {
