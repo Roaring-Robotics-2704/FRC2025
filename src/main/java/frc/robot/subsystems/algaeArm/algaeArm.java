@@ -4,16 +4,11 @@
 
 package frc.robot.subsystems.algaeArm;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 
 public class AlgaeArm extends SubsystemBase {
     private AlgaeArmIO algaeArmIO;
     private final AlgaeArmIOInputsAutoLogged inputs = new AlgaeArmIOInputsAutoLogged();
-
-    
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
@@ -25,6 +20,7 @@ public class AlgaeArm extends SubsystemBase {
         // This method will be called once per scheduler run
         algaeArmIO.updateInputs(inputs);
     }
+
     public void setPivotAngle(Double angle) {
         algaeArmIO.setAlgaeArmPosition(angle);
     }

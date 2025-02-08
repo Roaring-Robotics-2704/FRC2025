@@ -12,14 +12,15 @@ import frc.robot.subsystems.algaeArm.AlgaeArmConstants;
 /** Add your docs here. */
 public class AlgaeArmFactory {
 
-	public static Command AlgaeArmIntake(AlgaeArm arm) {
-		return new RunCommand(()->arm.setPivotAngle(AlgaeArmConstants.INTAKE_POSITION), arm);
-	}
-	public static Command AlgaeArmHold(AlgaeArm arm) {
-		return new RunCommand(()->arm.setPivotAngle(AlgaeArmConstants.HOLD_POSITION), arm);
-	}
+    public static Command AlgaeArmIntake(AlgaeArm arm) {
+        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INTAKE_POSITION), arm);
+    }
 
-	public static Command AlgaeArmInside(AlgaeArm arm) {
-		return new RunCommand(()->arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
-	}
+    public static Command AlgaeArmHold(AlgaeArm arm) {
+        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.HOLD_POSITION), arm);
+    }
+
+    public static Command AlgaeArmInside(AlgaeArm arm) {
+        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
+    }
 }

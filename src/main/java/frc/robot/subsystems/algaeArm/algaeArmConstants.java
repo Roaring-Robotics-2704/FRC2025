@@ -17,7 +17,7 @@ public class AlgaeArmConstants {
     public static final double SIM_ALGAE_ARM_KI = 0.0;
     public static final double SIM_ALGAE_ARM_KD = 0.0;
 
-    //Arm positions
+    // Arm positions
     public static final double INTAKE_POSITION = Units.degreesToRadians(45);
     public static final double HOLD_POSITION = Units.degreesToRadians(10);
     public static final double INSIDE_POSITION = Units.degreesToRadians(0);
