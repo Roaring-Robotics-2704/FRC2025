@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -50,15 +51,15 @@ public class DriveConstants {
     // Drive motor configuration
     public static final int DRIVE_CURRENT_LIMIT = 60;
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.5); // meters
-    public static final double DRIVE_REDUCTION =
-            (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+    public static final double DRIVE_REDUCTION = (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
+    // and 22 spur teeth
     public static final DCMotor DRIVE_GEARBOX = DCMotor.getNEO(1);
 
     // Drive encoder configuration
-    public static final double DRIVE_POSITION_FACTOR =
-            2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel Radians
-    public static final double DRIVE_VELOCITY_FACTOR =
-            (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel Rad/Sec
+    public static final double DRIVE_POSITION_FACTOR = 2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel
+    // Radians
+    public static final double DRIVE_VELOCITY_FACTOR = (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel
+    // Rad/Sec
 
     // Drive PID configuration
     public static final double DRIVE_KP = 0.0;
@@ -77,7 +78,7 @@ public class DriveConstants {
     public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
     // Turn encoder configuration
-    public static final boolean TURN_ENCODER_INVERTED = false;
+    public static final boolean TURN_ENCODER_INVERTED = true;
     public static final double TURN_POSITION_FACTOR = 2 * Math.PI; // Rotations -> Radians
     public static final double TURN_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
@@ -119,4 +120,6 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
+    public static final PathConstraints CONSTRAINTS =
+            new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 }
