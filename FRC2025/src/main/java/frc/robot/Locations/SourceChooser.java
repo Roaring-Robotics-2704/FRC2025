@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SourceChooser{
+public class SourceChooser {
     SendableChooser<Pose2d> sourcePosChooser = new SendableChooser<>();
     /** Creates a new SourceChooser. */
     public SourceChooser() {

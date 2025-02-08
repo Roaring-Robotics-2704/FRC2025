@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -12,8 +13,6 @@ import edu.wpi.first.math.util.Units;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
-
-import com.pathplanner.lib.path.PathConstraints;
 
 public class DriveConstants {
     public static final double MAX_SPEED = 4.8; // Meters per Second
@@ -119,8 +118,6 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
-public static final PathConstraints CONSTRAINTS = new PathConstraints(
-                        3.0, 4.0,
-                        Units.degreesToRadians(540), Units.degreesToRadians(720));
+    public static final PathConstraints CONSTRAINTS =
+            new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 }
-

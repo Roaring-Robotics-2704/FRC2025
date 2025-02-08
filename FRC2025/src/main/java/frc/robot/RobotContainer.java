@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Locations.ReefChooser;
+import frc.robot.Locations.SourceChooser;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -41,8 +43,6 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.Locations.SourceChooser;
-import frc.robot.Locations.ReefChooser;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -58,8 +58,8 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private SwerveDriveSimulation driveSimulation = null;
-    public static SourceChooser sourceChooser = new SourceChooser(); 
-    public static ReefChooser reefChooser = new ReefChooser(); 
+    public static SourceChooser sourceChooser = new SourceChooser();
+    public static ReefChooser reefChooser = new ReefChooser();
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -200,11 +200,12 @@ public class RobotContainer {
     public void resetPose(Pose2d pose) {
         drive.resetOdometry(pose);
     }
-    public static Pose2d getSourcePose(){
-      return sourceChooser.getSourcePose();
+
+    public static Pose2d getSourcePose() {
+        return sourceChooser.getSourcePose();
     }
+
     public static Pose2d getReefPose() {
-        return reefChooser.getReefPose(); 
-        
+        return reefChooser.getReefPose();
     }
 }
