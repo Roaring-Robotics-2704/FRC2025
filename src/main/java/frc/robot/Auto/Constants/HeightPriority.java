@@ -4,12 +4,10 @@
 
 package frc.robot.Auto.Constants;
 
-import edu.wpi.first.wpilibj.Preferences;
-
 /** Add your docs here. */
 public class HeightPriority {
-	public int L4_PRIORTY=4;
-	public int L3_PRIORTY=1;
-	public int L2_PRIORTY=2;
-	public int L1_PRIORTY=3;
+    public int L4_PRIORTY = 4;
+    public int L3_PRIORTY = 1;
+    public int L2_PRIORTY = 2;
+    public int L1_PRIORTY = 3;
 }

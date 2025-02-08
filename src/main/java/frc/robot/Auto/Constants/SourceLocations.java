@@ -11,6 +11,7 @@ import frc.robot.util.PoseUtil;
 /** Add your docs here. */
 public class SourceLocations {
     private SourceLocations() {}
+
     public static final Pose2d SOURCE_LEFT =
             new Pose2d(1.121, 1.027, Rotation2d.fromDegrees(0)); // TODO fill in actual values
     public static final Pose2d SOURCE_RIGHT =

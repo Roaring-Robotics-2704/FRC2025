@@ -4,21 +4,18 @@
 
 package frc.robot.commands.autonomous;
 
+import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathfindThenFollowPath;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.PoseUtil;
-
-import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
-
 import java.util.List;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -51,9 +48,10 @@ public class Pathbuilder extends Command {
         if ((oldSourcePose != RobotContainer.getSourcePose()) || (RobotContainer.getReefPose() != oldReefPose)) {
             oldReefPose = RobotContainer.getReefPose();
             oldSourcePose = RobotContainer.getSourcePose();
-            toReefWaypoints = PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(oldReefPose, 0, -0.5), oldReefPose);
-            toSourceWaypoints = PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(oldSourcePose, 0, -0.5), oldSourcePose);
-            
+            toReefWaypoints =
+                    PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(oldReefPose, 0, -0.5), oldReefPose);
+            toSourceWaypoints =
+                    PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(oldSourcePose, 0, -0.5), oldSourcePose);
 
             toReefPath = new PathPlannerPath(
                     toReefWaypoints,
@@ -65,7 +63,6 @@ public class Pathbuilder extends Command {
                     DriveConstants.CONSTRAINTS,
                     null,
                     new GoalEndState(0, RobotContainer.getSourcePose().getRotation()));
-            
         }
     }
 
@@ -78,6 +75,7 @@ public class Pathbuilder extends Command {
     public Command goToReef() {
         return AutoBuilder.pathfindThenFollowPath(toReefPath, CONSTRAINTS);
     }
+
     public Command goToSource() {
         return AutoBuilder.pathfindThenFollowPath(toSourcePath, CONSTRAINTS);
     }
