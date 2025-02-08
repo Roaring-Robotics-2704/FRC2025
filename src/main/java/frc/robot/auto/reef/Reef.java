@@ -10,6 +10,7 @@ import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import java.util.ArrayList;
 import java.util.List;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /** Add your docs here. */
 public class Reef {
@@ -59,10 +60,10 @@ public class Reef {
             if (face.getSelected()) {
                 Branch rightBranch = face.getBranch(Side.RIGHT);
                 Branch leftBranch = face.getBranch(Side.LEFT);
-                if (rightBranch.getCoralStatus(level)) {
+                if (!rightBranch.getCoralStatus(level)) {
                     branches.add(rightBranch);
                 }
-                if (leftBranch.getCoralStatus(level)) {
+                if (!leftBranch.getCoralStatus(level)) {
                     branches.add(leftBranch);
                 }
             }
@@ -84,14 +85,31 @@ public class Reef {
         return closestBranch;
     }
 
+    @AutoLogOutput
     public Pose2d getclosestPose(Pose2d currentPose, Level level) {
         Level currentLevel = level;
         Branch[] branches = checkHeightAvailability(currentLevel);
         while (branches.length == 0) {
-            currentLevel = getLesserLevel(level);
+            currentLevel = getLesserLevel(currentLevel);
             branches = checkHeightAvailability(currentLevel);
         }
-        return getClosestBranch(currentPose, checkHeightAvailability(level)).getPose();
+        System.out.println(getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .getPose()
+                .toString());
+        return getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .getPose();
+    }
+
+    public Branch getclosestBranch2(Pose2d currentPose, Level level) {
+        Level currentLevel = level;
+        Branch[] branches = checkHeightAvailability(currentLevel);
+        while (branches.length == 0) {
+            currentLevel = getLesserLevel(currentLevel);
+            branches = checkHeightAvailability(currentLevel);
+        }
+        System.out.println(getClosestBranch(currentPose, checkHeightAvailability(currentLevel))
+                .toString());
+        return getClosestBranch(currentPose, checkHeightAvailability(currentLevel));
     }
 
     // Front Left Reef locations

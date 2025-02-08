@@ -36,8 +36,7 @@ public class SourceChooser {
     public class SourceLocations {
         private SourceLocations() {}
 
-        public static final Pose2d SOURCE_LEFT =
-                new Pose2d(1.121, 7.025, Rotation2d.fromDegrees(-54)); // TODO fill in actual values
+        public static final Pose2d SOURCE_LEFT = new Pose2d(1.121, 7.025, Rotation2d.fromDegrees(-54));
         public static final Pose2d SOURCE_RIGHT = new Pose2d(1.121, 1.027, Rotation2d.fromDegrees(54));
 
         public static final Pose2d SOURCE_LEFT_CLOSE =
