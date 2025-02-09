@@ -4,18 +4,18 @@
 
 package frc.robot.commands.autonomous.components;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.commands.drive.DriveCommands;
-import java.util.function.Supplier;
 
 /** Add your docs here. */
 public class GoToReef {
     Reef reef;
-
-    public static Supplier<Command> goToReef(Reef reef) {
-        return () -> DriveCommands.pathfindPose(() -> reef.getclosestPose(AutoBuilder.getCurrentPose(), Level.L3));
+    public Supplier<Command> goToReef(Reef reef, Supplier<Pose2d> pose) {
+        return ()-> DriveCommands.pathfindPose(() -> reef.getclosestPose(pose.get(), Level.L3));
     }
 }

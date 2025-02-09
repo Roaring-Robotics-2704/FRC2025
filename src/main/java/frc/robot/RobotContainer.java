@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
-import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -153,7 +152,7 @@ public class RobotContainer {
         // Default command, normal field-relative drive
 
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+                drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -180,7 +179,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new DynamicAuto(reef, sourceChooser).repeatedly();
+        return autoChooser.get();
     }
 
     public void resetSimulationField() {
