@@ -24,7 +24,7 @@ public class DynamicAuto extends SequentialCommandGroup {
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
                 GoToReef.goToReef(reef).get(),
-                new RunCommand(() -> reef.getclosestBranch2(AutoBuilder.getCurrentPose(), Level.L3)
+                new RunCommand(() -> reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
                         .setCoralStatus(Level.L3, true)),
                 new WaitCommand(0.5),
                 GoToSource.goToSource(chooser).get(),

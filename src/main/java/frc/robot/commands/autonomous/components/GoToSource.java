@@ -15,7 +15,7 @@ import frc.robot.commands.drive.DriveCommands;
 
 /** Add your docs here. */
 public class GoToSource{
-    public Supplier<Command> goToSource(SourceChooser chooser) {
+    public static Supplier<Command> goToSource(SourceChooser chooser) {
         return ()-> DriveCommands.pathfindPose(chooser::getSourcePose);
     }
 }

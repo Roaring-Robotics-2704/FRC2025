@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
+import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -65,6 +67,7 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private Reef reef = new Reef();
+    private Branch currentBranch;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -138,7 +141,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
-        // dynamicAuto.schedule();
+        autoChooser.addOption("Dynamic Auto", new DynamicAuto(reef, sourceChooser).repeatedly());
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -167,10 +170,11 @@ public class RobotContainer {
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         controller.a().whileTrue(DriveCommands.pathfindPose(sourceChooser::getSourcePose));
-        controller
-                .y()
-                .whileTrue(
-                        DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
+        controller.y().whileTrue(DriveCommands.pathfindPose(() -> reef.getclosestBranch(
+                        sourceChooser.getSourcePose(), Level.L3)
+                .getPose()));
+        controller.y().onFalse(Commands.runOnce(() -> reef.getclosestBranch(getPose(), Level.L3)
+                .setCoralStatus(Level.L3, true)));
     }
 
     /**
