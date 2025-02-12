@@ -18,7 +18,7 @@ import frc.robot.commands.drive.DriveCommands;
 /** Add your docs here. */
 public class GoToReef {
     Reef reef;
-    public Supplier<Command> goToReef(Reef reef) {
+    public static Supplier<Command> goToReef(Reef reef) {
         return ()-> DriveCommands.pathfindPose(() -> reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3).getPose());
     }
 }
