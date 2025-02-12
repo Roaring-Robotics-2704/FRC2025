@@ -4,18 +4,14 @@
 
 package frc.robot.commands.autonomous.components;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.auto.reef.Branch.Level;
-import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.commands.drive.DriveCommands;
+import java.util.function.Supplier;
 
 /** Add your docs here. */
-public class GoToSource{
+public class GoToSource {
     public static Supplier<Command> goToSource(SourceChooser chooser) {
-        return ()-> DriveCommands.pathfindPose(chooser::getSourcePose);
+        return () -> DriveCommands.pathfindPose(chooser::getSourcePose);
     }
 }

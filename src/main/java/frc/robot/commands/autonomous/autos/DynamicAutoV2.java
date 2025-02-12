@@ -1,70 +1,78 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.autonomous.autos;
 
+import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
-import frc.robot.commands.autonomous.components.GoToReef;
-import frc.robot.commands.autonomous.components.GoToSource;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DynamicAutoV2 extends Command {
-  Reef reef;
-  SourceChooser chooser;
-  Command reefCommand;
-  Command sourceCommand;
-  boolean reefDone = false;
-    /** Creates a new DynamicAutoV2. */
-  public DynamicAutoV2(Reef reef, SourceChooser chooser) {
-    this.reef = reef;
-    this.chooser = chooser;
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
+    private final Reef reef;
+    private final SourceChooser sourceChooser;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    reefCommand = GoToReef.goToReef(reef).get();
-    sourceCommand = GoToSource.goToSource(chooser).get();
-    reefCommand.initialize();
-    reefDone = false;
-  }
+    private Command currentCommand;
+    private boolean goingToReef = true;
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    reefCommand = GoToReef.goToReef(reef).get();
-    sourceCommand = GoToSource.goToSource(chooser).get();
-    if(reefCommand.isFinished() && !reefDone) {
-      reefDone = true;
-      reefCommand.end(false);
-      sourceCommand.initialize();
-      sourceCommand.execute();
-    } else if (sourceCommand.isFinished() && reefDone) {
-      reefDone = false;
-      reefCommand.initialize();
-      reefCommand.execute();
+    private static final double SWITCH_THRESHOLD = Units.inchesToMeters(10); // Distance to trigger swap
+
+    public DynamicAutoV2(Reef reef, SourceChooser chooser) {
+        this.reef = reef;
+        this.sourceChooser = chooser;
     }
-    if (reefDone) {
-      sourceCommand.execute();
-    } else {
-      reefCommand.execute();
+
+    @Override
+    public void initialize() {
+        System.out.println("[DynamicAutoV2] Starting...");
+        scheduleNextPath();
     }
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    reefCommand.end(interrupted);
-    sourceCommand.end(interrupted);
-  }
+    @Override
+    public void execute() {
+        if (currentCommand == null || !currentCommand.isScheduled()) {
+            System.out.println("[DynamicAutoV2] Current command is not running. Scheduling next path...");
+            scheduleNextPath();
+        }
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    private void scheduleNextPath() {
+        Pose2d currentPose = AutoBuilder.getCurrentPose();
+
+        Pose2d targetPose =
+                goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
+        if (!goingToReef) {
+            reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+        }
+
+        System.out.println("[DynamicAutoV2] Scheduling path to " + (goingToReef ? "REEF" : "SOURCE"));
+
+        if (currentCommand != null) {
+            System.out.println("[DynamicAutoV2] Cancelling previous command...");
+            currentCommand.cancel();
+        }
+
+        currentCommand = AutoBuilder.pathfindToPose(targetPose, CONSTRAINTS).andThen(() -> {
+            System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+            goingToReef = !goingToReef; // Toggle AFTER completion
+        });
+
+        currentCommand.schedule();
+        System.out.println("[DynamicAutoV2] Path to " + (goingToReef ? "REEF" : "SOURCE") + " started.");
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        if (currentCommand != null) {
+            currentCommand.cancel();
+        }
+        System.out.println("[DynamicAutoV2] Command Ended. Interrupted? " + interrupted);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false; // Runs indefinitely
+    }
 }

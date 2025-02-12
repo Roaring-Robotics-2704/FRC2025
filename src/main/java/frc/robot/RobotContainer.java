@@ -30,6 +30,7 @@ import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.commands.autonomous.autos.DynamicAuto;
+import frc.robot.commands.autonomous.autos.DynamicAutoV2;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -183,7 +184,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return new DynamicAutoV2(reef, sourceChooser);
     }
 
     public void resetSimulationField() {

@@ -88,7 +88,6 @@ public class Reef {
             }
         }
 
-        System.out.println(closestBranch.toString());
         return closestBranch;
     }
 
