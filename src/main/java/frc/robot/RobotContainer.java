@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
+import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -38,6 +39,9 @@ import frc.robot.subsystems.drive.GyroIOSim;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -57,6 +61,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
+    private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
@@ -85,7 +90,8 @@ public class RobotContainer {
                         drive, new VisionIOLimelight(VisionConstants.CAMERA_0_NAME, drive::getRotation)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
-                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                this.elevator = new Elevator(new ElevatorIOSpark());
+                                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
                 // create a maple-sim swerve drive simulation instance
@@ -104,6 +110,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                this.elevator = new Elevator(new ElevatorIO() {}); 
                 // new VisionIOPhotonVisionSim(
                 // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
@@ -113,6 +120,7 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
                 vision = new Vision(drive, new VisionIO() {});
+                this.elevator = new Elevator(new ElevatorIO() {});
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
         }
@@ -172,6 +180,10 @@ public class RobotContainer {
                 .y()
                 .whileTrue(
                         DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
+        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
     }
 
     /**
