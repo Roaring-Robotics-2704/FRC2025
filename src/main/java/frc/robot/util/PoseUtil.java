@@ -27,4 +27,9 @@ public class PoseUtil {
         double theta = (pose1.getRotation().getDegrees() + pose2.getRotation().getDegrees()) / 2;
         return new Pose2d(x, y, Rotation2d.fromDegrees(theta));
     }
+
+    public static double getDistance(Pose2d currentPose, Pose2d sourceLeft) {
+        return Math.sqrt(Math.pow(currentPose.getX() - sourceLeft.getX(), 2)
+                + Math.pow(currentPose.getY() - sourceLeft.getY(), 2));
+    }
 }
