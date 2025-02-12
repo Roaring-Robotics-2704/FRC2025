@@ -59,6 +59,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private static SourceChooser sourceChooser = new SourceChooser();
+    private static DynamicAuto dynamicAuto;
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
 
@@ -120,6 +121,7 @@ public class RobotContainer {
         }
 
         // Set up auto routines
+        dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
 
         // autoChooser = new LoggedDashboardChooser<>(
         // "Auto Choices",
@@ -141,7 +143,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
-        autoChooser.addOption("Dynamic Auto", new DynamicAuto(reef, sourceChooser).repeatedly());
+        autoChooser.addOption("Dynamic Auto", dynamicAuto);
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -153,7 +155,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-
+        drive.setDefaultCommand(dynamicAuto);
         // drive.setDefaultCommand(DriveCommands.joystickDrive(
         //         drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
 
@@ -183,7 +185,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new DynamicAuto(reef, sourceChooser);
+        return dynamicAuto;
     }
 
     public void resetSimulationField() {

@@ -9,6 +9,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
+import frc.robot.subsystems.drive.Drive;
+import java.util.Optional;
+
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeReefSimulation;
 
 public class DynamicAuto extends Command {
     private final Reef reef;
@@ -17,11 +21,13 @@ public class DynamicAuto extends Command {
     private Command currentCommand;
     private boolean goingToReef = true;
 
+
     private static final double SWITCH_THRESHOLD = Units.inchesToMeters(10); // Distance to trigger swap
 
-    public DynamicAuto(Reef reef, SourceChooser chooser) {
+    public DynamicAuto(Reef reef, SourceChooser chooser, Drive drive) {
         this.reef = reef;
         this.sourceChooser = chooser;
+        addRequirements(drive);
     }
 
     @Override
@@ -44,7 +50,16 @@ public class DynamicAuto extends Command {
         Pose2d targetPose =
                 goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
         if (!goingToReef) {
-            reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+            if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
+            } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
+            }
         }
 
         System.out.println("[DynamicAutoV2] Scheduling path to " + (goingToReef ? "REEF" : "SOURCE"));
@@ -74,6 +89,6 @@ public class DynamicAuto extends Command {
 
     @Override
     public boolean isFinished() {
-        return false; // Runs indefinitely
+        return reef.isReefFull(); // Runs indefinitely
     }
 }

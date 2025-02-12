@@ -91,6 +91,15 @@ public class Reef {
         return closestBranch;
     }
 
+    public boolean isReefFull() {
+        for (Face face : faces) {
+            if (face.getSelected() && (!face.leftBranch.isFull() || !face.rightBranch.isFull())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Front Left Reef locations
     public static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60));
     public static final Pose2d FL_LEFT = new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60));
