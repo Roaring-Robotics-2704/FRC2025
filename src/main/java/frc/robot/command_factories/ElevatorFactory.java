@@ -11,7 +11,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 
 /** Add your docs here. */
 public class ElevatorFactory {
-	private ElevatorFactory() {}
+    private ElevatorFactory() {}
 
     public static Command elevatorL1(Elevator elevator) {
         return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L1_HEIGHT), elevator);

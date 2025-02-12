@@ -14,6 +14,8 @@ public class Elevator extends SubsystemBase {
     /** Creates a new Elevator. */
     private final ElevatorIO io;
 
+    private final ElevatorVisualization visualization = new ElevatorVisualization();
+
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private MutDistance setpoint = Inches.mutable(0);
 
@@ -27,6 +29,8 @@ public class Elevator extends SubsystemBase {
         this.io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
         this.io.runSetpoint(setpoint);
+        visualization.update(inputs.elevatorHeight);
+
         // This method will be called once per scheduler run
     }
 

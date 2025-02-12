@@ -23,11 +23,15 @@ public interface ElevatorIO {
 
     default void setElevatorVelocity(double velocityRadperSec) {}
 
-    default void runVolts(Voltage volts) {};
+    default void runVolts(Voltage volts) {}
+    ;
 
-    default void runSetpoint(Distance position) {};
+    default void runSetpoint(Distance position) {}
+    ;
 
-    default void stop() {};
+    default void stop() {}
+    ;
 
-    default void init() {};
+    default void init() {}
+    ;
 }
