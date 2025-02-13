@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
@@ -63,6 +64,7 @@ public class RobotContainer {
     private final Vision vision;
     private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
+    private static DynamicAuto dynamicAuto;
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
 
@@ -71,6 +73,7 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private Reef reef = new Reef();
+    private Branch currentBranch;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -126,6 +129,7 @@ public class RobotContainer {
         }
 
         // Set up auto routines
+        dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
 
         // autoChooser = new LoggedDashboardChooser<>(
         // "Auto Choices",
@@ -147,7 +151,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
-        // dynamicAuto.schedule();
+        autoChooser.addOption("Dynamic Auto", dynamicAuto);
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -159,9 +163,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-
-        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        drive.setDefaultCommand(dynamicAuto);
+        // drive.setDefaultCommand(DriveCommands.joystickDrive(
+        //         drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -176,10 +180,9 @@ public class RobotContainer {
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         controller.a().whileTrue(DriveCommands.pathfindPose(sourceChooser::getSourcePose));
-        controller
-                .y()
-                .whileTrue(
-                        DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
+        controller.y().whileTrue(DriveCommands.pathfindPose(() -> reef.getclosestBranch(
+                        sourceChooser.getSourcePose(), Level.L3)
+                .getPose()));
         controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
         controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
         controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
@@ -192,7 +195,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new DynamicAuto(reef, sourceChooser).repeatedly();
+        return dynamicAuto;
     }
 
     public void resetSimulationField() {

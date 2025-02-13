@@ -71,4 +71,8 @@ public class Branch {
     public Pose2d getPose() {
         return pose;
     }
+
+    public boolean isFull() {
+        return level3 && level2 && level1;
+    }
 }
