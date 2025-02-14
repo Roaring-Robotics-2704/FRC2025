@@ -47,6 +47,7 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.outtake.Outtake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -58,6 +59,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private static SourceChooser sourceChooser = new SourceChooser();
+    private static Outtake outtake;
     // private static ReefChooser reefChooser = new ReefChooser();
     // private DynamicAuto dynamicAuto;
 
@@ -85,6 +87,7 @@ public class RobotContainer {
                         drive, new VisionIOLimelight(VisionConstants.CAMERA_0_NAME, drive::getRotation)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
+                this.outtake = new Outtake(new OuttakeIOSpark() {});
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
@@ -104,6 +107,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                this.outtake = new Outtake(new OuttakeIO() {});
                 // new VisionIOPhotonVisionSim(
                 // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
@@ -172,7 +176,9 @@ public class RobotContainer {
                 .y()
                 .whileTrue(
                         DriveCommands.pathfindPose(() -> reef.getclosestPose(sourceChooser.getSourcePose(), Level.L3)));
-    }
+        controller.rightTrigger().whileTrue(outtake.outtakeInCmd());
+        controller.leftTrigger().whileTrue(outtake.outtakeOutCmd());
+        }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
