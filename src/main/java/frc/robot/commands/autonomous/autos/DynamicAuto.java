@@ -10,9 +10,6 @@ import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.subsystems.drive.Drive;
-import java.util.Optional;
-
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeReefSimulation;
 
 public class DynamicAuto extends Command {
     private final Reef reef;
@@ -20,7 +17,6 @@ public class DynamicAuto extends Command {
 
     private Command currentCommand;
     private boolean goingToReef = true;
-
 
     private static final double SWITCH_THRESHOLD = Units.inchesToMeters(10); // Distance to trigger swap
 

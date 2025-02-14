@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /** Add your docs here. */
 public class Branch {
-    private Boolean level4 = false;
+    private Boolean level4 = true;
     private Boolean level3 = false;
     private Boolean level2 = false;
     private Boolean level1 = false;
