@@ -91,7 +91,7 @@ public class RobotContainer {
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
                 this.elevator = new Elevator(new ElevatorIOSpark());
-                                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
                 // create a maple-sim swerve drive simulation instance
@@ -110,7 +110,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
-                this.elevator = new Elevator(new ElevatorIO() {}); 
+                this.elevator = new Elevator(new ElevatorIO() {});
                 // new VisionIOPhotonVisionSim(
                 // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
