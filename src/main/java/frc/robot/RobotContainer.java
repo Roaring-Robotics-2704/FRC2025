@@ -14,7 +14,9 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
+import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -90,7 +92,9 @@ public class RobotContainer {
                         new ModuleIOSpark(2),
                         new ModuleIOSpark(3));
                 this.vision = new Vision(
-                        drive, new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0)
+                        drive,
+                        new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
+                        new VisionIOPhotonVision(VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
                 this.elevator = new Elevator(new ElevatorIOSpark());
@@ -112,7 +116,10 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
-                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                                CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(
+                                CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+
                 this.elevator = new Elevator(new ElevatorIO() {});
                 // new VisionIOPhotonVisionSim(
                 // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
@@ -165,7 +172,7 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         // drive.setDefaultCommand(dynamicAuto);
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -179,7 +186,10 @@ public class RobotContainer {
         // gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-        controller.a().whileTrue(DriveCommands.pathfindPose(sourceChooser::getSourcePose));
+        controller
+                .a()
+                .whileTrue(
+                        DriveCommands.pathfindPose(sourceChooser::getSourcePose).asProxy());
         controller.y().whileTrue(DriveCommands.pathfindPose(() -> reef.getclosestBranch(
                         sourceChooser.getSourcePose(), Level.L3)
                 .getPose()));

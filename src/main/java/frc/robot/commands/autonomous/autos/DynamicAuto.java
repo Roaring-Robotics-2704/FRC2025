@@ -45,18 +45,18 @@ public class DynamicAuto extends Command {
 
         Pose2d targetPose =
                 goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
-        if (!goingToReef) {
-            if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+        // if (!goingToReef) {
+        //     if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
+        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
 
-            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
-            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
-            } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
-            }
-        }
+        //     } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
+        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
+        //     } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
+        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
+        //     } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
+        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
+        //     }
+        // }
 
         System.out.println("[DynamicAutoV2] Scheduling path to " + (goingToReef ? "REEF" : "SOURCE"));
 

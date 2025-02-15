@@ -24,6 +24,11 @@ public class Reef {
         faces[3] = new Face(B_LEFT, B_RIGHT);
         faces[4] = new Face(BR_LEFT, BR_RIGHT);
         faces[5] = new Face(FR_LEFT, FR_RIGHT);
+        faces[1].setSelected(false);
+        faces[2].setSelected(false);
+        faces[3].setSelected(false);
+        faces[4].setSelected(false);
+        faces[5].setSelected(false);
     }
 
     class Face {
