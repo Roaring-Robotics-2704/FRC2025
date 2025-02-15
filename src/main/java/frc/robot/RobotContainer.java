@@ -46,7 +46,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -90,11 +90,11 @@ public class RobotContainer {
                         new ModuleIOSpark(2),
                         new ModuleIOSpark(3));
                 this.vision = new Vision(
-                        drive, new VisionIOLimelight(VisionConstants.CAMERA_0_NAME, drive::getRotation)
+                        drive, new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0)
                         // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
                         );
                 this.elevator = new Elevator(new ElevatorIOSpark());
-                                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
+                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
                 // create a maple-sim swerve drive simulation instance
@@ -113,7 +113,7 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
-                this.elevator = new Elevator(new ElevatorIO() {}); 
+                this.elevator = new Elevator(new ElevatorIO() {});
                 // new VisionIOPhotonVisionSim(
                 // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
                 // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
@@ -130,7 +130,7 @@ public class RobotContainer {
 
         // Set up auto routines
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
-
+        drive.register();
         // autoChooser = new LoggedDashboardChooser<>(
         // "Auto Choices",
         // AutoBuilder.buildAutoChooserWithOptionsModifier(stream ->
@@ -163,9 +163,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(dynamicAuto);
-        // drive.setDefaultCommand(DriveCommands.joystickDrive(
-        //         drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
+        // drive.setDefaultCommand(dynamicAuto);
+        drive.setDefaultCommand(DriveCommands.joystickDrive(
+                drive, () -> -controller.getRightY(), () -> -controller.getRightX(), () -> -controller.getLeftX()));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
