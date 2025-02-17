@@ -278,6 +278,10 @@ public class DriveCommands {
     }
 
     public static Command pathfindPose(Supplier<Pose2d> pose) {
+        if (AutoBuilder.shouldFlip()) {
+                return AutoBuilder.pathfindToPoseFlipped(pose.get(), CONSTRAINTS);
+        } else {
         return AutoBuilder.pathfindToPose(pose.get(), CONSTRAINTS);
+        }
     }
 }
