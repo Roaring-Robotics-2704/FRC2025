@@ -4,8 +4,8 @@ import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
@@ -17,8 +17,7 @@ public class DynamicAuto extends Command {
 
     private Command currentCommand;
     private boolean goingToReef = true;
-
-    private static final double SWITCH_THRESHOLD = Units.inchesToMeters(10); // Distance to trigger swap
+    private boolean isDone = false;
 
     public DynamicAuto(Reef reef, SourceChooser chooser, Drive drive) {
         this.reef = reef;
@@ -45,18 +44,18 @@ public class DynamicAuto extends Command {
 
         Pose2d targetPose =
                 goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
-        // if (!goingToReef) {
-        //     if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
-        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+        if (!goingToReef) {
+            if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
 
-        //     } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
-        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
-        //     } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
-        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
-        //     } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
-        //         reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
-        //     }
-        // }
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
+            } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
+            }
+        }
 
         System.out.println("[DynamicAutoV2] Scheduling path to " + (goingToReef ? "REEF" : "SOURCE"));
 
@@ -65,12 +64,32 @@ public class DynamicAuto extends Command {
             currentCommand.cancel();
         }
 
-        currentCommand = AutoBuilder.pathfindToPose(targetPose, CONSTRAINTS).andThen(() -> {
-            System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
-            goingToReef = !goingToReef; // Toggle AFTER completion
-        });
+        if (Robot.isRedAlliance()) {
+            currentCommand = AutoBuilder.pathfindToPoseFlipped(targetPose, CONSTRAINTS)
+                    .andThen(() -> {
+                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                        goingToReef = !goingToReef; // Toggle AFTER completion
+                        if (currentCommand != null) {
+                            currentCommand.cancel();
+                        }
+                        scheduleNextPath();
+                    });
+        } else {
+            currentCommand = AutoBuilder.pathfindToPose(targetPose, CONSTRAINTS).andThen(() -> {
+                System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                goingToReef = !goingToReef; // Toggle AFTER completion
+                if (currentCommand != null) {
+                    currentCommand.cancel();
+                }
+                scheduleNextPath();
+            });
+        }
 
         currentCommand.schedule();
+        if (reef.isReefFull()) {
+            isDone = true;
+            System.out.println("[DynamicAutoV2] Reef is full.");
+        }
 
         System.out.println("[DynamicAutoV2] Path to " + (goingToReef ? "REEF" : "SOURCE") + " started.");
     }
@@ -81,10 +100,15 @@ public class DynamicAuto extends Command {
             currentCommand.cancel();
         }
         System.out.println("[DynamicAutoV2] Command Ended. Interrupted? " + interrupted);
+        if (!isDone && reef.isReefFull()) {
+            isDone = true;
+            System.out.println("[DynamicAutoV2] Reef is full. Ending command.");
+        }
     }
 
     @Override
     public boolean isFinished() {
-        return reef.isReefFull(); // Runs indefinitely
+
+        return reef.isReefFull(); // Runs until reef is full
     }
 }

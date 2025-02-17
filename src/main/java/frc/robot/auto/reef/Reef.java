@@ -4,8 +4,12 @@
 
 package frc.robot.auto.reef;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import java.util.ArrayList;
@@ -24,11 +28,14 @@ public class Reef {
         faces[3] = new Face(B_LEFT, B_RIGHT);
         faces[4] = new Face(BR_LEFT, BR_RIGHT);
         faces[5] = new Face(FR_LEFT, FR_RIGHT);
-        faces[1].setSelected(false);
-        faces[2].setSelected(false);
+        if (Constants.CURRENT_MODE != Mode.SIM && !Constants.COMPETITION) {
+            faces[1].setSelected(false);
+            faces[2].setSelected(false);
+            faces[3].setSelected(false);
+            faces[4].setSelected(false);
+            faces[5].setSelected(false);
+        }
         faces[3].setSelected(false);
-        faces[4].setSelected(false);
-        faces[5].setSelected(false);
     }
 
     class Face {
@@ -76,6 +83,9 @@ public class Reef {
     }
 
     public Branch getclosestBranch(Pose2d currentPose, Level level) {
+        if (Robot.isRedAlliance()) {
+            currentPose = FlippingUtil.flipFieldPose(currentPose);
+        }
         Level currentLevel = level;
         Branch[] branches = checkHeightAvailability(currentLevel);
         while (branches.length == 0) {

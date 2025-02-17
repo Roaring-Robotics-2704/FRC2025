@@ -19,6 +19,7 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -179,7 +180,9 @@ public class RobotContainer {
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
-                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
+                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset
+                // odometry
+                // to
                 // actual robot pose
                 // during simulation
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
@@ -205,7 +208,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return dynamicAuto;
+        return autoChooser.get();
     }
 
     public void resetSimulationField() {
@@ -238,5 +241,13 @@ public class RobotContainer {
 
     public void resetPose(Pose2d pose) {
         drive.resetOdometry(pose);
+    }
+
+    public static Pose2d getBluePose() {
+        if (Robot.isRedAlliance()) {
+            return FlippingUtil.flipFieldPose(AutoBuilder.getCurrentPose());
+        } else {
+            return AutoBuilder.getCurrentPose();
+        }
     }
 }

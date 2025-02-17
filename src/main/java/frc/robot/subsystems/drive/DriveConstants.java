@@ -121,5 +121,5 @@ public class DriveConstants {
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
     public static final PathConstraints CONSTRAINTS =
-            new PathConstraints(1.0, 2.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+            new PathConstraints(3.0, 2.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 }

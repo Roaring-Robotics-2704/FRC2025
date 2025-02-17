@@ -4,11 +4,11 @@
 
 package frc.robot.auto.source;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtil;
 import java.util.function.Supplier;
 
@@ -52,9 +52,8 @@ public class SourceChooser {
                 PoseUtil.offsetPose(SOURCE_RIGHT, -0.5, 0); // TODO fill in actual values
 
         public static Supplier<Pose2d> getClosestSource() {
-
-            return () -> (PoseUtil.getDistance(AutoBuilder.getCurrentPose(), SOURCE_LEFT)
-                            < PoseUtil.getDistance(AutoBuilder.getCurrentPose(), SOURCE_RIGHT)
+            return () -> (PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_LEFT)
+                            < PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_RIGHT)
                     ? SOURCE_LEFT
                     : SOURCE_RIGHT);
         }

@@ -140,6 +140,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     @Override
     public void periodic() {
+        if (getCurrentCommand() != null) {
+            Logger.recordMetadata("Drive/Command", getCurrentCommand().getName());
+        }
         odometryLock.lock();
         try {
             // Prevents odometry updates while reading data
