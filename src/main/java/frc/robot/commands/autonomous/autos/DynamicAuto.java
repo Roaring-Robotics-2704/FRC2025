@@ -1,6 +1,6 @@
 package frc.robot.commands.autonomous.autos;
 
-import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -65,7 +65,7 @@ public class DynamicAuto extends Command {
         }
 
         if (Robot.isRedAlliance()) {
-            currentCommand = AutoBuilder.pathfindToPoseFlipped(targetPose, CONSTRAINTS)
+            currentCommand = AutoBuilder.pathfindToPoseFlipped(targetPose, FINDINGCONSTRAINTS)
                     .andThen(() -> {
                         System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
                         goingToReef = !goingToReef; // Toggle AFTER completion
@@ -75,14 +75,15 @@ public class DynamicAuto extends Command {
                         scheduleNextPath();
                     });
         } else {
-            currentCommand = AutoBuilder.pathfindToPose(targetPose, CONSTRAINTS).andThen(() -> {
-                System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
-                goingToReef = !goingToReef; // Toggle AFTER completion
-                if (currentCommand != null) {
-                    currentCommand.cancel();
-                }
-                scheduleNextPath();
-            });
+            currentCommand = AutoBuilder.pathfindToPose(targetPose, FINDINGCONSTRAINTS)
+                    .andThen(() -> {
+                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                        goingToReef = !goingToReef; // Toggle AFTER completion
+                        if (currentCommand != null) {
+                            currentCommand.cancel();
+                        }
+                        scheduleNextPath();
+                    });
         }
 
         currentCommand.schedule();

@@ -1,10 +1,11 @@
 package frc.robot.subsystems.algaeArm;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -19,12 +20,12 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     private double m_armSetpointDegrees = 0;
 
     // The arm gearbox represents a gearbox containing two Vex 775pro motors.
-    private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
+    private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
     // Standard classes for controlling our arm
     private final PIDController m_controller = new PIDController(m_armKp, 0, 0);
     private final Encoder m_encoder = new Encoder(1, 2);
-    private final PWMSparkMax m_motor = new PWMSparkMax(28);
+    private final SparkMax m_motor = new SparkMax(AlgaeArmConstants.PIVOT_MOTOR_CANID, MotorType.kBrushless);
 
     // Simulation classes help us simulate what's going on, including gravity.
     // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
@@ -58,7 +59,9 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     }
 
     @Override
-    public void setRollerSpeed(double speed) {}
+    public void setRollerSpeed(double speed) {
+        m_motor.set(speed);
+    }
 
     @Override
     public void updateInputs(AlgaeArmIOInputs inputs) {

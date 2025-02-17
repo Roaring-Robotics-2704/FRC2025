@@ -49,8 +49,8 @@ public class DriveConstants {
     public static final int BACK_RIGHT_TURN_CAN_ID = 8;
 
     // Drive motor configuration
-    public static final int DRIVE_CURRENT_LIMIT = 45;
-    public static final double WHEEL_RADIUS = Units.inchesToMeters(1.5); // meters
+    public static final int DRIVE_CURRENT_LIMIT = 40;
+    public static final double WHEEL_RADIUS = Units.inchesToMeters(1.437); // meters
     public static final double DRIVE_REDUCTION = (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
     // and 22 spur teeth
     public static final DCMotor DRIVE_GEARBOX = DCMotor.getNEO(1);
@@ -62,10 +62,10 @@ public class DriveConstants {
     // Rad/Sec
 
     // Drive PID configuration
-    public static final double DRIVE_KP = 0.0;
-    public static final double DRIVE_KD = 0.0;
-    public static final double DRIVE_KS = 0.0;
-    public static final double DRIVE_KV = 0.1;
+    public static final double DRIVE_KP = 0;
+    public static final double DRIVE_KD = 0.0019261;
+    public static final double DRIVE_KS = 0.15747; // kS: 0.15747
+    public static final double DRIVE_KV = 0.10193; // kV: 0.10193
     public static final double DRIVE_SIM_KP = 0.05;
     public static final double DRIVE_SIM_KD = 0.0;
     public static final double DRIVE_SIM_KS = 0.0;
@@ -83,7 +83,7 @@ public class DriveConstants {
     public static final double TURN_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
     // Turn PID configuration
-    public static final double TURN_KP = 2.0;
+    public static final double TURN_KP = 1.9;
     public static final double TURN_KD = 0.0;
     public static final double TURN_SIM_KP = 8.0;
     public static final double TURN_SIM_KD = 0.0;
@@ -93,7 +93,7 @@ public class DriveConstants {
     // PathPlanner configuration
     public static final double ROBOT_MASS = Units.lbsToKilograms(125); // KG
     public static final double ROBOT_MOI = 6.883;
-    public static final double WHEEL_COF = 1.2;
+    public static final double WHEEL_COF = 0.9;
     public static final RobotConfig ppConfig = new RobotConfig(
             ROBOT_MASS,
             ROBOT_MOI,
@@ -120,6 +120,8 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
-    public static final PathConstraints CONSTRAINTS =
-            new PathConstraints(3.0, 2.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+    public static final PathConstraints PATHCONSTRAINTS =
+            new PathConstraints(1, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // max 3 velocity
+    public static final PathConstraints FINDINGCONSTRAINTS =
+            new PathConstraints(2, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // max 3 velocity
 }

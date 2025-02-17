@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
@@ -64,19 +63,19 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+
+    @SuppressWarnings("unused")
     private final Vision vision;
+
     private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
     private static DynamicAuto dynamicAuto;
-    // private static ReefChooser reefChooser = new ReefChooser();
-    // private DynamicAuto dynamicAuto;
 
     private static SwerveDriveSimulation driveSimulation = null;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private Reef reef = new Reef();
-    private Branch currentBranch;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -95,15 +94,12 @@ public class RobotContainer {
                 this.vision = new Vision(
                         drive,
                         new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
-                        new VisionIOPhotonVision(VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)
-                        // new VisionIOLimelight(VisionConstants.CAMERA_1_NAME, drive::getRotation));
-                        );
+                        new VisionIOPhotonVision(VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1));
                 this.elevator = new Elevator(new ElevatorIOSpark());
-                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             case SIM -> {
                 // create a maple-sim swerve drive simulation instance
-                this.driveSimulation =
+                RobotContainer.driveSimulation =
                         new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
                 // add the simulated drivetrain to the simulation field
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
@@ -122,31 +118,18 @@ public class RobotContainer {
                                 CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
                 this.elevator = new Elevator(new ElevatorIO() {});
-                // new VisionIOPhotonVisionSim(
-                // CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
-                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
             default -> {
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
-                vision = new Vision(drive, new VisionIO() {});
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
                 this.elevator = new Elevator(new ElevatorIO() {});
-                // dynamicAuto = new DynamicAuto(sourceChooser.getSourceChooser(), drive);
             }
         }
-
-        // Set up auto routines
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
-        drive.register();
-        // autoChooser = new LoggedDashboardChooser<>(
-        // "Auto Choices",
-        // AutoBuilder.buildAutoChooserWithOptionsModifier(stream ->
-        // Boolean.TRUE.equals(Constants.COMPETITION)
-        // ? stream.filter(auto -> auto.getName().startsWith("comp"))
-        // : stream));
+        // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
             autoChooser.addOption(
@@ -171,7 +154,6 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-        // drive.setDefaultCommand(dynamicAuto);
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
