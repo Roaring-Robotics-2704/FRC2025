@@ -23,20 +23,25 @@ public class VisionConstants {
     // Private constructor to prevent instantiation
     private VisionConstants() {}
     // AprilTag layout
-    public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    public static final AprilTagFieldLayout TAG_LAYOUT =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     // Camera names, must match names configured on coprocessor
-    public static final String CAMERA_0_NAME = "camera_1";
-    public static final String CAMERA_1_NAME = "camera_2";
-    public static final String CAMERA_2_NAME = "camera_3";
-    public static final String CAMERA_3_NAME = "camera_4";
+    public static final String CAMERA_0_NAME = "camera_0";
+    public static final String CAMERA_1_NAME = "camera_1";
 
     // Robot to camera transforms
     // (Not used by Limelight, configure in web UI instead)
-    public static final Transform3d robotToCamera0 =
-            new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -Units.degreesToRadians(0), 0.0));
-    public static final Transform3d robotToCamera1 =
-            new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -Units.degreesToRadians(0), Math.PI));
+    public static final Transform3d robotToCamera0 = new Transform3d(
+            Units.inchesToMeters(14.345708),
+            Units.inchesToMeters(6.314371),
+            Units.inchesToMeters(13.906743),
+            new Rotation3d(0.0, -Units.degreesToRadians(0), 0.0));
+    public static final Transform3d robotToCamera1 = new Transform3d(
+            -Units.inchesToMeters(28),
+            0.0,
+            Units.inchesToMeters(32.5),
+            new Rotation3d(0.0, -Units.degreesToRadians(10), Math.PI));
 
     // Basic filtering thresholds
     public static final double MAX_AMBIGUITY = 0.3;
@@ -45,13 +50,13 @@ public class VisionConstants {
     // Standard deviation baselines, for 1 meter distance and 1 tag
     // (Adjusted automatically based on distance and # of tags)
     public static final double linearStdDevBaseline = 0.02; // Meters
-    public static final double angularStdDevBaseline = 0.06; // Radians
+    public static final double angularStdDevBaseline = Units.degreesToRadians(3); // Radians
 
     // Standard deviation multipliers for each camera
     // (Adjust to trust some cameras more than others)
     protected static final double[] cameraStdDevFactors = new double[] {
         1.0, // Camera 0
-        1.0 // Camera 1
+        0.97 // Camera 1
     };
 
     // Multipliers to apply for MegaTag 2 observations

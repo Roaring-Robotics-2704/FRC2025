@@ -1,5 +1,11 @@
 package frc.robot.commands.drive;
 
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
+import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -10,15 +16,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.PoseUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -36,7 +42,6 @@ public class DriveCommands {
     private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
     private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
     private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
-    private static final Alert alert = new Alert("Drive Characterization", AlertType.kInfo);
 
     private DriveCommands() {}
 
@@ -62,9 +67,9 @@ public class DriveCommands {
                     // Get linear velocity
                     Translation2d linearVelocity =
                             getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
+                    linearVelocity = linearVelocity.times(Constants.DRIVE_SPEED);
                     // Apply rotation deadband
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * Constants.TURN_SPEED;
 
                     // Square rotation value for more precise control
                     omega = Math.copySign(omega * omega, omega);
@@ -274,5 +279,18 @@ public class DriveCommands {
         private double[] positions = new double[4];
         private Rotation2d lastAngle = new Rotation2d();
         private double gyroDelta = 0.0;
+    }
+
+    public static Command pathfindPose(Supplier<Pose2d> pose) {
+        PathPlannerPath path = new PathPlannerPath(
+                PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(pose.get(), -0.5, 0), pose.get()),
+                PATHCONSTRAINTS,
+                null,
+                new GoalEndState(0, pose.get().getRotation()));
+        if (AutoBuilder.shouldFlip()) {
+            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
+        } else {
+            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
+        }
     }
 }
