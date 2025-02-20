@@ -1,33 +1,27 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.MutCurrent;
-import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.MutLinearVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
-
     @AutoLog
     class ElevatorIOInputs {
-        public MutDistance position = Inches.mutable(0);
-        public MutLinearVelocity velocity = InchesPerSecond.mutable(0);
-
-        public MutVoltage appliedVolts = Volts.mutable(0);
-
-        public MutCurrent supplyCurrent = Amps.mutable(0);
-        public MutCurrent torqueCurrent = Amps.mutable(0);
+        public boolean elevatorConnected = false;
+        public double elevatorHeight = 0.0;
+        public double elevatorVelocity = 0.0;
+        public double rightElevatorAppliedVolts = 0.0;
+        public double leftElevatorAppliedVolts = 0.0;
+        public double rightElevatorCurrentAmps = 0.0;
+        public double leftElevatorCurrentAmps = 0.0;
     }
 
+    /** Updates the set of loggable inputs. */
     default void updateInputs(ElevatorIOInputs inputs) {}
-    ;
+
+    default void setElevatorPosition(double outputs) {}
+
+    default void setElevatorVelocity(double velocityRadperSec) {}
 
     default void runVolts(Voltage volts) {}
     ;
