@@ -176,7 +176,7 @@ public class Reef {
             return faces[0];
         } else if (face == Faces.FRONT_LEFT) {
             return faces[1];
-        } else if (face == Faces.BACK_LEFT){
+        } else if (face == Faces.BACK_LEFT) {
             return faces[2];
         } else if (face == Faces.BACK) {
             return faces[3];
@@ -185,6 +185,5 @@ public class Reef {
         } else if (face == Faces.FRONT_RIGHT) {
             return faces[5];
         } else return faces[0];
-        
     }
 }
