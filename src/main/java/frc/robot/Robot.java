@@ -1,6 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -105,8 +104,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit() {
-        PathfindingCommand.warmupCommand();
-        robotContainer.resetSimulationField();
+        // robotContainer.resetSimulationField();
     }
 
     /** This function is called periodically when disabled. */

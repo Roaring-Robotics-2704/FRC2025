@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": 303,
-      "y": 184,
-      "width": 1101,
-      "height": 650,
+      "x": -8,
+      "y": -8,
+      "width": 1936,
+      "height": 1048,
       "state": {
         "sidebar": {
           "width": 294,
@@ -62,7 +62,11 @@
             "/AdvantageKit/RealOutputs/CTREMotor/3",
             "/AdvantageKit/RealOutputs/SwerveStates",
             "/AdvantageKit/RealOutputs/Odometry/Robot",
-            "/AdvantageKit/RealOutputs/SwerveStates/Measured"
+            "/AdvantageKit/RealOutputs/SwerveStates/Measured",
+            "/AdvantageKit/RealOutputs/Vision/Summary",
+            "/AdvantageKit/RealOutputs/Vision/Summary/RobotPoses",
+            "/AdvantageKit/RealOutputs/Vision/Summary/TagPoses",
+            "/AdvantageKit/RealOutputs/Vision/Summary/RobotPosesRejected"
           ]
         },
         "tabs": {
@@ -82,27 +86,17 @@
               "controller": {
                 "sources": [
                   {
-                    "type": "ghost",
+                    "type": "robot",
                     "logKey": "NT:/AdvantageKit/RealOutputs/Odometry/Robot",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "Crab Bot",
-                      "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "robot",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/RobotPosition",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "Crab Bot"
+                      "model": "2025 KitBot"
                     }
                   },
                   {
                     "type": "swerveStates",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/Setpoints",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/Measured",
                     "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
@@ -112,16 +106,45 @@
                   },
                   {
                     "type": "swerveStates",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/Measured",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/SetpointsOptimized",
                     "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
-                      "color": "#ff8c00",
+                      "color": "#0000ff",
                       "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Vision/Summary/TagPoses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Odometry/Trajectory",
+                    "logType": "Pose2d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Odometry/TrajectorySetpoint",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "2025 KitBot",
+                      "color": "#ff0000"
                     }
                   }
                 ],
-                "game": "2024 Field",
+                "game": "2025 Field (Welded)",
                 "origin": "blue"
               },
               "controllerUUID": "9p30xnq3grwk3msk2y4y54whg8n1qz7x",
@@ -129,14 +152,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.7313564491338231,
-                  5.968403479160117,
-                  -10.365530546036977
+                  6.6685165963689235,
+                  4.034601038403369,
+                  0.05526342095161141
                 ],
                 "cameraTarget": [
-                  3.4044435760286507,
-                  -1.5105765402205444,
-                  0.3822893203493872
+                  4.713717626982029,
+                  -1.1696527815553563,
+                  -0.28555591896787513
                 ]
               },
               "controlsHeight": 200
@@ -204,5 +227,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.0.0-beta-3"
+  "version": "4.1.2"
 }

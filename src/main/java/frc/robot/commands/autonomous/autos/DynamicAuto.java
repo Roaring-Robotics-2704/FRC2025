@@ -1,50 +1,115 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.autonomous.autos;
 
-import edu.wpi.first.wpilibj.event.EventLoop;
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot;
+import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
+import frc.robot.auto.source.SourceChooser;
 import frc.robot.subsystems.drive.Drive;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DynamicAuto extends Command {
-    private Reef reef;
-    private Drive drive;
-    EventLoop loop = new EventLoop();
-    Trigger toReef;
-    Trigger toSource;
+    private final Reef reef;
+    private final SourceChooser sourceChooser;
 
-    // if we're at the target velocity, kick the ball into the shooter wheel
-    /** Creates a new DynamicAuto. */
-    public DynamicAuto(Reef reef, Drive drive) {
+    private Command currentCommand;
+    private boolean goingToReef = true;
+    private boolean isDone = false;
+
+    public DynamicAuto(Reef reef, SourceChooser chooser, Drive drive) {
         this.reef = reef;
-        this.drive = drive;
+        this.sourceChooser = chooser;
         addRequirements(drive);
-        toReef = new Trigger(loop, () -> !toSource.getAsBoolean());
-        toSource = new Trigger(loop, () -> !toReef.getAsBoolean());
-
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
-    // Called when the command is initially scheduled.
     @Override
-    public void initialize() {}
+    public void initialize() {
+        System.out.println("[DynamicAutoV2] Starting...");
+        scheduleNextPath();
+    }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {}
+    public void execute() {
+        if (currentCommand == null || !currentCommand.isScheduled()) {
+            System.out.println("[DynamicAutoV2] Current command is not running. Scheduling next path...");
+            scheduleNextPath();
+        }
+    }
 
-    // Called once the command ends or is interrupted.
+    private void scheduleNextPath() {
+        Pose2d currentPose = AutoBuilder.getCurrentPose();
+
+        Pose2d targetPose =
+                goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
+        if (!goingToReef) {
+            if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
+
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
+            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
+            } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
+            }
+        }
+
+        System.out.println("[DynamicAutoV2] Scheduling path to " + (goingToReef ? "REEF" : "SOURCE"));
+
+        if (currentCommand != null) {
+            System.out.println("[DynamicAutoV2] Cancelling previous command...");
+            currentCommand.cancel();
+        }
+
+        if (Robot.isRedAlliance()) {
+            currentCommand = AutoBuilder.pathfindToPoseFlipped(targetPose, FINDINGCONSTRAINTS)
+                    .andThen(() -> {
+                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                        goingToReef = !goingToReef; // Toggle AFTER completion
+                        if (currentCommand != null) {
+                            currentCommand.cancel();
+                        }
+                        scheduleNextPath();
+                    });
+        } else {
+            currentCommand = AutoBuilder.pathfindToPose(targetPose, FINDINGCONSTRAINTS)
+                    .andThen(() -> {
+                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                        goingToReef = !goingToReef; // Toggle AFTER completion
+                        if (currentCommand != null) {
+                            currentCommand.cancel();
+                        }
+                        scheduleNextPath();
+                    });
+        }
+
+        currentCommand.schedule();
+        if (reef.isReefFull()) {
+            isDone = true;
+            System.out.println("[DynamicAutoV2] Reef is full.");
+        }
+
+        System.out.println("[DynamicAutoV2] Path to " + (goingToReef ? "REEF" : "SOURCE") + " started.");
+    }
+
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        if (currentCommand != null) {
+            currentCommand.cancel();
+        }
+        System.out.println("[DynamicAutoV2] Command Ended. Interrupted? " + interrupted);
+        if (!isDone && reef.isReefFull()) {
+            isDone = true;
+            System.out.println("[DynamicAutoV2] Reef is full. Ending command.");
+        }
+    }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+
+        return reef.isReefFull(); // Runs until reef is full
     }
 }

@@ -4,8 +4,12 @@
 
 package frc.robot.auto.reef;
 
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import java.util.ArrayList;
@@ -24,6 +28,14 @@ public class Reef {
         faces[3] = new Face(B_LEFT, B_RIGHT);
         faces[4] = new Face(BR_LEFT, BR_RIGHT);
         faces[5] = new Face(FR_LEFT, FR_RIGHT);
+        if (Constants.CURRENT_MODE != Mode.SIM && !Constants.COMPETITION) {
+            faces[1].setSelected(false);
+            faces[2].setSelected(false);
+            faces[3].setSelected(false);
+            faces[4].setSelected(false);
+            faces[5].setSelected(false);
+        }
+        faces[3].setSelected(false);
     }
 
     public class Face {
@@ -68,10 +80,10 @@ public class Reef {
             if (face.getSelected()) {
                 Branch rightBranch = face.getBranch(Side.RIGHT);
                 Branch leftBranch = face.getBranch(Side.LEFT);
-                if (rightBranch.getCoralStatus(level)) {
+                if (!rightBranch.getCoralStatus(level)) {
                     branches.add(rightBranch);
                 }
-                if (leftBranch.getCoralStatus(level)) {
+                if (!leftBranch.getCoralStatus(level)) {
                     branches.add(leftBranch);
                 }
             }
@@ -79,7 +91,16 @@ public class Reef {
         return branches.toArray(new Branch[branches.size()]);
     }
 
-    public Branch getClosestBranch(Pose2d currentPose, Branch[] branches) {
+    public Branch getclosestBranch(Pose2d currentPose, Level level) {
+        if (Robot.isRedAlliance()) {
+            currentPose = FlippingUtil.flipFieldPose(currentPose);
+        }
+        Level currentLevel = level;
+        Branch[] branches = checkHeightAvailability(currentLevel);
+        while (branches.length == 0) {
+            currentLevel = getLesserLevel(currentLevel);
+            branches = checkHeightAvailability(currentLevel);
+        }
         Branch closestBranch = null;
         double minDistance = Double.MAX_VALUE;
         for (Branch branch : branches) {
@@ -90,17 +111,17 @@ public class Reef {
                 closestBranch = branch;
             }
         }
+
         return closestBranch;
     }
 
-    public Pose2d getclosestPose(Pose2d currentPose, Level level) {
-        Level currentLevel = level;
-        Branch[] branches = checkHeightAvailability(currentLevel);
-        while (branches.length == 0) {
-            currentLevel = getLesserLevel(level);
-            branches = checkHeightAvailability(currentLevel);
+    public boolean isReefFull() {
+        for (Face face : faces) {
+            if (face.getSelected() && (!face.leftBranch.isFull() || !face.rightBranch.isFull())) {
+                return false;
+            }
         }
-        return getClosestBranch(currentPose, checkHeightAvailability(level)).getPose();
+        return true;
     }
 
     // Front Left Reef locations
@@ -155,7 +176,7 @@ public class Reef {
             return faces[0];
         } else if (face == Faces.FRONT_LEFT) {
             return faces[1];
-        } else if (face == Faces.BACK_LEFT){
+        } else if (face == Faces.BACK_LEFT) {
             return faces[2];
         } else if (face == Faces.BACK) {
             return faces[3];
@@ -164,6 +185,5 @@ public class Reef {
         } else if (face == Faces.FRONT_RIGHT) {
             return faces[5];
         } else return faces[0];
-        
     }
 }
