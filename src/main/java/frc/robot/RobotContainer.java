@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
@@ -31,9 +32,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
+import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.autos.DynamicAuto;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -76,6 +79,7 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private Reef reef = new Reef();
+    ButtonBoard buttonBoard = new ButtonBoard(reef);
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -144,6 +148,8 @@ public class RobotContainer {
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto);
         // Configure the button bindings
+        // reefCommand = AutoBuilder.pathfindToPose(
+        //         reef.getReefSide(Faces.FRONT).getBranch(Side.LEFT).getPose(), FINDINGCONSTRAINTS);
         configureButtonBindings();
     }
 
@@ -171,13 +177,17 @@ public class RobotContainer {
         // gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
+        // controller.a().whileTrue(new RunCommand(() -> DriveCommands.goToSource(sourceChooser)));
+        // controller
+        //         .y()
+        //         .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef, buttonBoard.getSelectedBranchSide())));
         controller
                 .a()
-                .whileTrue(
-                        DriveCommands.pathfindPose(sourceChooser::getSourcePose).asProxy());
-        controller.y().whileTrue(DriveCommands.pathfindPose(() -> reef.getclosestBranch(
-                        sourceChooser.getSourcePose(), Level.L3)
-                .getPose()));
+                .whileTrue(Commands.sequence(
+                        Commands.runOnce(() -> reefDriveCommand().cancel()), reefDriveCommand()));
+        controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
+        controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
+        controller.y().toggleOnTrue(dynamicAuto);
         controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
         controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
         controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
@@ -231,5 +241,24 @@ public class RobotContainer {
         } else {
             return AutoBuilder.getCurrentPose();
         }
+    }
+
+    public void goToReef() {
+        AutoBuilder.pathfindToPose(reef.getclosestBranch(getPose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
+    }
+
+    public void goToSource() {
+        AutoBuilder.pathfindToPose(sourceChooser.getClosestSourcePose(), FINDINGCONSTRAINTS);
+    }
+
+    public Command reefDriveCommand() {
+        System.out.println("X: " + AutoBuilder.getCurrentPose().getX() + " Y: "
+                + AutoBuilder.getCurrentPose().getY());
+        System.out.println(reef.getclosestFace(AutoBuilder.getCurrentPose()).getName());
+        System.out.println(reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
+                .getSide()
+                .name());
+        return AutoBuilder.pathfindToPose(
+                reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
     }
 }

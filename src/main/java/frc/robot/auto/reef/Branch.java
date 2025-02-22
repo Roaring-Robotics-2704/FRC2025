@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 /** Add your docs here. */
 public class Branch {
-    private Boolean level4 = true;
+    private Boolean level4 = false;
     private Boolean level3 = false;
     private Boolean level2 = false;
     private Boolean level1 = false;
@@ -73,6 +73,6 @@ public class Branch {
     }
 
     public boolean isFull() {
-        return level3 && level2 && level1;
+        return level4 && level3 && level2 && level1;
     }
 }

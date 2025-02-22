@@ -7,45 +7,47 @@ package frc.robot.auto.reef;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
+import frc.robot.util.PoseUtil;
 import java.util.ArrayList;
 import java.util.List;
 
 /** Add your docs here. */
 public class Reef {
-    Face[] faces = new Face[6];
+    static Face[] faces = new Face[6];
+    static int twelve = 3;
 
     // Private constructor to hide the implicit public one
     public Reef() {
 
-        faces[0] = new Face(F_LEFT, F_RIGHT);
-        faces[1] = new Face(FL_LEFT, FL_RIGHT);
-        faces[2] = new Face(BL_LEFT, BL_RIGHT);
-        faces[3] = new Face(B_LEFT, B_RIGHT);
-        faces[4] = new Face(BR_LEFT, BR_RIGHT);
-        faces[5] = new Face(FR_LEFT, FR_RIGHT);
-        if (Constants.CURRENT_MODE != Mode.SIM && !Constants.COMPETITION) {
-            faces[1].setSelected(false);
-            faces[2].setSelected(false);
-            faces[3].setSelected(false);
-            faces[4].setSelected(false);
-            faces[5].setSelected(false);
-        }
-        faces[3].setSelected(false);
+        faces[0] = new Face(F_LEFT, F_RIGHT, Faces.FRONT);
+        faces[1] = new Face(FL_LEFT, FL_RIGHT, Faces.FRONT_LEFT);
+        faces[2] = new Face(BL_LEFT, BL_RIGHT, Faces.BACK_LEFT);
+        faces[3] = new Face(B_LEFT, B_RIGHT, Faces.BACK);
+        faces[4] = new Face(BR_LEFT, BR_RIGHT, Faces.BACK_RIGHT);
+        faces[5] = new Face(FR_LEFT, FR_RIGHT, Faces.FRONT_RIGHT);
+        // if (Constants.CURRENT_MODE != Mode.SIM && !Constants.COMPETITION) {
+        //     faces[1].setSelected(false);
+        //     faces[2].setSelected(false);
+        //     faces[3].setSelected(false);
+        //     faces[4].setSelected(false);
+        //     faces[5].setSelected(false);
+        // }
+        // faces[3].setSelected(false);
     }
 
     public class Face {
         Branch rightBranch;
         Branch leftBranch;
         Boolean isSelected = true;
+        Faces face;
 
-        public Face(Pose2d leftPose, Pose2d rightPose) {
+        public Face(Pose2d leftPose, Pose2d rightPose, Faces face) {
             rightBranch = new Branch(Side.RIGHT, rightPose);
             leftBranch = new Branch(Side.LEFT, leftPose);
+            this.face = face;
         }
 
         public Branch getBranch(Side side) {
@@ -63,15 +65,29 @@ public class Reef {
         public Boolean getSelected() {
             return isSelected;
         }
+
+        public String getName() {
+            return face.name();
+        }
     }
 
     public enum Faces {
-        FRONT,
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT,
-        BACK
+        FRONT(faces[0]),
+        FRONT_LEFT(faces[1]),
+        FRONT_RIGHT(faces[2]),
+        BACK_LEFT(faces[3]),
+        BACK_RIGHT(faces[4]),
+        BACK(faces[5]);
+
+        private final Face face;
+
+        Faces(Face face) {
+            this.face = face;
+        }
+
+        public Face getFace() {
+            return face;
+        }
     }
 
     public Branch[] checkHeightAvailability(Level level) {
@@ -99,13 +115,13 @@ public class Reef {
         Branch[] branches = checkHeightAvailability(currentLevel);
         while (branches.length == 0) {
             currentLevel = getLesserLevel(currentLevel);
-            branches = checkHeightAvailability(currentLevel);
+            branches = checkHeightAvailability(currentLevel); // TODO add recursion
         }
         Branch closestBranch = null;
         double minDistance = Double.MAX_VALUE;
         for (Branch branch : branches) {
-            double distance =
-                    currentPose.getTranslation().getDistance(branch.getPose().getTranslation());
+            double distance = PoseUtil.getDistance(currentPose, branch.getPose());
+            // currentPose.getTranslation().getDistance(branch.getPose().getTranslation());
             if (distance < minDistance) {
                 minDistance = distance;
                 closestBranch = branch;
@@ -113,6 +129,35 @@ public class Reef {
         }
 
         return closestBranch;
+    }
+
+    public Face getclosestFace(Pose2d currentPose) {
+        if (Robot.isRedAlliance()) {
+            currentPose = FlippingUtil.flipFieldPose(currentPose);
+        }
+        List<Face> availablefaces = new ArrayList<>();
+        for (Face face : faces) {
+            if (face.getSelected()) {
+                availablefaces.add(face);
+            }
+        }
+        if (availablefaces.isEmpty()) {
+            availablefaces.add(Faces.FRONT.getFace());
+        }
+        Face closestFace = null;
+        double minDistance = Double.MAX_VALUE;
+        for (Face face : availablefaces) {
+            double distance = currentPose
+                    .getTranslation()
+                    .getDistance(PoseUtil.averagePose(face.leftBranch.getPose(), face.rightBranch.getPose())
+                            .getTranslation());
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestFace = face;
+            }
+        }
+
+        return closestFace;
     }
 
     public boolean isReefFull() {
@@ -149,12 +194,13 @@ public class Reef {
     private static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120));
 
     // private static CoralStatus[] getHeightPriority(CoralStatus priority1) {
-    //     // CoralStatus[] priorities = {CoralStatus.L3, CoralStatus.L2, CoralStatus.L1,
-    //     // CoralStatus.L4};
-    //     CoralStatus priority2 = getLesserPriority(priority1);
-    //     CoralStatus priority3 = getLesserPriority(priority2);
-    //     CoralStatus priority4 = getLesserPriority(priority3);
-    //     return new CoralStatus[] { priority1, priority2, priority3, priority4 };
+    // // CoralStatus[] priorities = {CoralStatus.L3, CoralStatus.L2,
+    // CoralStatus.L1,
+    // // CoralStatus.L4};
+    // CoralStatus priority2 = getLesserPriority(priority1);
+    // CoralStatus priority3 = getLesserPriority(priority2);
+    // CoralStatus priority4 = getLesserPriority(priority3);
+    // return new CoralStatus[] { priority1, priority2, priority3, priority4 };
     // }
 
     private static Level getLesserLevel(Level priority) {

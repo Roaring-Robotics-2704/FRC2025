@@ -36,8 +36,15 @@ public class SourceChooser {
         return sourcePosChooser;
     }
 
+    public Pose2d getClosestSourcePose() {
+        return (PoseUtil.getDistance(RobotContainer.getBluePose(), SourceLocations.SOURCE_LEFT)
+                        < PoseUtil.getDistance(RobotContainer.getBluePose(), SourceLocations.SOURCE_RIGHT)
+                ? SourceLocations.SOURCE_LEFT
+                : SourceLocations.SOURCE_RIGHT);
+    }
+
     public class SourceLocations {
-        private SourceLocations() {}
+        public SourceLocations() {}
 
         public static final Pose2d SOURCE_LEFT = new Pose2d(1.121, 7.025, Rotation2d.fromDegrees(-54));
         public static final Pose2d SOURCE_RIGHT = new Pose2d(1.121, 1.027, Rotation2d.fromDegrees(54));

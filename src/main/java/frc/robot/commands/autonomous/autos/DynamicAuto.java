@@ -18,6 +18,7 @@ public class DynamicAuto extends Command {
     private Command currentCommand;
     private boolean goingToReef = true;
     private boolean isDone = false;
+    Pose2d currentPose;
 
     public DynamicAuto(Reef reef, SourceChooser chooser, Drive drive) {
         this.reef = reef;
@@ -27,20 +28,22 @@ public class DynamicAuto extends Command {
 
     @Override
     public void initialize() {
+        currentPose = AutoBuilder.getCurrentPose();
         System.out.println("[DynamicAutoV2] Starting...");
-        scheduleNextPath();
+        scheduleNextPath(currentPose);
     }
 
     @Override
     public void execute() {
+        currentPose = AutoBuilder.getCurrentPose();
         if (currentCommand == null || !currentCommand.isScheduled()) {
             System.out.println("[DynamicAutoV2] Current command is not running. Scheduling next path...");
-            scheduleNextPath();
+            scheduleNextPath(currentPose);
         }
     }
 
-    private void scheduleNextPath() {
-        Pose2d currentPose = AutoBuilder.getCurrentPose();
+    private void scheduleNextPath(Pose2d pose) {
+        currentPose = AutoBuilder.getCurrentPose();
 
         Pose2d targetPose =
                 goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
@@ -53,7 +56,7 @@ public class DynamicAuto extends Command {
             } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
                 reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
             } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, false);
+                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, true);
             }
         }
 
@@ -72,7 +75,7 @@ public class DynamicAuto extends Command {
                         if (currentCommand != null) {
                             currentCommand.cancel();
                         }
-                        scheduleNextPath();
+                        scheduleNextPath(targetPose);
                     });
         } else {
             currentCommand = AutoBuilder.pathfindToPose(targetPose, FINDINGCONSTRAINTS)
@@ -82,7 +85,8 @@ public class DynamicAuto extends Command {
                         if (currentCommand != null) {
                             currentCommand.cancel();
                         }
-                        scheduleNextPath();
+                        currentPose = AutoBuilder.getCurrentPose();
+                        scheduleNextPath(currentPose);
                     });
         }
 
