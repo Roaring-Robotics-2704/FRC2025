@@ -1,11 +1,9 @@
 package frc.robot.commands.autonomous;
 
-import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
@@ -43,10 +41,6 @@ public class DynamicAuto extends Command {
     }
 
     private void scheduleNextPath() {
-        currentPose = AutoBuilder.getCurrentPose();
-
-        Pose2d targetPose =
-                goingToReef ? reef.getclosestBranch(currentPose, Level.L3).getPose() : sourceChooser.getSourcePose();
         if (!goingToReef) {
             if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
                 reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
@@ -67,28 +61,18 @@ public class DynamicAuto extends Command {
             currentCommand.cancel();
         }
 
-        if (Robot.isRedAlliance()) {
-            currentCommand = AutoBuilder.pathfindToPoseFlipped(targetPose, FINDINGCONSTRAINTS)
-                    .andThen(() -> {
-                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
-                        goingToReef = !goingToReef; // Toggle AFTER completion
-                        if (currentCommand != null) {
-                            currentCommand.cancel();
-                        }
-                        scheduleNextPath();
-                    });
-        } else {
-            currentCommand = AutoBuilder.pathfindToPose(targetPose, FINDINGCONSTRAINTS)
-                    .andThen(() -> {
-                        System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
-                        goingToReef = !goingToReef; // Toggle AFTER completion
-                        if (currentCommand != null) {
-                            currentCommand.cancel();
-                        }
-                        currentPose = AutoBuilder.getCurrentPose();
-                        scheduleNextPath();
-                    });
-        }
+        currentCommand = ((goingToReef)
+                        ? RobotContainer.GoToReef().get()
+                        : RobotContainer.GoToSource().get())
+                .andThen(() -> {
+                    System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
+                    goingToReef = !goingToReef; // Toggle AFTER completion
+                    if (currentCommand != null) {
+                        currentCommand.cancel();
+                    }
+                    currentPose = AutoBuilder.getCurrentPose();
+                    scheduleNextPath();
+                });
 
         currentCommand.schedule();
         if (reef.isReefFull()) {

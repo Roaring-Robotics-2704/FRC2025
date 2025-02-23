@@ -34,7 +34,8 @@ public final class Constants {
 
     public enum Controller {
         XBOX,
-        JOYSTICK
+        JOYSTICK,
+        NONE
     }
 
     public static final int RECHECK_SECONDS = 12;

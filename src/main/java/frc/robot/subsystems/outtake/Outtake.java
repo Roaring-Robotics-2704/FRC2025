@@ -34,12 +34,16 @@ public class Outtake extends SubsystemBase {
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
                 .repeatedly()
-                .withTimeout(OUTTAKE_TIME);
+                .withTimeout(OUTTAKE_TIME)
+                .andThen(() -> outtake.setSpeed(0));
     }
 
     public Command outtakeInCmd() {
 
-        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
+        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                .repeatedly()
+                .withTimeout(INTAKE_TIME)
+                .andThen(() -> outtake.setSpeed(0));
     }
 
     Command outtakeOutSlowCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
@@ -47,6 +51,7 @@ public class Outtake extends SubsystemBase {
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED * .5))
                 .repeatedly()
-                .withTimeout(OUTTAKE_TIME * 2);
+                .withTimeout(OUTTAKE_TIME * 2)
+                .andThen(() -> outtake.setSpeed(0));
     }
 }

@@ -37,11 +37,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
+import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
+import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
@@ -85,11 +87,11 @@ public class RobotContainer {
     private Elevator elevator;
     private Outtake outtake;
 
-    private Reef reef = new Reef();
+    private static Reef reef = new Reef();
     private static SourceChooser sourceChooser = new SourceChooser();
 
     private static DynamicAuto dynamicAuto;
-    // private static DynamicAutoBeta dynamicAutoBeta;
+    private static Command dynamicAutoBeta;
 
     private static SwerveDriveSimulation driveSimulation = null;
 
@@ -161,7 +163,7 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
-        // dynamicAutoBeta = new DynamicAutoBeta(reef, sourceChooser, drive, elevator, outtake);
+        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake).repeatedly();
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -178,7 +180,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto);
-        // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -195,12 +197,14 @@ public class RobotContainer {
             drive.setDefaultCommand(DriveCommands.joystickDrive(
                     drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
-        } else {
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
             drive.setDefaultCommand(DriveCommands.joystickDrive(
                     drive,
                     () -> -joystick.getRawAxis(1),
                     () -> -joystick.getRawAxis(0),
                     () -> -joystick.getRawAxis(2)));
+        } else {
+            // drive.setDefaultCommand(dynamicAutoBeta);
         }
 
         // Switch to X pattern when X button is pressed
@@ -220,7 +224,7 @@ public class RobotContainer {
 
         if (CONTROLLER == Constants.Controller.XBOX) {
             controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        } else {
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
             joystick.button(4).onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         }
         // controller.a().whileTrue(new RunCommand(() ->
@@ -231,19 +235,19 @@ public class RobotContainer {
         // buttonBoard.getSelectedBranchSide())));
         if (CONTROLLER == Constants.Controller.XBOX) {
             controller.a().whileTrue(Commands.deferredProxy(GoToReef()));
-            controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
-            controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
-            controller.y().whileTrue(dynamicAuto);
+            controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+            controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+            controller.y().whileTrue(dynamicAutoBeta);
             controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
             controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
             controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
             controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
-        } else {
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
             joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef()));
             joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
-            joystick.button(5).whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
-            joystick.button(6).whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
-            joystick.button(7).whileTrue(dynamicAuto);
+            joystick.button(5).whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+            joystick.button(6).whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+            joystick.button(7).whileTrue(dynamicAutoBeta);
         }
     }
 
@@ -296,38 +300,63 @@ public class RobotContainer {
         }
     }
 
-    public Supplier<Command> GoToReef() {
-
+    public static Supplier<Command> GoToReef() {
         return () -> AutoBuilder.pathfindThenFollowPath(
                 generatePath(
                                 PoseUtil.offsetPose(
-                                        reef.getclosestBranch(getPose(), Level.L3)
+                                        reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
                                                 .getPose(),
                                         -Units.feetToMeters(1),
                                         0),
-                                reef.getclosestBranch(getPose(), Level.L3).getPose())
+                                reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
+                                        .getPose())
                         .get(),
                 FINDINGCONSTRAINTS);
     }
+    ;
 
     public static Supplier<PathPlannerPath> generatePath(Pose2d start, Pose2d end) {
+        // Calculate the starting rotation based on the direction from start to end
         Rotation2d startRotation = new Rotation2d(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()));
+
+        // Use the rotation of the end pose as the end rotation
         Rotation2d endRotation = end.getRotation();
+
+        // Return a supplier that generates a PathPlannerPath with the calculated waypoints and constraints
         return () -> new PathPlannerPath(
+                // Create waypoints from the start and end poses with the calculated rotations
                 PathPlannerPath.waypointsFromPoses(
                         new Pose2d(start.getTranslation(), startRotation),
-                        new Pose2d(end.getTranslation(), startRotation)),
+                        new Pose2d(end.getTranslation(), endRotation)),
+                // Use predefined path constraints
                 PATHCONSTRAINTS,
+                // Define the ideal starting state with a velocity of 0.5 and the calculated end rotation
                 new IdealStartingState(0.5, endRotation),
-                new GoalEndState(0.0, endRotation)); // Goal end state with original rotation from end pose
+                // Define the goal end state with a velocity of 0.0 and the calculated end rotation
+                new GoalEndState(0.0, endRotation));
     }
 
-    public Supplier<Command> GoToSource() {
+    public static Supplier<Command> GoToSource() {
 
         return () -> AutoBuilder.pathfindThenFollowPath(
                 generatePath(
                                 PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1), 0),
                                 sourceChooser.getClosestSourcePose())
+                        .get(),
+                FINDINGCONSTRAINTS);
+    }
+
+    public static Supplier<Command> GoToSource(Side side) {
+
+        return () -> AutoBuilder.pathfindThenFollowPath(
+                generatePath(
+                                PoseUtil.offsetPose(
+                                        (side == Side.RIGHT)
+                                                ? SourceLocations.SOURCE_RIGHT
+                                                : SourceLocations.SOURCE_LEFT,
+                                        Units.feetToMeters(1),
+                                        0),
+                                (side == Side.RIGHT) ? SourceLocations.SOURCE_RIGHT : SourceLocations.SOURCE_LEFT)
                         .get(),
                 FINDINGCONSTRAINTS);
     }
