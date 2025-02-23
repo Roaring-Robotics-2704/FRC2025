@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -34,7 +35,9 @@ import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
+import frc.robot.command_factories.drive.GoToReef;
 import frc.robot.commands.autonomous.autos.DynamicAuto;
+import frc.robot.commands.autonomous.autos.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
@@ -53,6 +56,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -73,6 +77,7 @@ public class RobotContainer {
     private final Elevator elevator;
     private static SourceChooser sourceChooser = new SourceChooser();
     private static DynamicAuto dynamicAuto;
+    private static DynamicAutoBeta dynamicAutoBeta;
 
     private static SwerveDriveSimulation driveSimulation = null;
 
@@ -80,6 +85,7 @@ public class RobotContainer {
     private final CommandXboxController controller = new CommandXboxController(0);
     private Reef reef = new Reef();
     ButtonBoard buttonBoard = new ButtonBoard(reef);
+    GoToReef reefCommand;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -132,6 +138,10 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
+        dynamicAutoBeta = new DynamicAutoBeta(reef, sourceChooser, drive);
+
+        reefCommand = new GoToReef(reef, drive, controller);
+        reefCommand.schedule();
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
@@ -147,6 +157,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto);
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
         // Configure the button bindings
         // reefCommand = AutoBuilder.pathfindToPose(
         //         reef.getReefSide(Faces.FRONT).getBranch(Side.LEFT).getPose(), FINDINGCONSTRAINTS);
@@ -159,10 +170,11 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-
+        CommandScheduler.getInstance().schedule(reefCommand);
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -181,10 +193,7 @@ public class RobotContainer {
         // controller
         //         .y()
         //         .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef, buttonBoard.getSelectedBranchSide())));
-        controller
-                .a()
-                .whileTrue(Commands.sequence(
-                        Commands.runOnce(() -> reefDriveCommand().cancel()), reefDriveCommand()));
+        // controller.a().whileTrue(reefDriveCommand(this::getPose));
         controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
         controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
         controller.y().toggleOnTrue(dynamicAuto);
@@ -243,22 +252,20 @@ public class RobotContainer {
         }
     }
 
-    public void goToReef() {
-        AutoBuilder.pathfindToPose(reef.getclosestBranch(getPose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
-    }
+    // public void goToReef() {
+    //     AutoBuilder.pathfindToPose(reef.getclosestBranch(getPose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
+    // }
 
     public void goToSource() {
         AutoBuilder.pathfindToPose(sourceChooser.getClosestSourcePose(), FINDINGCONSTRAINTS);
     }
 
-    public Command reefDriveCommand() {
-        System.out.println("X: " + AutoBuilder.getCurrentPose().getX() + " Y: "
-                + AutoBuilder.getCurrentPose().getY());
-        System.out.println(reef.getclosestFace(AutoBuilder.getCurrentPose()).getName());
-        System.out.println(reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
-                .getSide()
-                .name());
+    public Command reefDriveCommand(Supplier<Pose2d> currentPose) {
+        System.out.println(reef.getclosestFace(currentPose.get()).getName());
+        System.out.println(
+                reef.getclosestBranch(currentPose.get(), Level.L3).getSide().name());
         return AutoBuilder.pathfindToPose(
-                reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
+                        reef.getclosestBranch(currentPose.get(), Level.L3).getPose(), FINDINGCONSTRAINTS)
+                .asProxy();
     }
 }

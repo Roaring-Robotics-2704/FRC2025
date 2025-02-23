@@ -108,8 +108,10 @@ public class Reef {
     }
 
     public Branch getclosestBranch(Pose2d currentPose, Level level) {
+        Pose2d pose = currentPose;
+        System.out.println("X: " + pose.getX() + " Y: " + pose.getY());
         if (Robot.isRedAlliance()) {
-            currentPose = FlippingUtil.flipFieldPose(currentPose);
+            pose = FlippingUtil.flipFieldPose(currentPose);
         }
         Level currentLevel = level;
         Branch[] branches = checkHeightAvailability(currentLevel);
@@ -120,7 +122,8 @@ public class Reef {
         Branch closestBranch = null;
         double minDistance = Double.MAX_VALUE;
         for (Branch branch : branches) {
-            double distance = PoseUtil.getDistance(currentPose, branch.getPose());
+            double distance = PoseUtil.getDistance(pose, branch.getPose());
+            //    0 System.out.println(distance);
             // currentPose.getTranslation().getDistance(branch.getPose().getTranslation());
             if (distance < minDistance) {
                 minDistance = distance;

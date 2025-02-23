@@ -30,7 +30,7 @@ public class DynamicAuto extends Command {
     public void initialize() {
         currentPose = AutoBuilder.getCurrentPose();
         System.out.println("[DynamicAutoV2] Starting...");
-        scheduleNextPath(currentPose);
+        scheduleNextPath();
     }
 
     @Override
@@ -38,11 +38,11 @@ public class DynamicAuto extends Command {
         currentPose = AutoBuilder.getCurrentPose();
         if (currentCommand == null || !currentCommand.isScheduled()) {
             System.out.println("[DynamicAutoV2] Current command is not running. Scheduling next path...");
-            scheduleNextPath(currentPose);
+            scheduleNextPath();
         }
     }
 
-    private void scheduleNextPath(Pose2d pose) {
+    private void scheduleNextPath() {
         currentPose = AutoBuilder.getCurrentPose();
 
         Pose2d targetPose =
@@ -75,7 +75,7 @@ public class DynamicAuto extends Command {
                         if (currentCommand != null) {
                             currentCommand.cancel();
                         }
-                        scheduleNextPath(targetPose);
+                        scheduleNextPath();
                     });
         } else {
             currentCommand = AutoBuilder.pathfindToPose(targetPose, FINDINGCONSTRAINTS)
@@ -86,7 +86,7 @@ public class DynamicAuto extends Command {
                             currentCommand.cancel();
                         }
                         currentPose = AutoBuilder.getCurrentPose();
-                        scheduleNextPath(currentPose);
+                        scheduleNextPath();
                     });
         }
 
