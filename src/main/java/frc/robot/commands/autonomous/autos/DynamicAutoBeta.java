@@ -18,6 +18,7 @@ import frc.robot.subsystems.elevator.Elevator;
 
 import java.util.List;
 import java.util.function.Supplier;
+
 public class DynamicAutoBeta extends Command {
 
     private Reef reef;
@@ -37,7 +38,7 @@ public class DynamicAutoBeta extends Command {
 
 
         commandList = List.of(
-                goToReef(chooser.getClosestSourcePose(), Level.L3),
+                goToReef(),
                 ElevatorUp(),
                 goToSource(),
 
@@ -119,24 +120,30 @@ public class DynamicAutoBeta extends Command {
     }
 
     private Supplier<Command> goToReef() {
-        return () -> goToPose(reef.getclosestBranch(RobotContainer.getBluePose(), PRIORITY_LEVEL).getPose()); // Get the closest branch on the reef
-                                                                                 // and go to it
+        return () -> goToPose(reef.getclosestBranch(RobotContainer.getBluePose(), PRIORITY_LEVEL).getPose()); // Get the
+                                                                                                              // closest
+                                                                                                              // branch
+                                                                                                              // on the
+                                                                                                              // reef
+        // and go to it
     }
 
     private Supplier<Command> goToSource() {
         return () -> goToPose(sourceChooser.getClosestSourcePose()); // Get the closest source pose and go to it
     }
+
+    @SuppressWarnings("static-access")
     private Supplier<Command> ElevatorUp() {
         Level currentLevel = PRIORITY_LEVEL;
         Branch branch = reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL);
         if (branch.getCoralStatus(PRIORITY_LEVEL)) {
-            return () -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Go to the Priority level
+            return () -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Go to the Priority level if 
         } else {
-            while (branch.getCoralStatus(currentLevel) != TRUE) {
-                currentLevel = 
-                if (branch.getCoralStatus(currentLevel)) {
-                    return () -> ElevatorFactory.elevator(elevator, currentLevel); // Go to the next level
-                }
+            while (!branch.getCoralStatus(currentLevel)) {
+                currentLevel = reef.getLesserLevel(currentLevel);
             }
+            Level elevatorLevel = currentLevel;
+            return () -> ElevatorFactory.elevator(elevator, elevatorLevel); // Go to the current level
+        }
     }
 }

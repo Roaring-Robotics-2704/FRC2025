@@ -206,7 +206,7 @@ public class Reef {
     // return new CoralStatus[] { priority1, priority2, priority3, priority4 };
     // }
 
-    private static Level getLesserLevel(Level priority) {
+    public static Level getLesserLevel(Level priority) {
         if (priority == Level.L4) {
             return Level.L3;
         } else if (priority == Level.L3) {
