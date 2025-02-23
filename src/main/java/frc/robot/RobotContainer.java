@@ -64,18 +64,17 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a "declarative" paradigm, very
- * little robot logic should actually be handled in the {@link Robot} periodic
- * methods (other than the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and
- * button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
+ * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
+ * Instead, the structure of the robot (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
     // Subsystems
     private Drive drive;
+
     @SuppressWarnings("unused")
     private Vision vision;
+
     private Elevator elevator;
     private Outtake outtake;
 
@@ -94,9 +93,7 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
             case REAL: {
@@ -118,8 +115,8 @@ public class RobotContainer {
 
             case SIM: {
                 // create a maple-sim swerve drive simulation instance
-                driveSimulation = new SwerveDriveSimulation(DriveConstants.mapleSimConfig,
-                        new Pose2d(3, 3, new Rotation2d()));
+                driveSimulation =
+                        new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
                 // add the simulated drivetrain to the simulation field
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 // Sim robot, instantiate physics sim IO implementations
@@ -136,28 +133,17 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
-                this.elevator = new Elevator(new ElevatorIO() {
-                });
-                this.outtake = new Outtake(new OuttakeIO() {
-                });
+                this.elevator = new Elevator(new ElevatorIO() {});
+                this.outtake = new Outtake(new OuttakeIO() {});
                 break;
             }
             default: {
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {
-                        }, new ModuleIO() {
-                        }, new ModuleIO() {
-                        }, new ModuleIO() {
-                        }, new ModuleIO() {
-                        });
-                vision = new Vision(drive, new VisionIO() {
-                }, new VisionIO() {
-                });
-                this.elevator = new Elevator(new ElevatorIO() {
-                });
-                this.outtake = new Outtake(new OuttakeIO() {
-                });
+                        new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                this.elevator = new Elevator(new ElevatorIO() {});
+                this.outtake = new Outtake(new OuttakeIO() {});
                 break;
             }
         }
@@ -185,12 +171,9 @@ public class RobotContainer {
     }
 
     /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by instantiating a
-     * {@link GenericHID} or one of its subclasses
-     * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
-     * and then passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * Use this method to define your button->command mappings. Buttons can be created by instantiating a
+     * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
+     * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
 
@@ -202,8 +185,11 @@ public class RobotContainer {
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
-                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
-                : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
+                ? (() -> drive.resetOdometry(
+                        driveSimulation
+                                .getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
+                : (() -> drive.resetOdometry(
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // controller.a().whileTrue(new RunCommand(() ->
@@ -232,8 +218,7 @@ public class RobotContainer {
     }
 
     public void resetSimulationField() {
-        if (Constants.CURRENT_MODE != Constants.Mode.SIM)
-            return;
+        if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(new Pose2d(8.125, 7.35, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
@@ -242,15 +227,13 @@ public class RobotContainer {
     }
 
     public static void resetSimulationField(Pose2d pose) {
-        if (Constants.CURRENT_MODE != Constants.Mode.SIM)
-            return;
+        if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(pose);
     }
 
     public void displaySimFieldToAdvantageScope() {
-        if (Constants.CURRENT_MODE != Constants.Mode.SIM)
-            return;
+        if (Constants.CURRENT_MODE != Constants.Mode.SIM) return;
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
@@ -288,7 +271,7 @@ public class RobotContainer {
         System.out.println(
                 reef.getclosestBranch(currentPose.get(), Level.L3).getSide().name());
         return AutoBuilder.pathfindToPose(
-                reef.getclosestBranch(currentPose.get(), Level.L3).getPose(), FINDINGCONSTRAINTS)
+                        reef.getclosestBranch(currentPose.get(), Level.L3).getPose(), FINDINGCONSTRAINTS)
                 .asProxy();
     }
 }

@@ -1,7 +1,7 @@
 package frc.robot.commands.autonomous.autos;
 
-import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.Constants.PRIORITY_LEVEL;
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,7 +15,6 @@ import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.outtake.Outtake;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -37,15 +36,7 @@ public class DynamicAutoBeta extends Command {
         this.elevator = elevator;
         this.outtake = outtake;
 
-
-        commandList = List.of(
-                goToReef(),
-                elevatorUp(),
-                outtake(),
-                elevatorDown(),
-                goToSource(),
-                intake()
-                );
+        commandList = List.of(goToReef(), elevatorUp(), outtake(), elevatorDown(), goToSource(), intake());
 
         addRequirements(drive, elevator);
     }
@@ -66,10 +57,7 @@ public class DynamicAutoBeta extends Command {
         }
     }
 
-    /**
-     * Schedules the next command in the sequence. Cancels the current command if it
-     * is running.
-     */
+    /** Schedules the next command in the sequence. Cancels the current command if it is running. */
     private void scheduleNextCommand() {
         // If the command list is empty, there is nothing to schedule
         if (commandList.isEmpty()) {
@@ -125,11 +113,12 @@ public class DynamicAutoBeta extends Command {
     }
 
     private Supplier<Command> goToReef() {
-        return () -> goToPose(reef.getclosestBranch(RobotContainer.getBluePose(), PRIORITY_LEVEL).getPose()); // Get the
-                                                                                                              // closest
-                                                                                                              // branch
-                                                                                                              // on the
-                                                                                                              // reef
+        return () -> goToPose(reef.getclosestBranch(RobotContainer.getBluePose(), PRIORITY_LEVEL)
+                .getPose()); // Get the
+        // closest
+        // branch
+        // on the
+        // reef
         // and go to it
     }
 
@@ -142,7 +131,7 @@ public class DynamicAutoBeta extends Command {
         Level currentLevel = PRIORITY_LEVEL;
         Branch branch = reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL);
         if (branch.getCoralStatus(PRIORITY_LEVEL)) {
-            return () -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Go to the Priority level if 
+            return () -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Go to the Priority level if
         } else {
             while (!branch.getCoralStatus(currentLevel)) {
                 currentLevel = reef.getLesserLevel(currentLevel);
@@ -151,6 +140,7 @@ public class DynamicAutoBeta extends Command {
             return () -> ElevatorFactory.elevator(elevator, elevatorLevel); // Go to the current level
         }
     }
+
     private Supplier<Command> elevatorDown() {
         return () -> ElevatorFactory.elevatorIntake(elevator); // Go to the intake height
     }
@@ -158,6 +148,7 @@ public class DynamicAutoBeta extends Command {
     private Supplier<Command> outtake() {
         return () -> outtake.outtakeOutCmd(); // Outtake the coral
     }
+
     private Supplier<Command> intake() {
         return () -> outtake.outtakeInCmd(); // Outtake the coral
     }

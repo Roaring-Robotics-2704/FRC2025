@@ -4,6 +4,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
+
 public class RemoverIOSpark implements RemoverIO {
     private SparkMax rollerMotor;
     private SparkMax pivotMotor;

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-
 public class AlgaeArmIOSim implements AlgaeArmIO {
     private double m_armKp = 3;
     // The arm gearbox represents a gearbox containing 1 NEO motor.
@@ -38,10 +37,10 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
     // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    //private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-    //private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-    //private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-    //private final MechanismLigament2d m_arm =
+    // private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
+    // private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+    // private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
+    // private final MechanismLigament2d m_arm =
     //        m_armPivot.append(new MechanismLigament2d("Arm", 30, Units.radiansToDegrees(m_armSim.getAngleRads())));
 
     public AlgaeArmIOSim() {}

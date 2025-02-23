@@ -29,7 +29,8 @@ public class Outtake extends SubsystemBase {
         outtake.updateInputs(outtakeInputs);
     }
 
-    public Command outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+    public Command
+            outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
                 .repeatedly()

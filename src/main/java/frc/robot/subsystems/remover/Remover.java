@@ -8,6 +8,7 @@ public class Remover extends SubsystemBase {
     private RemoverIO removerIO;
 
     private RemoverIOInputsAutoLogged removerIOInputsAutoLogged = new RemoverIOInputsAutoLogged();
+
     public Remover(RemoverIO removerIO) {
         this.removerIO = removerIO;
     }

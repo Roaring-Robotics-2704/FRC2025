@@ -8,10 +8,10 @@ import frc.robot.auto.reef.Branch.Level;
  * the value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).
  */
 public final class Constants {
-    //Auto Priority
+    // Auto Priority
     public static final Level PRIORITY_LEVEL = Level.L3;
 
-    //General Constants
+    // General Constants
     public static final double DRIVE_SPEED = 0.25;
     public static final double TURN_SPEED = 0.6;
     public static final Boolean COMPETITION = false;
