@@ -62,7 +62,7 @@ public class Branch {
             case L2:
                 return level2;
             case L1:
-                return level1;
+                return false;
             default:
                 return false;
         }

@@ -34,8 +34,8 @@ import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
-import frc.robot.commands.autonomous.autos.DynamicAuto;
-import frc.robot.commands.autonomous.autos.DynamicAutoBeta;
+import frc.robot.commands.autonomous.DynamicAuto;
+import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
@@ -198,7 +198,7 @@ public class RobotContainer {
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        // controller.a().whileTrue(reefDriveCommand(this::getPose));
+        // controller.a().whileTrue(Commands.deferredProxy(GoToReef()));
         controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
         controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
         controller.y().toggleOnTrue(dynamicAuto);
@@ -257,21 +257,8 @@ public class RobotContainer {
         }
     }
 
-    // public void goToReef() {
-    // AutoBuilder.pathfindToPose(reef.getclosestBranch(getPose(),
-    // Level.L3).getPose(), FINDINGCONSTRAINTS);
-    // }
-
-    public void goToSource() {
-        AutoBuilder.pathfindToPose(sourceChooser.getClosestSourcePose(), FINDINGCONSTRAINTS);
-    }
-
-    public Command reefDriveCommand(Supplier<Pose2d> currentPose) {
-        System.out.println(reef.getclosestFace(currentPose.get()).getName());
-        System.out.println(
-                reef.getclosestBranch(currentPose.get(), Level.L3).getSide().name());
-        return AutoBuilder.pathfindToPose(
-                        reef.getclosestBranch(currentPose.get(), Level.L3).getPose(), FINDINGCONSTRAINTS)
-                .asProxy();
+    public Supplier<Command> GoToReef() {
+        return () -> AutoBuilder.pathfindToPose(
+                reef.getclosestBranch(RobotContainer.getBluePose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
     }
 }

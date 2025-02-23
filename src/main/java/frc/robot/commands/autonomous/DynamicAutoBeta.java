@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous.autos;
+package frc.robot.commands.autonomous;
 
 import static frc.robot.Constants.PRIORITY_LEVEL;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;

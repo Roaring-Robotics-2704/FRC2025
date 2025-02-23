@@ -22,9 +22,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
-import frc.robot.auto.reef.Branch.Side;
-import frc.robot.auto.reef.Reef;
-import frc.robot.auto.source.SourceChooser;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.PoseUtil;
@@ -295,30 +292,6 @@ public class DriveCommands {
             return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS); // TODO add flipping
         } else {
             return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
-        }
-    }
-
-    public static void goToSource(SourceChooser source) {
-        if (AutoBuilder.shouldFlip()) {
-            AutoBuilder.pathfindToPoseFlipped(source.getSourcePose(), FINDINGCONSTRAINTS);
-        } else {
-            AutoBuilder.pathfindToPose(source.getSourcePose(), FINDINGCONSTRAINTS);
-        }
-    }
-
-    public static void goToReef(Reef reef, Side side) {
-        if (AutoBuilder.shouldFlip()) {
-            AutoBuilder.pathfindToPoseFlipped(
-                    reef.getclosestFace(AutoBuilder.getCurrentPose())
-                            .getBranch(side)
-                            .getPose(),
-                    FINDINGCONSTRAINTS);
-        } else {
-            AutoBuilder.pathfindToPose(
-                    reef.getclosestFace(AutoBuilder.getCurrentPose())
-                            .getBranch(side)
-                            .getPose(),
-                    FINDINGCONSTRAINTS);
         }
     }
 }
