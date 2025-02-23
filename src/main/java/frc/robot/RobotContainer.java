@@ -13,20 +13,27 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.CONTROLLER;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
+import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_1_NAME;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
@@ -35,7 +42,6 @@ import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
-import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
@@ -57,6 +63,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.PoseUtil;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -82,12 +89,14 @@ public class RobotContainer {
     private static SourceChooser sourceChooser = new SourceChooser();
 
     private static DynamicAuto dynamicAuto;
-    private static DynamicAutoBeta dynamicAutoBeta;
+    // private static DynamicAutoBeta dynamicAutoBeta;
 
     private static SwerveDriveSimulation driveSimulation = null;
 
     // Controller
-    private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController controller;
+    private final CommandJoystick joystick;
+
     ButtonBoard buttonBoard = new ButtonBoard(reef);
 
     // Dashboard inputs
@@ -95,6 +104,10 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        // Initialize Controller
+        controller = new CommandXboxController(0);
+        joystick = new CommandJoystick(2);
+
         switch (Constants.CURRENT_MODE) {
             case REAL: {
                 // Real robot, instantiate hardware IO implementations
@@ -148,7 +161,7 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
-        dynamicAutoBeta = new DynamicAutoBeta(reef, sourceChooser, drive, elevator, outtake);
+        // dynamicAutoBeta = new DynamicAutoBeta(reef, sourceChooser, drive, elevator, outtake);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -165,7 +178,7 @@ public class RobotContainer {
             autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto);
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
+        // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -178,11 +191,25 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-        // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            drive.setDefaultCommand(DriveCommands.joystickDrive(
+                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
+        } else {
+            drive.setDefaultCommand(DriveCommands.joystickDrive(
+                    drive,
+                    () -> -joystick.getRawAxis(1),
+                    () -> -joystick.getRawAxis(0),
+                    () -> -joystick.getRawAxis(2)));
+        }
+
+        // Switch to X pattern when X button is pressed
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        } else {
+            joystick.button(3).onTrue(Commands.runOnce(drive::stopWithX, drive));
+            ;
+        }
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
                 ? (() -> drive.resetOdometry(
@@ -190,22 +217,34 @@ public class RobotContainer {
                                 .getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
                 : (() -> drive.resetOdometry(
                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        } else {
+            joystick.button(4).onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        }
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        // controller.a().whileTrue(Commands.deferredProxy(GoToReef()));
-        controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
-        controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
-        controller.y().toggleOnTrue(dynamicAuto);
-        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.a().whileTrue(Commands.deferredProxy(GoToReef()));
+            controller.x().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
+            controller.b().whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
+            controller.y().whileTrue(dynamicAuto);
+            controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+            controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+            controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+            controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+        } else {
+            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef()));
+            joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
+            joystick.button(5).whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_LEFT, FINDINGCONSTRAINTS));
+            joystick.button(6).whileTrue(AutoBuilder.pathfindToPose(SourceLocations.SOURCE_RIGHT, FINDINGCONSTRAINTS));
+            joystick.button(7).whileTrue(dynamicAuto);
+        }
     }
 
     /**
@@ -258,7 +297,38 @@ public class RobotContainer {
     }
 
     public Supplier<Command> GoToReef() {
-        return () -> AutoBuilder.pathfindToPose(
-                reef.getclosestBranch(RobotContainer.getBluePose(), Level.L3).getPose(), FINDINGCONSTRAINTS);
+
+        return () -> AutoBuilder.pathfindThenFollowPath(
+                generatePath(
+                                PoseUtil.offsetPose(
+                                        reef.getclosestBranch(getPose(), Level.L3)
+                                                .getPose(),
+                                        -Units.feetToMeters(1),
+                                        0),
+                                reef.getclosestBranch(getPose(), Level.L3).getPose())
+                        .get(),
+                FINDINGCONSTRAINTS);
+    }
+
+    public static Supplier<PathPlannerPath> generatePath(Pose2d start, Pose2d end) {
+        Rotation2d startRotation = new Rotation2d(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()));
+        Rotation2d endRotation = end.getRotation();
+        return () -> new PathPlannerPath(
+                PathPlannerPath.waypointsFromPoses(
+                        new Pose2d(start.getTranslation(), startRotation),
+                        new Pose2d(end.getTranslation(), startRotation)),
+                PATHCONSTRAINTS,
+                new IdealStartingState(0.5, endRotation),
+                new GoalEndState(0.0, endRotation)); // Goal end state with original rotation from end pose
+    }
+
+    public Supplier<Command> GoToSource() {
+
+        return () -> AutoBuilder.pathfindThenFollowPath(
+                generatePath(
+                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1), 0),
+                                sourceChooser.getClosestSourcePose())
+                        .get(),
+                FINDINGCONSTRAINTS);
     }
 }

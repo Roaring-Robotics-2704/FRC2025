@@ -11,6 +11,9 @@ public final class Constants {
     // Auto Priority
     public static final Level PRIORITY_LEVEL = Level.L3;
 
+    // Controller
+    public static final Controller CONTROLLER = Controller.JOYSTICK;
+
     // General Constants
     public static final double DRIVE_SPEED = 0.25;
     public static final double TURN_SPEED = 0.6;
@@ -27,6 +30,11 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    public enum Controller {
+        XBOX,
+        JOYSTICK
     }
 
     public static final int RECHECK_SECONDS = 12;

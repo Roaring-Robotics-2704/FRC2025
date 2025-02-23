@@ -121,7 +121,7 @@ public class DriveConstants {
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
     public static final PathConstraints PATHCONSTRAINTS =
-            new PathConstraints(2, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // max 3 velocity
+            new PathConstraints(0.5, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // max 3 velocity
     public static final PathConstraints FINDINGCONSTRAINTS =
             new PathConstraints(2, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // max 3 velocity
 }
