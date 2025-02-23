@@ -46,4 +46,5 @@ public class ElevatorConstants {
     public static final double L2_HEIGHT = 32;
     public static final double L3_HEIGHT = 47.5;
     public static final double L4_HEIGHT = 72;
+    public static final double INTAKE_HEIGHT = 2;
 }

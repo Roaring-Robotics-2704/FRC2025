@@ -1,4 +1,5 @@
 {
     "sonarCloudOrganization": "mmarchjr",
-    "projectKey": "mmarchjr_FRC2025-test"
+    "projectKey": "mmarchjr_FRC2025",
+    "region": "EU"
 }

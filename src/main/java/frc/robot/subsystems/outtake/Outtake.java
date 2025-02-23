@@ -26,17 +26,17 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-
+        outtake.updateInputs(outtakeInputs);
     }
 
-    Command outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+    public Command outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
                 .repeatedly()
                 .withTimeout(OUTTAKE_TIME);
     }
 
-    Command outtakeInCmd() {
+    public Command outtakeInCmd() {
 
         return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
     }

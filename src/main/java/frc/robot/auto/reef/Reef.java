@@ -104,6 +104,12 @@ public class Reef {
                 }
             }
         }
+        if (branches.isEmpty()) {
+            Branch[] branch = checkHeightAvailability(getLesserLevel(level));
+            for (Branch b : branch) {
+                branches.add(b);
+            }
+        }
         return branches.toArray(new Branch[branches.size()]);
     }
 
@@ -115,16 +121,10 @@ public class Reef {
         }
         Level currentLevel = level;
         Branch[] branches = checkHeightAvailability(currentLevel);
-        while (branches.length == 0) {
-            currentLevel = getLesserLevel(currentLevel);
-            branches = checkHeightAvailability(currentLevel); // TODO add recursion
-        }
         Branch closestBranch = null;
         double minDistance = Double.MAX_VALUE;
         for (Branch branch : branches) {
             double distance = PoseUtil.getDistance(pose, branch.getPose());
-            //    0 System.out.println(distance);
-            // currentPose.getTranslation().getDistance(branch.getPose().getTranslation());
             if (distance < minDistance) {
                 minDistance = distance;
                 closestBranch = branch;

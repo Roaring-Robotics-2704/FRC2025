@@ -6,7 +6,6 @@ import static frc.robot.Constants.PRIORITY_LEVEL;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
@@ -15,6 +14,7 @@ import frc.robot.auto.source.SourceChooser;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.outtake.Outtake;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -23,24 +23,29 @@ public class DynamicAutoBeta extends Command {
 
     private Reef reef;
     private SourceChooser sourceChooser;
-    private Drive drive;
     private Elevator elevator;
+    private Outtake outtake;
+
     private int currentIndex = 0;
 
     private Command currentCommand;
     List<Supplier<Command>> commandList;
 
-    public DynamicAutoBeta(Reef reef, SourceChooser chooser, Drive drive, Elevator elevator) {
+    public DynamicAutoBeta(Reef reef, SourceChooser chooser, Drive drive, Elevator elevator, Outtake outtake) {
         this.reef = reef;
         this.sourceChooser = chooser;
-        this.drive = drive;
         this.elevator = elevator;
+        this.outtake = outtake;
 
 
         commandList = List.of(
                 goToReef(),
-                ElevatorUp(),
+                elevatorUp(),
+                outtake(),
+                elevatorDown(),
                 goToSource(),
+                intake()
+                );
 
         addRequirements(drive, elevator);
     }
@@ -133,7 +138,7 @@ public class DynamicAutoBeta extends Command {
     }
 
     @SuppressWarnings("static-access")
-    private Supplier<Command> ElevatorUp() {
+    private Supplier<Command> elevatorUp() {
         Level currentLevel = PRIORITY_LEVEL;
         Branch branch = reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL);
         if (branch.getCoralStatus(PRIORITY_LEVEL)) {
@@ -145,5 +150,15 @@ public class DynamicAutoBeta extends Command {
             Level elevatorLevel = currentLevel;
             return () -> ElevatorFactory.elevator(elevator, elevatorLevel); // Go to the current level
         }
+    }
+    private Supplier<Command> elevatorDown() {
+        return () -> ElevatorFactory.elevatorIntake(elevator); // Go to the intake height
+    }
+
+    private Supplier<Command> outtake() {
+        return () -> outtake.outtakeOutCmd(); // Outtake the coral
+    }
+    private Supplier<Command> intake() {
+        return () -> outtake.outtakeInCmd(); // Outtake the coral
     }
 }

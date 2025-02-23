@@ -7,12 +7,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Remover extends SubsystemBase {
     private RemoverIO removerIO;
 
+    private RemoverIOInputsAutoLogged removerIOInputsAutoLogged = new RemoverIOInputsAutoLogged();
     public Remover(RemoverIO removerIO) {
         this.removerIO = removerIO;
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        removerIO.updateInputs(removerIOInputsAutoLogged);
+    }
 
     Command pivotCommand() {
         int pivotChecker = 0;

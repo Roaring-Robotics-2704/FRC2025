@@ -8,18 +8,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import frc.robot.subsystems.algaeArm.AlgaeArmConstants.*;
-import frc.robot.subsystems.algaeArm.AlgaeArmIO.AlgaeArmIOInputs;
-import frc.robot.util.SparkUtil.*;
+
 
 public class AlgaeArmIOSim implements AlgaeArmIO {
     private double m_armKp = 3;
-    private double m_armSetpointDegrees = 0;
-
-    // The arm gearbox represents a gearbox containing two Vex 775pro motors.
+    // The arm gearbox represents a gearbox containing 1 NEO motor.
     private final DCMotor m_armGearbox = DCMotor.getNEO(1);
 
     // Standard classes for controlling our arm
@@ -45,11 +38,11 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
     // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-    private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-    private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-    private final MechanismLigament2d m_arm =
-            m_armPivot.append(new MechanismLigament2d("Arm", 30, Units.radiansToDegrees(m_armSim.getAngleRads())));
+    //private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
+    //private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+    //private final MechanismLigament2d m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
+    //private final MechanismLigament2d m_arm =
+    //        m_armPivot.append(new MechanismLigament2d("Arm", 30, Units.radiansToDegrees(m_armSim.getAngleRads())));
 
     public AlgaeArmIOSim() {}
 
