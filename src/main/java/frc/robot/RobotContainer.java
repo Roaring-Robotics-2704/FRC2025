@@ -79,36 +79,36 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
     // Subsystems
-    private Drive drive;
+    private Drive drive; // Drive subsystem
 
     @SuppressWarnings("unused")
-    private Vision vision;
+    private Vision vision; // Vision subsystem
 
-    private Elevator elevator;
-    private Outtake outtake;
+    private Elevator elevator; // Elevator subsystem
+    private Outtake outtake; // Outtake subsystem
 
-    private static Reef reef = new Reef();
-    private static SourceChooser sourceChooser = new SourceChooser();
+    private static Reef reef = new Reef(); // Reef object
+    private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
 
-    private static DynamicAuto dynamicAuto;
-    private static Command dynamicAutoBeta;
+    private static DynamicAuto dynamicAuto; // Dynamic auto command
+    private static Command dynamicAutoBeta; // Dynamic auto beta command
 
-    private static SwerveDriveSimulation driveSimulation = null;
+    private static SwerveDriveSimulation driveSimulation = null; // Swerve drive simulation
 
     // Controller
-    private final CommandXboxController controller;
-    private final CommandJoystick joystick;
+    private final CommandXboxController controller; // Xbox controller
+    private final CommandJoystick joystick; // Joystick
 
-    ButtonBoard buttonBoard = new ButtonBoard(reef);
+    ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
     // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
+    private final LoggedDashboardChooser<Command> autoChooser; // Auto chooser
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         // Initialize Controller
-        controller = new CommandXboxController(0);
-        joystick = new CommandJoystick(2);
+        controller = new CommandXboxController(0); // Initialize Xbox controller
+        joystick = new CommandJoystick(2); // Initialize joystick
 
         switch (Constants.CURRENT_MODE) {
             case REAL: {
@@ -118,71 +118,91 @@ public class RobotContainer {
                         new ModuleIOSpark(0),
                         new ModuleIOSpark(1),
                         new ModuleIOSpark(2),
-                        new ModuleIOSpark(3));
+                        new ModuleIOSpark(3)); // Initialize drive subsystem
                 this.vision = new Vision(
                         drive,
                         new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
-                        new VisionIOPhotonVision(VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1));
-                this.elevator = new Elevator(new ElevatorIOSpark());
-                this.outtake = new Outtake(new OuttakeIOSpark());
+                        new VisionIOPhotonVision(
+                                VisionConstants.CAMERA_1_NAME,
+                                VisionConstants.robotToCamera1)); // Initialize vision subsystem
+                this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
+                this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
                 break;
             }
 
             case SIM: {
                 // create a maple-sim swerve drive simulation instance
-                driveSimulation =
-                        new SwerveDriveSimulation(DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+                driveSimulation = new SwerveDriveSimulation(
+                        DriveConstants.mapleSimConfig,
+                        new Pose2d(3, 3, new Rotation2d())); // Initialize drive simulation
                 // add the simulated drivetrain to the simulation field
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive simulation to arena
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOSim(driveSimulation.getModules()[0]),
                         new ModuleIOSim(driveSimulation.getModules()[1]),
                         new ModuleIOSim(driveSimulation.getModules()[2]),
-                        new ModuleIOSim(driveSimulation.getModules()[3]));
+                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive subsystem
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
                                 CAMERA_0_NAME, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
-                                CAMERA_1_NAME, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                CAMERA_1_NAME,
+                                robotToCamera1,
+                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize vision subsystem
 
-                this.elevator = new Elevator(new ElevatorIO() {});
-                this.outtake = new Outtake(new OuttakeIO() {});
+                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
+                this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 break;
             }
             default: {
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
-                this.elevator = new Elevator(new ElevatorIO() {});
-                this.outtake = new Outtake(new OuttakeIO() {});
+                        new GyroIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {}); // Initialize drive subsystem
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
+                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
+                this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 break;
             }
         }
-        dynamicAuto = new DynamicAuto(reef, sourceChooser, drive);
-        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake).repeatedly();
+        dynamicAuto = new DynamicAuto(reef, sourceChooser, drive); // Initialize dynamic auto command
+        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake)
+                .repeatedly(); // Initialize dynamic auto beta command
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser =
+                new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize auto chooser
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
             autoChooser.addOption(
-                    "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-            autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+                    "Drive Wheel Radius Characterization",
+                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius characterization option
             autoChooser.addOption(
-                    "Drive SysId (Quasistatic Forward)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+                    "Drive Simple FF Characterization",
+                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward characterization option
             autoChooser.addOption(
-                    "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-            autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-            autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+                    "Drive SysId (Quasistatic Forward)",
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId quasistatic forward option
+            autoChooser.addOption(
+                    "Drive SysId (Quasistatic Reverse)",
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId quasistatic reverse option
+            autoChooser.addOption(
+                    "Drive SysId (Dynamic Forward)",
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic forward option
+            autoChooser.addOption(
+                    "Drive SysId (Dynamic Reverse)",
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic reverse option
         }
-        autoChooser.addOption("Dynamic Auto", dynamicAuto);
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta);
+        autoChooser.addOption("Dynamic Auto", dynamicAuto); // Add dynamic auto option
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta); // Add dynamic auto beta option
         // Configure the button bindings
-        configureButtonBindings();
+        configureButtonBindings(); // Configure button bindings
     }
 
     /**
@@ -315,6 +335,13 @@ public class RobotContainer {
     }
     ;
 
+    /**
+     * Generates a path from a starting pose to an ending pose using PathPlanner.
+     *
+     * @param start The starting pose of the path.
+     * @param end The ending pose of the path.
+     * @return A Supplier that generates a PathPlannerPath with the calculated waypoints and constraints.
+     */
     public static Supplier<PathPlannerPath> generatePath(Pose2d start, Pose2d end) {
         // Calculate the starting rotation based on the direction from start to end
         Rotation2d startRotation = new Rotation2d(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()));

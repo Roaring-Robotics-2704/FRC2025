@@ -12,8 +12,8 @@ import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtil;
 import java.util.function.Supplier;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SourceChooser {
+    // Needs to be a supplier to work with getting the closest
     SendableChooser<Supplier<Pose2d>> sourcePosChooser = new SendableChooser<>();
     /** Creates a new SourceChooser. */
     public SourceChooser() {
@@ -25,22 +25,14 @@ public class SourceChooser {
         sourcePosChooser.addOption("Right Middle", () -> SourceLocations.SOURCE_RIGHT);
         sourcePosChooser.addOption("Right Far", () -> SourceLocations.SOURCE_RIGHT_FAR);
         SmartDashboard.putData("Source Pos", sourcePosChooser);
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
-    public Pose2d getSourcePose() {
+    public Pose2d getSourcePose() { // Gets the Driver set source's pose
         return sourcePosChooser.getSelected().get();
     }
 
-    public SendableChooser<Supplier<Pose2d>> getSourceChooser() {
-        return sourcePosChooser;
-    }
-
-    public Pose2d getClosestSourcePose() {
-        return (PoseUtil.getDistance(RobotContainer.getBluePose(), SourceLocations.SOURCE_LEFT)
-                        < PoseUtil.getDistance(RobotContainer.getBluePose(), SourceLocations.SOURCE_RIGHT)
-                ? SourceLocations.SOURCE_LEFT
-                : SourceLocations.SOURCE_RIGHT);
+    public Pose2d getClosestSourcePose() { // Gets the closest source to us to get coral
+        return SourceLocations.getClosestSource().get(); // Uses the one from the Source Locations
     }
 
     public class SourceLocations {
@@ -58,7 +50,7 @@ public class SourceChooser {
         public static final Pose2d SOURCE_RIGHT_FAR =
                 PoseUtil.offsetPose(SOURCE_RIGHT, -0.5, 0); // TODO fill in actual values
 
-        public static Supplier<Pose2d> getClosestSource() {
+        public static Supplier<Pose2d> getClosestSource() { // Gets the closest source to us to get coral from
             return () -> (PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_LEFT)
                             < PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_RIGHT)
                     ? SOURCE_LEFT

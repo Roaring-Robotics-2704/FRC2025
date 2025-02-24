@@ -27,7 +27,6 @@ public class DynamicAutoBeta extends SequentialCommandGroup {
     private final Reef reef;
     private final Elevator elevator;
     private final Outtake outtake;
-    private boolean first = true;
 
     /** Creates a new DynamicAutoBeta. */
     public DynamicAutoBeta(Reef reef, Drive drive, Elevator elevator, Outtake outtake) {
@@ -36,60 +35,62 @@ public class DynamicAutoBeta extends SequentialCommandGroup {
         this.outtake = outtake;
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
-        addRequirements(drive, elevator, outtake);
+        addRequirements(drive, elevator, outtake); // Add subsystem dependencies
         addCommands(
-                new PrintCommand("Dynamic Auto Beta starting Cycle"), // Added because WPILIB skips the first command
-                Commands.deferredProxy(RobotContainer.GoToReef()),
-                Commands.deferredProxy(ElevatorUp()),
-                Commands.deferredProxy(Outtake()),
-                Commands.deferredProxy(FillReefSlot()),
-                Commands.deferredProxy(ElevatorDown()),
-                Commands.deferredProxy(RobotContainer.GoToSource()),
-                Commands.deferredProxy(Intake()));
+                new PrintCommand("Dynamic Auto Beta starting Cycle"), // Print command to indicate start
+                Commands.deferredProxy(RobotContainer.GoToReef()), // Go to reef
+                Commands.deferredProxy(ElevatorUp()), // Move elevator up
+                Commands.deferredProxy(Outtake()), // Outtake command
+                Commands.deferredProxy(FillReefSlot()), // Fill reef slot
+                Commands.deferredProxy(ElevatorDown()), // Move elevator down
+                Commands.deferredProxy(RobotContainer.GoToSource()), // Go to source
+                Commands.deferredProxy(Intake())); // Intake command
     }
 
     public Supplier<Command> ElevatorUp() {
         return () -> {
-            Level currentLevel = PRIORITY_LEVEL;
+            Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
             if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL)
-                    .getCoralStatus(PRIORITY_LEVEL)) {
-                return Commands.runOnce(() -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL));
+                    .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
+                return Commands.runOnce(
+                        () -> ElevatorFactory.elevator(elevator, PRIORITY_LEVEL)); // Run elevator command
             }
             while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL)
-                    .getCoralStatus(currentLevel)) {
-                currentLevel = Reef.getLesserLevel(currentLevel);
+                    .getCoralStatus(currentLevel)) { // Loop to find free level
+                currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
             }
-            Level freeLevel = currentLevel;
-            return Commands.runOnce(() -> ElevatorFactory.elevator(elevator, freeLevel));
+            Level freeLevel = currentLevel; // Set free level
+            return Commands.runOnce(() -> ElevatorFactory.elevator(elevator, freeLevel)); // Run elevator command
         };
     }
 
     public Supplier<Command> ElevatorDown() {
-        return () -> Commands.runOnce(() -> ElevatorFactory.elevatorIntake(elevator));
+        return () -> Commands.runOnce(() -> ElevatorFactory.elevatorIntake(elevator)); // Run elevator intake command
     }
 
     public Supplier<Command> Outtake() {
-        return () -> outtake.outtakeOutCmd();
+        return () -> outtake.outtakeOutCmd(); // Run outtake command
     }
 
     public Supplier<Command> Intake() {
-        return () -> outtake.outtakeInCmd();
+        return () -> outtake.outtakeInCmd(); // Run intake command
     }
 
     public Supplier<Command> FillReefSlot() {
         return () -> {
-            Level currentLevel = PRIORITY_LEVEL;
+            Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
             if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel)
-                    .getCoralStatus(PRIORITY_LEVEL)) {
+                    .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL)
-                        .setCoralStatus(PRIORITY_LEVEL, true);
+                        .setCoralStatus(PRIORITY_LEVEL, true); // Set coral status to true
             }
             while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel)
-                    .getCoralStatus(currentLevel)) {
-                currentLevel = Reef.getLesserLevel(currentLevel);
+                    .getCoralStatus(currentLevel)) { // Loop to find free level
+                currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
             }
-            reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel).setCoralStatus(currentLevel, true);
-            return new PrintCommand("Filled reef slot");
+            reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel)
+                    .setCoralStatus(currentLevel, true); // Set coral status to true
+            return new PrintCommand("Filled reef slot"); // Print command to indicate slot filled
         };
     }
 }
