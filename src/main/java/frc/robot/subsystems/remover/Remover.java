@@ -18,23 +18,13 @@ public class Remover extends SubsystemBase {
         removerIO.updateInputs(removerIOInputsAutoLogged);
     }
 
-    Command pivotCommand() {
-        int pivotChecker = 0;
-        pivotChecker++;
-
-        if ((pivotChecker % 2) == 0) {
-            return new RunCommand(() -> removerIO.setRemoverRollerPositionRad(RemoverConstants.PIVOT_SPEED))
-                    .repeatedly()
-                    .withTimeout(1);
-        } else {
-            return new RunCommand(() -> removerIO.setRemoverRollerPositionRad(RemoverConstants.PIVOT_SPEED * -1))
-                    .repeatedly()
-                    .withTimeout(1);
-        }
-    }
-
-    Command rollerCommand() {
+    Command ArmOut() {
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(RemoverConstants.ROLLER_SPEED))
+                .repeatedly()
+                .withTimeout(1);
+    }
+    Command ArmIn() {
+        return new RunCommand(() -> removerIO.setRemoverRollerSpeed(-RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
                 .withTimeout(1);
     }

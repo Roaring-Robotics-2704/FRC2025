@@ -14,7 +14,7 @@ public class OuttakeIOSpark implements OuttakeIO {
 
     public OuttakeIOSpark() {
         motor = new SparkMax(OUTTAKE_ID, MotorType.kBrushless);
-        outtakeBeambreak = new DigitalInput(21);
+        outtakeBeambreak = new DigitalInput(OuttakeConstants.OUTTAKE_BEAMBREAK_ID);
     }
 
     @Override
