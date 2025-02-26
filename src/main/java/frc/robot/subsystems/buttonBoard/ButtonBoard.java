@@ -12,14 +12,14 @@ import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
-import frc.robot.auto.reef.Reef.Faces;
+import frc.robot.auto.reef.Reef.FaceEnum;
 
 public class ButtonBoard extends SubsystemBase {
     Reef reef;
     Level currentLevel = Level.L3;
     GenericHID board = new GenericHID(ButtonBoardConstants.BB_PORT);
     Branch.Side currentSide = Side.RIGHT;
-    Boolean[] selectedFaces = new Boolean[5];
+    Boolean[] selectedFaceEnum = new Boolean[5];
     /** Creates a new ButtonBoard. */
     public ButtonBoard(Reef reef) {
         this.reef = reef;
@@ -29,28 +29,28 @@ public class ButtonBoard extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         if (board.getRawButtonPressed(REEF_NEAR_CENTER)) {
-            reef.getReefSide(Faces.FRONT)
-                    .setSelected(!reef.getReefSide(Faces.FRONT).getSelected());
+            reef.getReefSide(FaceEnum.FRONT)
+                    .setSelected(!reef.getReefSide(FaceEnum.FRONT).getSelected());
         }
         if (board.getRawButtonPressed(REEF_NEAR_LEFT)) {
-            reef.getReefSide(Faces.FRONT_LEFT)
-                    .setSelected(!reef.getReefSide(Faces.FRONT_LEFT).getSelected());
+            reef.getReefSide(FaceEnum.FRONT_LEFT)
+                    .setSelected(!reef.getReefSide(FaceEnum.FRONT_LEFT).getSelected());
         }
         if (board.getRawButtonPressed(REEF_NEAR_RIGHT)) {
-            reef.getReefSide(Faces.FRONT_RIGHT)
-                    .setSelected(!reef.getReefSide(Faces.FRONT_RIGHT).getSelected());
+            reef.getReefSide(FaceEnum.FRONT_RIGHT)
+                    .setSelected(!reef.getReefSide(FaceEnum.FRONT_RIGHT).getSelected());
         }
         if (board.getRawButtonPressed(REEF_FAR_LEFT)) {
-            reef.getReefSide(Faces.BACK_LEFT)
-                    .setSelected(!reef.getReefSide(Faces.BACK_LEFT).getSelected());
+            reef.getReefSide(FaceEnum.BACK_LEFT)
+                    .setSelected(!reef.getReefSide(FaceEnum.BACK_LEFT).getSelected());
         }
         if (board.getRawButtonPressed(REEF_FAR_RIGHT)) {
-            reef.getReefSide(Faces.BACK_RIGHT)
-                    .setSelected(!reef.getReefSide(Faces.BACK_RIGHT).getSelected());
+            reef.getReefSide(FaceEnum.BACK_RIGHT)
+                    .setSelected(!reef.getReefSide(FaceEnum.BACK_RIGHT).getSelected());
         }
         if (board.getRawButtonPressed(REEF_FAR_CENTER)) {
-            reef.getReefSide(Faces.BACK)
-                    .setSelected(!reef.getReefSide(Faces.BACK).getSelected());
+            reef.getReefSide(FaceEnum.BACK)
+                    .setSelected(!reef.getReefSide(FaceEnum.BACK).getSelected());
         }
 
         if (board.getRawButton(ButtonBoardConstants.LEVEL_4R)) {

@@ -61,14 +61,14 @@ public class DynamicAuto extends Command {
     /** Schedules the next path based on the current state and position. */
     private void scheduleNextPath() {
         if (!goingToReef) { // If not going to the reef, update the coral status
-            if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L3)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L3, true);
-            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L2)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L2, true);
-            } else if (!reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L1)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L1, true);
-            } else if (reef.getclosestBranch(currentPose, Level.L3).getCoralStatus(Level.L4)) {
-                reef.getclosestBranch(currentPose, Level.L3).setCoralStatus(Level.L4, true);
+            if (!reef.getclosestBranch(currentPose, Level.L3, true).getCoralStatus(Level.L3)) {
+                reef.getclosestBranch(currentPose, Level.L3, true).setCoralStatus(Level.L3, true);
+            } else if (!reef.getclosestBranch(currentPose, Level.L3, true).getCoralStatus(Level.L2)) {
+                reef.getclosestBranch(currentPose, Level.L3, true).setCoralStatus(Level.L2, true);
+            } else if (!reef.getclosestBranch(currentPose, Level.L3, true).getCoralStatus(Level.L1)) {
+                reef.getclosestBranch(currentPose, Level.L3, true).setCoralStatus(Level.L1, true);
+            } else if (reef.getclosestBranch(currentPose, Level.L3, true).getCoralStatus(Level.L4)) {
+                reef.getclosestBranch(currentPose, Level.L3, true).setCoralStatus(Level.L4, true);
             }
         }
 
@@ -81,7 +81,7 @@ public class DynamicAuto extends Command {
 
         // Schedule the next command based on the current state (going to reef or source)
         currentCommand = ((goingToReef)
-                        ? RobotContainer.GoToReef().get()
+                        ? RobotContainer.GoToReef(true, true).get()
                         : RobotContainer.GoToSource().get())
                 .andThen(() -> {
                     System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));

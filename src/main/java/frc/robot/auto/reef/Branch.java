@@ -5,6 +5,7 @@
 package frc.robot.auto.reef;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.auto.reef.Reef.Face;
 
 /** Add your docs here. */
 public class Branch {
@@ -14,10 +15,12 @@ public class Branch {
     private Boolean level1 = false;
     private Pose2d pose;
     Side side = null;
+    Face face;
 
-    public Branch(Side side, Pose2d pose) {
+    public Branch(Side side, Pose2d pose, Face face) {
         this.side = side;
         this.pose = pose;
+        this.face = face;
     }
 
     public enum Side {
@@ -34,6 +37,10 @@ public class Branch {
 
     public Side getSide() {
         return side;
+    }
+
+    public Face getFace() {
+        return face;
     }
 
     public void setCoralStatus(Level level, Boolean status) {

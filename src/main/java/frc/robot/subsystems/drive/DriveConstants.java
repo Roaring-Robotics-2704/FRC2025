@@ -19,8 +19,8 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 public class DriveConstants {
     public static final double MAX_SPEED = 4.8; // Meters per Second
     public static final double ODOMETRY_FREQUENCY = 100.0; // Hz
-    public static final double TRACK_WIDTH = Units.inchesToMeters(26.5); // Track width in meters
-    public static final double TRACK_LENGTH = Units.inchesToMeters(26.5); // Track length in meters
+    public static final double TRACK_WIDTH = Units.inchesToMeters(27); // Track width in meters
+    public static final double TRACK_LENGTH = Units.inchesToMeters(27); // Track length in meters
     public static final double DRIVE_BASE_RADIUS =
             Math.hypot(TRACK_WIDTH / 2.0, TRACK_LENGTH / 2.0); // Drive base radius
     protected static final Translation2d[] moduleTranslations = new Translation2d[] {
@@ -50,7 +50,7 @@ public class DriveConstants {
     public static final int BACK_RIGHT_TURN_CAN_ID = 8; // Back right turn CAN ID
 
     // Drive motor configuration
-    public static final int DRIVE_CURRENT_LIMIT = 40; // Drive current limit
+    public static final int DRIVE_CURRENT_LIMIT = 45; // Drive current limit
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.437); // Wheel radius in meters
     public static final double DRIVE_REDUCTION = (45.0 * 22.0) / (14.0 * 15.0); // Drive reduction ratio
     public static final DCMotor DRIVE_GEARBOX = DCMotor.getNEO(1); // Drive gearbox configuration
@@ -93,7 +93,7 @@ public class DriveConstants {
     // PathPlanner configuration
     public static final double ROBOT_MASS = Units.lbsToKilograms(95); // Robot mass in kilograms
     public static final double ROBOT_MOI = 6.883; // Moment of inertia
-    public static final double WHEEL_COF = 0.9; // Coefficient of friction
+    public static final double WHEEL_COF = 1.2; // Coefficient of friction
     public static final RobotConfig ppConfig = new RobotConfig(
             ROBOT_MASS,
             ROBOT_MOI,
@@ -120,8 +120,8 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF)); // MapleSim configuration
-    public static final PathConstraints PATHCONSTRAINTS =
-            new PathConstraints(0.5, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
-    public static final PathConstraints FINDINGCONSTRAINTS =
-            new PathConstraints(2, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
+    public static final PathConstraints PATHCONSTRAINTS = new PathConstraints(
+            MAX_SPEED * 0.5, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
+    public static final PathConstraints FINDINGCONSTRAINTS = new PathConstraints(
+            MAX_SPEED * 0.95, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
 }

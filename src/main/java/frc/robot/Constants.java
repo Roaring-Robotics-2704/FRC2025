@@ -12,7 +12,8 @@ public final class Constants {
     public static final Level PRIORITY_LEVEL = Level.L3;
 
     // Controller
-    public static final Controller CONTROLLER = Controller.JOYSTICK;
+    public static final Controller CONTROLLER = Controller.XBOX;
+    public static final Boolean FieldRelative = true;
 
     // General Constants
     public static final double DRIVE_SPEED = 0.25;

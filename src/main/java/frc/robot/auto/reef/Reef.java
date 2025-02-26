@@ -18,16 +18,15 @@ import java.util.List;
 public class Reef {
     // Array to hold the six faces of the reef
     static Face[] faces = new Face[6];
-    static int twelve = 3;
 
     // Private constructor to initialize the faces with their respective positions and orientations
     public Reef() {
-        faces[0] = new Face(F_LEFT, F_RIGHT, Faces.FRONT);
-        faces[1] = new Face(FL_LEFT, FL_RIGHT, Faces.FRONT_LEFT);
-        faces[2] = new Face(BL_LEFT, BL_RIGHT, Faces.BACK_LEFT);
-        faces[3] = new Face(B_LEFT, B_RIGHT, Faces.BACK);
-        faces[4] = new Face(BR_LEFT, BR_RIGHT, Faces.BACK_RIGHT);
-        faces[5] = new Face(FR_LEFT, FR_RIGHT, Faces.FRONT_RIGHT);
+        faces[0] = new Face(F_LEFT, F_RIGHT, FaceEnum.FRONT);
+        faces[1] = new Face(FL_LEFT, FL_RIGHT, FaceEnum.FRONT_LEFT);
+        faces[2] = new Face(BL_LEFT, BL_RIGHT, FaceEnum.BACK_LEFT);
+        faces[3] = new Face(B_LEFT, B_RIGHT, FaceEnum.BACK);
+        faces[4] = new Face(BR_LEFT, BR_RIGHT, FaceEnum.BACK_RIGHT);
+        faces[5] = new Face(FR_LEFT, FR_RIGHT, FaceEnum.FRONT_RIGHT);
     }
 
     /** The Face class represents a face of the reef, containing two branches and a selection status. */
@@ -35,7 +34,7 @@ public class Reef {
         Branch rightBranch;
         Branch leftBranch;
         Boolean isSelected = true;
-        Faces face;
+        FaceEnum face;
 
         /**
          * Constructor to initialize the face with left and right branch poses and its type.
@@ -44,9 +43,9 @@ public class Reef {
          * @param rightPose Pose of the right branch
          * @param face Type of the face
          */
-        public Face(Pose2d leftPose, Pose2d rightPose, Faces face) {
-            rightBranch = new Branch(Side.RIGHT, rightPose);
-            leftBranch = new Branch(Side.LEFT, leftPose);
+        public Face(Pose2d leftPose, Pose2d rightPose, FaceEnum face) {
+            rightBranch = new Branch(Side.RIGHT, rightPose, this);
+            leftBranch = new Branch(Side.LEFT, leftPose, this);
             this.face = face;
         }
 
@@ -93,7 +92,7 @@ public class Reef {
     }
 
     /** Enum representing the different faces of the reef. */
-    public enum Faces {
+    public enum FaceEnum {
         FRONT(faces[0]),
         FRONT_LEFT(faces[1]),
         FRONT_RIGHT(faces[2]),
@@ -103,7 +102,7 @@ public class Reef {
 
         private final Face face;
 
-        Faces(Face face) {
+        FaceEnum(Face face) {
             this.face = face;
         }
 
@@ -123,17 +122,22 @@ public class Reef {
      * @param level The level to check for availability
      * @return An array of available branches at the specified level
      */
-    public Branch[] checkHeightAvailability(Level level) {
+    public Branch[] checkHeightAvailability(Level level, boolean useVision) {
         List<Branch> branches = new ArrayList<>();
         for (Face face : faces) {
             if (face.getSelected()) {
                 Branch rightBranch = face.getBranch(Side.RIGHT);
                 Branch leftBranch = face.getBranch(Side.LEFT);
-                if (!rightBranch.getCoralStatus(level)) {
-                    branches.add(rightBranch);
-                }
-                if (!leftBranch.getCoralStatus(level)) {
+                if (useVision) {
+                    if (!rightBranch.getCoralStatus(level)) {
+                        branches.add(rightBranch);
+                    }
+                    if (!leftBranch.getCoralStatus(level)) {
+                        branches.add(leftBranch);
+                    }
+                } else {
                     branches.add(leftBranch);
+                    branches.add(rightBranch);
                 }
             }
         }
@@ -147,25 +151,36 @@ public class Reef {
      * @param level The level to check for availability
      * @return The closest branch to the current pose at the specified level
      */
-    public Branch getclosestBranch(Pose2d currentPose, Level level) {
+    public Branch getclosestBranch(Pose2d currentPose, Level level, boolean useVision) {
         Pose2d pose = currentPose;
         if (Robot.isRedAlliance()) {
             pose = FlippingUtil.flipFieldPose(currentPose);
         }
         Level currentLevel = level;
-        Branch[] branches = checkHeightAvailability(currentLevel);
+        Branch[] branches = checkHeightAvailability(currentLevel, useVision);
         while (branches.length == 0) {
             currentLevel = getLesserLevel(currentLevel);
-            branches = checkHeightAvailability(currentLevel);
+            branches = checkHeightAvailability(currentLevel, useVision);
         }
         Branch closestBranch = null;
         double minDistance = Double.MAX_VALUE;
         for (Branch branch : branches) {
             double distance = PoseUtil.getDistance(pose, branch.getPose());
+            try {
+                System.out.println("Face: " + branch.getFace().getName() + " Side: " + branch.getSide() + " Distance: "
+                        + distance);
+            } catch (Exception e) {
+                System.out.println("Error getting face name: " + e.getMessage());
+            }
             if (distance < minDistance) {
                 minDistance = distance;
                 closestBranch = branch;
             }
+        }
+        try {
+            System.out.println("Face: " + closestBranch.getFace().getName() + " Side: " + closestBranch.getSide());
+        } catch (Exception e) {
+            System.out.println("Error getting face name: " + e.getMessage());
         }
         return closestBranch;
     }
@@ -187,7 +202,7 @@ public class Reef {
             }
         }
         if (availablefaces.isEmpty()) {
-            availablefaces.add(Faces.FRONT.getFace());
+            availablefaces.add(FaceEnum.FRONT.getFace());
         }
         Face closestFace = null;
         double minDistance = Double.MAX_VALUE;
@@ -245,7 +260,7 @@ public class Reef {
         } else if (priority == Level.L3) {
             return Level.L2;
         } else if (priority == Level.L2) {
-            return Level.L4;
+            return Level.L1;
         } else if (priority == Level.L1) {
             return Level.L4;
         } else {
@@ -259,18 +274,18 @@ public class Reef {
      * @param face The enum value representing the face
      * @return The face corresponding to the enum value
      */
-    public Face getReefSide(Faces face) {
-        if (face == Faces.FRONT) {
+    public Face getReefSide(FaceEnum face) {
+        if (face == FaceEnum.FRONT) {
             return faces[0];
-        } else if (face == Faces.FRONT_LEFT) {
+        } else if (face == FaceEnum.FRONT_LEFT) {
             return faces[1];
-        } else if (face == Faces.BACK_LEFT) {
+        } else if (face == FaceEnum.BACK_LEFT) {
             return faces[2];
-        } else if (face == Faces.BACK) {
+        } else if (face == FaceEnum.BACK) {
             return faces[3];
-        } else if (face == Faces.BACK_RIGHT) {
+        } else if (face == FaceEnum.BACK_RIGHT) {
             return faces[4];
-        } else if (face == Faces.FRONT_RIGHT) {
+        } else if (face == FaceEnum.FRONT_RIGHT) {
             return faces[5];
         } else return faces[0];
     }

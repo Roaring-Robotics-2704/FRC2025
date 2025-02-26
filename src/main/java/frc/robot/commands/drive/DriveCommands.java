@@ -89,7 +89,7 @@ public class DriveCommands {
                 drive);
     }
 
-    public static Command tankDrive(
+    public static Command RobotOrientedDrive(
             Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
         return Commands.run(
                 () -> {
@@ -106,7 +106,7 @@ public class DriveCommands {
                     // Convert to field relative speeds & send command
                     ChassisSpeeds speeds = new ChassisSpeeds(
                             linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                            0,
+                            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                             omega * drive.getMaxAngularSpeedRadPerSec());
                     drive.runVelocity(speeds);
                 },

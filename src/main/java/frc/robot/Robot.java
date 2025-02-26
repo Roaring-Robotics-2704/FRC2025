@@ -124,6 +124,9 @@ public class Robot extends LoggedRobot {
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit() {
+        if (Constants.CURRENT_MODE == Constants.Mode.SIM) {
+            robotContainer.resetSimulationField();
+        }
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)
@@ -144,6 +147,7 @@ public class Robot extends LoggedRobot {
         if (Constants.CURRENT_MODE == Constants.Mode.REAL) {
             Shuffleboard.selectTab("Teleoperated");
         }
+
         // This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove

@@ -16,5 +16,4 @@ public interface RemoverIO {
     default void updateInputs(RemoverIOInputs inputs) {}
 
     default void setRemoverRollerVoltage(double voltage) {}
-
 }

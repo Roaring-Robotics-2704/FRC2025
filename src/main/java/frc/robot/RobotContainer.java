@@ -14,6 +14,7 @@
 package frc.robot;
 
 import static frc.robot.Constants.CONTROLLER;
+import static frc.robot.Constants.FieldRelative;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
@@ -172,8 +173,8 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive); // Initialize dynamic auto command
-        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake)
-                .repeatedly(); // Initialize dynamic auto beta command
+        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake).asProxy();
+        // Initialize dynamic auto beta command
 
         // Set up auto routines
         autoChooser =
@@ -200,7 +201,7 @@ public class RobotContainer {
                     drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic reverse option
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto); // Add dynamic auto option
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta); // Add dynamic auto beta option
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta option
         // Configure the button bindings
         configureButtonBindings(); // Configure button bindings
     }
@@ -214,17 +215,37 @@ public class RobotContainer {
 
         // Default command, normal field-relative drive
         if (CONTROLLER == Constants.Controller.XBOX) {
-            drive.setDefaultCommand(DriveCommands.joystickDrive(
-                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+            if (FieldRelative) {
+                drive.setDefaultCommand(DriveCommands.joystickDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
+            } else {
+                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
+            }
 
         } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            drive.setDefaultCommand(DriveCommands.joystickDrive(
-                    drive,
-                    () -> -joystick.getRawAxis(1),
-                    () -> -joystick.getRawAxis(0),
-                    () -> -joystick.getRawAxis(2)));
+            if (FieldRelative) {
+                drive.setDefaultCommand(DriveCommands.joystickDrive(
+                        drive,
+                        () -> -joystick.getRawAxis(1),
+                        () -> -joystick.getRawAxis(0),
+                        () -> -joystick.getRawAxis(2)));
+            } else {
+                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
+                        drive,
+                        () -> -joystick.getRawAxis(1),
+                        () -> -joystick.getRawAxis(0),
+                        () -> -joystick.getRawAxis(2)));
+            }
+
         } else {
-            // drive.setDefaultCommand(dynamicAutoBeta);
+            drive.setDefaultCommand(Commands.deferredProxy(() -> dynamicAutoBeta));
         }
 
         // Switch to X pattern when X button is pressed
@@ -254,20 +275,20 @@ public class RobotContainer {
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
         if (CONTROLLER == Constants.Controller.XBOX) {
-            controller.a().whileTrue(Commands.deferredProxy(GoToReef()));
+            controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
             controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
             controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            controller.y().whileTrue(dynamicAutoBeta);
+            controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
             controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
             controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
             controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
             controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
         } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef()));
+            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef(false, false)));
             joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
             joystick.button(5).whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
             joystick.button(6).whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            joystick.button(7).whileTrue(dynamicAutoBeta);
+            joystick.button(7).whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
         }
     }
 
@@ -320,20 +341,29 @@ public class RobotContainer {
         }
     }
 
-    public static Supplier<Command> GoToReef() {
+    public static Supplier<Command> GoToReef(Boolean useVision, Boolean targetSource) {
         return () -> AutoBuilder.pathfindThenFollowPath(
                 generatePath(
                                 PoseUtil.offsetPose(
-                                        reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
+                                        reef.getclosestBranch(
+                                                        (targetSource
+                                                                ? sourceChooser.getClosestSourcePose()
+                                                                : AutoBuilder.getCurrentPose()),
+                                                        Level.L3,
+                                                        useVision)
                                                 .getPose(),
                                         -Units.feetToMeters(1),
                                         0),
-                                reef.getclosestBranch(AutoBuilder.getCurrentPose(), Level.L3)
+                                reef.getclosestBranch(
+                                                (targetSource
+                                                        ? sourceChooser.getClosestSourcePose()
+                                                        : AutoBuilder.getCurrentPose()),
+                                                Level.L3,
+                                                useVision)
                                         .getPose())
                         .get(),
                 FINDINGCONSTRAINTS);
     }
-    ;
 
     /**
      * Generates a path from a starting pose to an ending pose using PathPlanner.
@@ -381,7 +411,7 @@ public class RobotContainer {
                                         (side == Side.RIGHT)
                                                 ? SourceLocations.SOURCE_RIGHT
                                                 : SourceLocations.SOURCE_LEFT,
-                                        Units.feetToMeters(1),
+                                        -Units.feetToMeters(1),
                                         0),
                                 (side == Side.RIGHT) ? SourceLocations.SOURCE_RIGHT : SourceLocations.SOURCE_LEFT)
                         .get(),

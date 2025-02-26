@@ -23,6 +23,7 @@ public class Remover extends SubsystemBase {
                 .repeatedly()
                 .withTimeout(1);
     }
+
     Command ArmIn() {
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(-RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
