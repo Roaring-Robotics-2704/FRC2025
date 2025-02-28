@@ -31,23 +31,23 @@ public class DriveConstants {
     };
 
     // Zeroed rotation values for each module, see setup instructions
-    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(-90); // Front left zero rotation
+    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(0); // Front left zero rotation
     public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0); // Front right zero rotation
-    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(180); // Back left zero rotation
-    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90); // Back right zero rotation
+    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(0); // Back left zero rotation
+    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(0); // Back right zero rotation
 
     // Device CAN IDs
     public static final int PIGEON_CAN_ID = 9; // Pigeon CAN ID
 
-    public static final int FRONT_LEFT_DRIVE_CAN_ID = 1; // Front left drive CAN ID
-    public static final int BACK_LEFT_DRIVE_CAN_ID = 3; // Back left drive CAN ID
-    public static final int FRONT_RIGHT_DRIVE_CAN_ID = 2; // Front right drive CAN ID
-    public static final int BACK_RIGHT_DRIVE_CAN_ID = 4; // Back right drive CAN ID
+    public static final int FRONT_LEFT_DRIVE_CAN_ID = 4; // Front left drive CAN ID
+    public static final int BACK_LEFT_DRIVE_CAN_ID = 2; // Back left drive CAN ID
+    public static final int FRONT_RIGHT_DRIVE_CAN_ID = 8; // Front right drive CAN ID
+    public static final int BACK_RIGHT_DRIVE_CAN_ID = 5; // Back right drive CAN ID
 
-    public static final int FRONT_LEFT_TURN_CAN_ID = 5; // Front left turn CAN ID
-    public static final int BACK_LEFT_TURN_CAN_ID = 7; // Back left turn CAN ID
-    public static final int FRONT_RIGHT_TURN_CAN_ID = 6; // Front right turn CAN ID
-    public static final int BACK_RIGHT_TURN_CAN_ID = 8; // Back right turn CAN ID
+    public static final int FRONT_LEFT_TURN_CAN_ID = 3; // Front left turn CAN ID
+    public static final int BACK_LEFT_TURN_CAN_ID = 1; // Back left turn CAN ID
+    public static final int FRONT_RIGHT_TURN_CAN_ID = 7; // Front right turn CAN ID
+    public static final int BACK_RIGHT_TURN_CAN_ID = 6; // Back right turn CAN ID
 
     // Drive motor configuration
     public static final int DRIVE_CURRENT_LIMIT = 45; // Drive current limit
