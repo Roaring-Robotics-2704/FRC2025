@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -27,10 +30,10 @@ public class DriveConstants {
     };
 
     // Zeroed rotation values for each module, see setup instructions
-    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(-90);
     public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(180);
+    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90);
 
     // Device CAN IDs
     public static final int PIGEON_CAN_ID = 9;
@@ -48,15 +51,15 @@ public class DriveConstants {
     // Drive motor configuration
     public static final int DRIVE_CURRENT_LIMIT = 60;
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.5); // meters
-    public static final double DRIVE_REDUCTION =
-            (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+    public static final double DRIVE_REDUCTION = (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
+    // and 22 spur teeth
     public static final DCMotor DRIVE_GEARBOX = DCMotor.getNEO(1);
 
     // Drive encoder configuration
-    public static final double DRIVE_POSITION_FACTOR =
-            2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel Radians
-    public static final double DRIVE_VELOCITY_FACTOR =
-            (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel Rad/Sec
+    public static final double DRIVE_POSITION_FACTOR = 2 * Math.PI / DRIVE_REDUCTION; // Rotor Rotations -> Wheel
+    // Radians
+    public static final double DRIVE_VELOCITY_FACTOR = (2 * Math.PI) / 60.0 / DRIVE_REDUCTION; // Rotor RPM -> Wheel
+    // Rad/Sec
 
     // Drive PID configuration
     public static final double DRIVE_KP = 0.0;
@@ -91,17 +94,17 @@ public class DriveConstants {
     public static final double ROBOT_MASS = Units.lbsToKilograms(125); // KG
     public static final double ROBOT_MOI = 6.883;
     public static final double WHEEL_COF = 1.2;
-    //     public static final RobotConfig ppConfig = new RobotConfig(
-    //             ROBOT_MASS,
-    //             ROBOT_MOI,
-    //             new ModuleConfig(
-    //                     WHEEL_RADIUS,
-    //                     MAX_SPEED,
-    //                     WHEEL_COF,
-    //                     DRIVE_GEARBOX.withReduction(DRIVE_REDUCTION),
-    //                     DRIVE_CURRENT_LIMIT,
-    //                     1),
-    //             moduleTranslations);
+    public static final RobotConfig ppConfig = new RobotConfig(
+            ROBOT_MASS,
+            ROBOT_MOI,
+            new ModuleConfig(
+                    WHEEL_RADIUS,
+                    MAX_SPEED,
+                    WHEEL_COF,
+                    DRIVE_GEARBOX.withReduction(DRIVE_REDUCTION),
+                    DRIVE_CURRENT_LIMIT,
+                    1),
+            moduleTranslations);
 
     public static final DriveTrainSimulationConfig mapleSimConfig = DriveTrainSimulationConfig.Default()
             .withCustomModuleTranslations(moduleTranslations)
@@ -117,4 +120,6 @@ public class DriveConstants {
                     Meters.of(WHEEL_RADIUS),
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF));
+    public static final PathConstraints CONSTRAINTS =
+            new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 }

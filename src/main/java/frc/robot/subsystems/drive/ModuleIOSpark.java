@@ -17,6 +17,7 @@ import static frc.robot.subsystems.drive.DriveConstants.FRONT_RIGHT_DRIVE_CAN_ID
 import static frc.robot.subsystems.drive.DriveConstants.FRONT_RIGHT_TURN_CAN_ID;
 import static frc.robot.subsystems.drive.DriveConstants.ODOMETRY_FREQUENCY;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_CURRENT_LIMIT;
+import static frc.robot.subsystems.drive.DriveConstants.TURN_ENCODER_INVERTED;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_INVERTED;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_KD;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_KP;
@@ -45,7 +46,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -110,7 +110,7 @@ public class ModuleIOSpark implements ModuleIO {
         turnController = turnSpark.getClosedLoopController();
 
         // Configure drive motor
-        var driveConfig = new SparkFlexConfig();
+        var driveConfig = new SparkMaxConfig();
         driveConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(DRIVE_CURRENT_LIMIT)
@@ -152,7 +152,7 @@ public class ModuleIOSpark implements ModuleIO {
                 .voltageCompensation(12.0);
         turnConfig
                 .absoluteEncoder
-                .inverted(TURN_INVERTED)
+                .inverted(TURN_ENCODER_INVERTED)
                 .positionConversionFactor(TURN_POSITION_FACTOR)
                 .velocityConversionFactor(TURN_VELOCITY_FACTOR)
                 .averageDepth(2);
@@ -173,7 +173,7 @@ public class ModuleIOSpark implements ModuleIO {
                 .outputCurrentPeriodMs(20);
         tryUntilOk(
                 turnSpark,
-                5,
+                20,
                 () -> turnSpark.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
         // Create odometry queues

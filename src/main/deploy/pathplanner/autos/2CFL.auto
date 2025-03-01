@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Start to FL_L"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FL_L to SRC"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SRC to FL_R"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FL_R to SRC"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SRC to F_L"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F_L to SRC"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
