@@ -29,6 +29,7 @@ public class ElevatorIOSpark implements ElevatorIO {
     private PIDController pidController;
     private final AnalogPotentiometer elevatorEncoder;
     private final ElevatorFeedforward feedforward;
+    private double offset = 0;
 
     public ElevatorIOSpark() {
         leftElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_1, MotorType.kBrushless);
@@ -39,6 +40,7 @@ public class ElevatorIOSpark implements ElevatorIO {
                 ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD);
         pidController.setIntegratorRange(-12, 12);
         feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
+        offset = elevatorEncoder.get();
 
         // Configure drive motor
         var driveConfig = new SparkMaxConfig();
@@ -80,6 +82,6 @@ public class ElevatorIOSpark implements ElevatorIO {
     }
 
     private Distance getHeight() {
-        return Meters.of(elevatorEncoder.get() * 120);
+        return Meters.of((elevatorEncoder.get() * 120)-offset);
     }
 }
