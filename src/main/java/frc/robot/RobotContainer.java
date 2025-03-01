@@ -57,6 +57,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO;
@@ -124,8 +125,8 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
                         new VisionIOPhotonVision(
-                                VisionConstants.CAMERA_1_NAME,
-                                VisionConstants.robotToCamera1)); // Initialize vision subsystem
+                                VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)); // Initialize vision
+                // subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
                 break;
@@ -137,14 +138,17 @@ public class RobotContainer {
                         DriveConstants.mapleSimConfig,
                         new Pose2d(3, 3, new Rotation2d())); // Initialize drive simulation
                 // add the simulated drivetrain to the simulation field
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive simulation to arena
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive
+                // simulation to
+                // arena
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOSim(driveSimulation.getModules()[0]),
                         new ModuleIOSim(driveSimulation.getModules()[1]),
                         new ModuleIOSim(driveSimulation.getModules()[2]),
-                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive subsystem
+                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive
+                // subsystem
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
@@ -152,9 +156,11 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 CAMERA_1_NAME,
                                 robotToCamera1,
-                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize vision subsystem
+                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize
+                // vision
+                // subsystem
 
-                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
+                this.elevator = new Elevator(new ElevatorIOSim()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 break;
             }
@@ -177,31 +183,41 @@ public class RobotContainer {
         // Initialize dynamic auto beta command
 
         // Set up auto routines
-        autoChooser =
-                new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize auto chooser
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize
+        // auto
+        // chooser
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
             autoChooser.addOption(
                     "Drive Wheel Radius Characterization",
-                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius characterization option
+                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius
+            // characterization option
             autoChooser.addOption(
                     "Drive Simple FF Characterization",
-                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward characterization option
+                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward
+            // characterization option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Forward)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId quasistatic forward option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId
+            // quasistatic forward
+            // option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Reverse)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId quasistatic reverse option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId
+            // quasistatic reverse
+            // option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Forward)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic forward option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic
+            // forward option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Reverse)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic reverse option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
+            // reverse option
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto); // Add dynamic auto option
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta option
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta
+        // option
         // Configure the button bindings
         configureButtonBindings(); // Configure button bindings
     }
@@ -257,11 +273,11 @@ public class RobotContainer {
         }
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
-                ? (() -> drive.resetOdometry(
-                        driveSimulation
-                                .getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
-                : (() -> drive.resetOdometry(
-                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
+                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
+                // actual robot pose
+                // during simulation
+                : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
+        // gyro
 
         if (CONTROLLER == Constants.Controller.XBOX) {
             controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
@@ -278,11 +294,17 @@ public class RobotContainer {
             controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
             controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
             controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-            controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-            controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-            controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-            controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+            // controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
+            // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+            // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+            // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+            // controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+            controller.povUp().whileTrue(ElevatorFactory.manualElevatorUp(elevator));
+            controller.povDown().whileTrue(ElevatorFactory.manualElevatorDown(elevator));
+            // controller.povLeft().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+            // controller.povRight().whileTrue(ElevatorFactory.elevatorL4(elevator));
+            controller.leftBumper().whileTrue(outtake.manualOuttakeCMD());
+            controller.rightBumper().whileTrue(outtake.manualIntakeCMD());
         } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
             joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef(false, false)));
             joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
@@ -379,7 +401,8 @@ public class RobotContainer {
         // Use the rotation of the end pose as the end rotation
         Rotation2d endRotation = end.getRotation();
 
-        // Return a supplier that generates a PathPlannerPath with the calculated waypoints and constraints
+        // Return a supplier that generates a PathPlannerPath with the calculated
+        // waypoints and constraints
         return () -> new PathPlannerPath(
                 // Create waypoints from the start and end poses with the calculated rotations
                 PathPlannerPath.waypointsFromPoses(
@@ -387,9 +410,11 @@ public class RobotContainer {
                         new Pose2d(end.getTranslation(), endRotation)),
                 // Use predefined path constraints
                 PATHCONSTRAINTS,
-                // Define the ideal starting state with a velocity of 0.5 and the calculated end rotation
+                // Define the ideal starting state with a velocity of 0.5 and the calculated end
+                // rotation
                 new IdealStartingState(0.5, endRotation),
-                // Define the goal end state with a velocity of 0.0 and the calculated end rotation
+                // Define the goal end state with a velocity of 0.0 and the calculated end
+                // rotation
                 new GoalEndState(0.0, endRotation));
     }
 

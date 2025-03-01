@@ -54,4 +54,14 @@ public class Outtake extends SubsystemBase {
                 .withTimeout(OUTTAKE_TIME * 2)
                 .andThen(() -> outtake.setSpeed(0));
     }
+
+    public Command manualOuttakeCMD() {
+        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
+                .repeatedly()
+                .finallyDo(() -> outtake.setSpeed(0));
+    }
+
+    public Command manualIntakeCMD() {
+        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().finallyDo(() -> outtake.setSpeed(0));
+    }
 }

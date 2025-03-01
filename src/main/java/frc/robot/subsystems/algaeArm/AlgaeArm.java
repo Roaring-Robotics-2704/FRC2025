@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems.algaeArm;
 
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeArm extends SubsystemBase {
@@ -23,5 +26,8 @@ public class AlgaeArm extends SubsystemBase {
 
     public void setPivotAngle(Double angle) {
         algaeArmIO.setAlgaeArmPosition(angle);
+    }
+    public void runVolts(Voltage volts) {
+        algaeArmIO.setAlgaeArmVoltage(volts.in(Volts));
     }
 }

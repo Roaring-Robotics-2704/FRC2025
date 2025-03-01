@@ -23,4 +23,7 @@ public class AlgaeArmFactory {
     public static Command AlgaeArmInside(AlgaeArm arm) {
         return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
     }
+    public static Command manualAlgaeArmUp(AlgaeArm arm) {
+        return new RunCommand(arm., null)
+    }
 }

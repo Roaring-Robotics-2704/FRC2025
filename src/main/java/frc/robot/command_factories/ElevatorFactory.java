@@ -46,7 +46,18 @@ public class ElevatorFactory {
     }
 
     public static Command elevatorIntake(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.MIN_HEIGHT), elevator);
+        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.INTAKE_HEIGHT), elevator);
     }
-    public static Command
+
+    public static Command manualElevatorUp(Elevator elevator) {
+        return new RunCommand(() -> elevator.setElevatorVolts(8), elevator)
+                .repeatedly()
+                .finallyDo(() -> elevator.setElevatorVolts(0));
+    }
+
+    public static Command manualElevatorDown(Elevator elevator) {
+        return new RunCommand(() -> elevator.setElevatorVolts(-8), elevator)
+                .repeatedly()
+                .finallyDo(() -> elevator.setElevatorVolts(0));
+    }
 }
