@@ -66,6 +66,9 @@ import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO;
 import frc.robot.subsystems.outtake.OuttakeIOSpark;
+import frc.robot.subsystems.remover.Remover;
+import frc.robot.subsystems.remover.RemoverIO;
+import frc.robot.subsystems.remover.RemoverIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -93,6 +96,7 @@ public class RobotContainer {
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
     private AlgaeArm algaeArm;
+    private Remover remover;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -135,6 +139,7 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
                 this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
+                this.remover = new Remover(new RemoverIOSpark()); // Initialize remover subsystem
                 break;
             }
 
@@ -169,6 +174,7 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIOSim()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
+                this.remover = new Remover(new RemoverIO() {}); // Initialize remover subsystem
                 break;
             }
             default: {
@@ -183,6 +189,7 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
+                this.remover = new Remover(new RemoverIO() {}); // Initialize remover subsystem
                 break;
             }
         }
@@ -281,6 +288,8 @@ public class RobotContainer {
         controller.povRight().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
         controller.povUp().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
         controller.povDown().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
+        joystick.button(1).whileTrue(remover.ArmOut());
+        joystick.button(2).whileTrue(remover.ArmIn());
     }
 
     /**

@@ -23,7 +23,7 @@ public class ElevatorConstants {
     // Motor Configs
     public static final int CURRENT_LIMIT = 60;
     public static final double PULLEY_RADIUS = Units.inchesToMeters(0.75); // meters
-    public static final double GEAR_REDUCTION = 5 / 1; // TODO get real values
+    public static final double GEAR_REDUCTION = 5 / 1;
     public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getNEO(2);
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);

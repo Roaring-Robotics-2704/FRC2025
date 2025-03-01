@@ -18,15 +18,15 @@ public class Remover extends SubsystemBase {
         removerIO.updateInputs(removerIOInputsAutoLogged);
     }
 
-    Command ArmOut() {
+    public Command ArmOut() { // TODO add elevator controls
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
-                .withTimeout(1);
+                .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 
-    Command ArmIn() {
+    public Command ArmIn() { // TODO add elevator controls
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(-RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
-                .withTimeout(1);
+                .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 }
