@@ -1,8 +1,11 @@
 package frc.robot.commands.drive;
 
-import static frc.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
+import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
+import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.PoseUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -85,7 +89,7 @@ public class DriveCommands {
                 drive);
     }
 
-    public static Command tankDrive(
+    public static Command RobotOrientedDrive(
             Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
         return Commands.run(
                 () -> {
@@ -102,7 +106,7 @@ public class DriveCommands {
                     // Convert to field relative speeds & send command
                     ChassisSpeeds speeds = new ChassisSpeeds(
                             linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                            0,
+                            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                             omega * drive.getMaxAngularSpeedRadPerSec());
                     drive.runVelocity(speeds);
                 },
@@ -278,6 +282,16 @@ public class DriveCommands {
     }
 
     public static Command pathfindPose(Supplier<Pose2d> pose) {
-        return AutoBuilder.pathfindToPose(pose.get(), CONSTRAINTS);
+        PathPlannerPath path = new PathPlannerPath(
+                PathPlannerPath.waypointsFromPoses(PoseUtil.offsetPose(pose.get(), -0.5, 0), pose.get()),
+                PATHCONSTRAINTS,
+                null,
+                new GoalEndState(0, pose.get().getRotation()));
+
+        if (AutoBuilder.shouldFlip()) {
+            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS); // TODO add flipping
+        } else {
+            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
+        }
     }
 }

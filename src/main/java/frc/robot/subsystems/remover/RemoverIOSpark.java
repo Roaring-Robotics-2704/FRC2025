@@ -1,10 +1,7 @@
 package frc.robot.subsystems.remover;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.controller.PIDController;
-import frc.robot.subsystems.remover.RemoverIO.RemoverIOInputs;
 
 public class RemoverIOSpark implements RemoverIO {
     private SparkMax rollerMotor;

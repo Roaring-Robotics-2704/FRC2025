@@ -4,6 +4,8 @@
 
 package frc.robot.command_factories;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.algaeArm.AlgaeArm;
@@ -22,5 +24,25 @@ public class AlgaeArmFactory {
 
     public static Command AlgaeArmInside(AlgaeArm arm) {
         return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
+    }
+
+    public static Command manualAlgaeArmUp(AlgaeArm arm) {
+        return new RunCommand(() -> arm.runVolts(Volts.of(4)), arm)
+                .repeatedly()
+                .finallyDo(() -> arm.runVolts(Volts.zero()));
+    }
+
+    public static Command manualAlgaeArmDown(AlgaeArm arm) {
+        return new RunCommand(() -> arm.runVolts(Volts.of(-4)), arm)
+                .repeatedly()
+                .finallyDo(() -> arm.runVolts(Volts.zero()));
+    }
+
+    public static Command manualAlgaeRollerIn(AlgaeArm arm) {
+        return new RunCommand(() -> arm.runRollers(0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
+    }
+
+    public static Command manualAlgaeRollerOut(AlgaeArm arm) {
+        return new RunCommand(() -> arm.runRollers(-0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
     }
 }

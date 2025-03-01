@@ -26,19 +26,24 @@ public class Outtake extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-
+        outtake.updateInputs(outtakeInputs);
     }
 
-    Command outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+    public Command
+            outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
                 .repeatedly()
-                .withTimeout(OUTTAKE_TIME);
+                .withTimeout(OUTTAKE_TIME)
+                .andThen(() -> outtake.setSpeed(0));
     }
 
-    Command outtakeInCmd() {
+    public Command outtakeInCmd() {
 
-        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().withTimeout(INTAKE_TIME);
+        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                .repeatedly()
+                .withTimeout(INTAKE_TIME)
+                .andThen(() -> outtake.setSpeed(0));
     }
 
     Command outtakeOutSlowCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
@@ -46,6 +51,17 @@ public class Outtake extends SubsystemBase {
 
         return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED * .5))
                 .repeatedly()
-                .withTimeout(OUTTAKE_TIME * 2);
+                .withTimeout(OUTTAKE_TIME * 2)
+                .andThen(() -> outtake.setSpeed(0));
+    }
+
+    public Command manualOuttakeCMD() {
+        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
+                .repeatedly()
+                .finallyDo(() -> outtake.setSpeed(0));
+    }
+
+    public Command manualIntakeCMD() {
+        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().finallyDo(() -> outtake.setSpeed(0));
     }
 }

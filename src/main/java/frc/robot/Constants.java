@@ -1,14 +1,23 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.auto.reef.Branch.Level;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change
  * the value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).
  */
 public final class Constants {
+    // Auto Priority
+    public static final Level PRIORITY_LEVEL = Level.L3;
+
+    // Controller
+    public static final Controller CONTROLLER = Controller.XBOX;
+    public static final Boolean FieldRelative = true;
+
+    // General Constants
     public static final double DRIVE_SPEED = 0.25;
-    public static final double TURN_SPEED = 0.8 / 2;
+    public static final double TURN_SPEED = 0.6;
     public static final Boolean COMPETITION = false;
     public static final Mode SIM_MODE = Mode.SIM;
     public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
@@ -22,6 +31,12 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    public enum Controller {
+        XBOX,
+        JOYSTICK,
+        NONE
     }
 
     public static final int RECHECK_SECONDS = 12;
