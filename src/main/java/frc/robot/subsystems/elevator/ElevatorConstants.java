@@ -21,14 +21,14 @@ public class ElevatorConstants {
     public static final int ENCODER_A = 0;
     public static final int ENCODER_B = 1;
     // Motor Configs
-    public static final int CURRENT_LIMIT = 40;
+    public static final int CURRENT_LIMIT = 60;
     public static final double PULLEY_RADIUS = Units.inchesToMeters(0.75); // meters
     public static final double GEAR_REDUCTION = 5 / 1; // TODO get real values
     public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getNEO(2);
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);
     // PID Constants
-    public static final double ELEVATOR_KP = 40;
+    public static final double ELEVATOR_KP = 2;
     public static final double ELEVATOR_KI = 0;
     public static final double ELEVATOR_KD = 0.0;
 

@@ -27,9 +27,11 @@ public class AlgaeArm extends SubsystemBase {
     public void setPivotAngle(Double angle) {
         algaeArmIO.setAlgaeArmPosition(angle);
     }
+
     public void runVolts(Voltage volts) {
         algaeArmIO.setAlgaeArmVoltage(volts.in(Volts));
     }
+
     public void runRollers(double speed) {
         algaeArmIO.setRollerSpeed(speed);
     }

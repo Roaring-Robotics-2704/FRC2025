@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -27,20 +28,18 @@ public class ElevatorIOSpark implements ElevatorIO {
     private final SparkMax leftElevatorMotor;
     private final SparkMax rightElevatorMotor;
     private PIDController pidController;
-    private final AnalogPotentiometer elevatorEncoder;
+    private final AnalogPotentiometer elevatorEncoder = new AnalogPotentiometer(ElevatorConstants.ANALOG_INPUT);
     private final ElevatorFeedforward feedforward;
     private double offset = 0;
 
     public ElevatorIOSpark() {
         leftElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_1, MotorType.kBrushless);
         rightElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_2, MotorType.kBrushless);
-
-        elevatorEncoder = new AnalogPotentiometer(ElevatorConstants.ANALOG_INPUT);
         pidController = new PIDController(
                 ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD);
         pidController.setIntegratorRange(-12, 12);
         feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
-        offset = elevatorEncoder.get();
+        offset = getHeight().in(Meters);
 
         // Configure drive motor
         var driveConfig = new SparkMaxConfig();
@@ -76,12 +75,13 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     @Override
     public void runSetpoint(Distance setpoint) {
-        double output = MathUtil.clamp(pidController.calculate(getHeight().in(Meters), setpoint.in(null)), -12, 12);
+        double output = MathUtil.clamp(pidController.calculate(getHeight().in(Meters), setpoint.in(Meters)), -3, 3);
         leftElevatorMotor.set(output);
         rightElevatorMotor.set(output);
     }
 
     private Distance getHeight() {
-        return Meters.of((elevatorEncoder.get() * 120)-offset);
+
+        return Meters.of((elevatorEncoder.get() * Units.inchesToMeters(120)) - offset);
     }
 }

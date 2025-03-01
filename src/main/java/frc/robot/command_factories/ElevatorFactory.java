@@ -50,13 +50,13 @@ public class ElevatorFactory {
     }
 
     public static Command manualElevatorUp(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorVolts(8), elevator)
+        return new RunCommand(() -> elevator.setElevatorVolts(3), elevator)
                 .repeatedly()
                 .finallyDo(() -> elevator.setElevatorVolts(0));
     }
 
     public static Command manualElevatorDown(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorVolts(-8), elevator)
+        return new RunCommand(() -> elevator.setElevatorVolts(-3), elevator)
                 .repeatedly()
                 .finallyDo(() -> elevator.setElevatorVolts(0));
     }

@@ -13,7 +13,6 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.CONTROLLER;
 import static frc.robot.Constants.FieldRelative;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
@@ -239,23 +238,16 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Default command, normal field-relative drive
-            if (FieldRelative) {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
-            } else {
-                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
-            }
-
+        if (FieldRelative) {
+            drive.setDefaultCommand(DriveCommands.joystickDrive(
+                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        } else {
+            drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
+                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        }
 
         // Switch to X pattern when X button is pressed
-            controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
                 ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
@@ -264,31 +256,31 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
         // gyro
 
-            controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-            controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-            controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-            controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            // controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-            // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-            // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-            // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-            // controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
-            controller.rightTrigger().whileTrue(ElevatorFactory.manualElevatorUp(elevator));
-            controller.leftTrigger().whileTrue(ElevatorFactory.manualElevatorDown(elevator));
-            // controller.povLeft().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-            // controller.povRight().whileTrue(ElevatorFactory.elevatorL4(elevator));
-            controller.leftBumper().whileTrue(outtake.manualOuttakeCMD());
-            controller.rightBumper().whileTrue(outtake.manualIntakeCMD());
-            controller.povLeft().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
-            controller.povRight().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
-            controller.povUp().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
-            controller.povDown().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
+        controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
+        controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+        controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+        // controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
+        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        // controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+        controller.rightTrigger().whileTrue(ElevatorFactory.elevatorL2(elevator));
+        controller.leftTrigger().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        // controller.povLeft().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        // controller.povRight().whileTrue(ElevatorFactory.elevatorL4(elevator));
+        controller.leftBumper().whileTrue(outtake.manualOuttakeCMD());
+        controller.rightBumper().whileTrue(outtake.manualIntakeCMD());
+        controller.povLeft().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
+        controller.povRight().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
+        controller.povUp().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
+        controller.povDown().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
     }
 
     /**

@@ -70,6 +70,11 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
     }
 
     @Override
+    public void setAlgaeArmVoltage(double voltage) {
+        pivotMotor.setVoltage(voltage);
+    }
+
+    @Override
     public void updateInputs(AlgaeArmIOInputs inputs) {
         inputs.algaePivotPositionRad = throughBore.getPosition();
         inputs.algaePivotVelocity = throughBore.getVelocity();

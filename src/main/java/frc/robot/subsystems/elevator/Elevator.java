@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/Height", inputs.elevatorHeight);
         Logger.recordOutput("Elevator/Setpoint", setpoint.position);
 
-        // this.io.runSetpoint(Meters.of(setpoint.position));
+        this.io.runSetpoint(Meters.of(setpoint.position));
         visualization.update(inputs.elevatorHeight);
 
         // This method will be called once per scheduler run
