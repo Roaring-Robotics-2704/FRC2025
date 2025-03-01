@@ -14,8 +14,7 @@ public class RemoverIOSpark implements RemoverIO {
             new PIDController(RemoverConstants.REMOVER_KP, RemoverConstants.REMOVER_KI, RemoverConstants.REMOVER_KD);
 
     public RemoverIOSpark() {
-        rollerMotor = new SparkMax(RemoverConstants.REMOVER_TURNING_CANID, MotorType.kBrushless);
-        throughBore = pivotMotor.getAbsoluteEncoder();
+        rollerMotor = new SparkMax(RemoverConstants.REMOVER_CANID, MotorType.kBrushless);
     }
 
     @Override

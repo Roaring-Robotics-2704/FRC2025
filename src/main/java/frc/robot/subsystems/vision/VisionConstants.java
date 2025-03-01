@@ -23,7 +23,8 @@ public class VisionConstants {
     // Private constructor to prevent instantiation
     private VisionConstants() {}
     // AprilTag layout
-    public static final AprilTagFieldLayout TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    public static final AprilTagFieldLayout TAG_LAYOUT =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     // Camera names, must match names configured on coprocessor
     public static final String CAMERA_0_NAME = "camera_1";
