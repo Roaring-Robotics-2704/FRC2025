@@ -14,19 +14,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.controller.PIDController;
-import frc.robot.subsystems.algaeArm.AlgaeArmConstants.*;
-import frc.robot.subsystems.algaeArm.AlgaeArmIO.AlgaeArmIOInputs;
-import frc.robot.util.SparkUtil.*;
 
 public class AlgaeArmIOSpark implements AlgaeArmIO {
     private SparkMax rollerMotor;
     private SparkMax pivotMotor;
     private AbsoluteEncoder throughBore;
     private SparkClosedLoopController pivotController;
-
-    private PIDController PIDController = new PIDController(
-            AlgaeArmConstants.ALGAE_ARM_KP, AlgaeArmConstants.ALGAE_ARM_KI, AlgaeArmConstants.ALGAE_ARM_KD);
 
     public AlgaeArmIOSpark() {
 
@@ -74,6 +67,11 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
     @Override
     public void setRollerSpeed(double speed) {
         rollerMotor.set(speed);
+    }
+
+    @Override
+    public void setAlgaeArmVoltage(double voltage) {
+        pivotMotor.setVoltage(voltage);
     }
 
     @Override

@@ -8,33 +8,35 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 import frc.robot.util.PoseUtil;
+import java.util.function.Supplier;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SourceChooser {
-    SendableChooser<Pose2d> sourcePosChooser = new SendableChooser<>();
+    // Needs to be a supplier to work with getting the closest
+    SendableChooser<Supplier<Pose2d>> sourcePosChooser = new SendableChooser<>();
     /** Creates a new SourceChooser. */
     public SourceChooser() {
-        sourcePosChooser.setDefaultOption("Left Far", SourceLocations.SOURCE_LEFT_FAR);
-        sourcePosChooser.addOption("Left Middle", SourceLocations.SOURCE_LEFT);
-        sourcePosChooser.addOption("Left Close", SourceLocations.SOURCE_LEFT_CLOSE);
-        sourcePosChooser.addOption("Right Close", SourceLocations.SOURCE_RIGHT_CLOSE);
-        sourcePosChooser.addOption("Right Middle", SourceLocations.SOURCE_RIGHT);
-        sourcePosChooser.addOption("Right Far", SourceLocations.SOURCE_RIGHT_FAR);
+        sourcePosChooser.setDefaultOption("Auto", SourceLocations.getClosestSource());
+        sourcePosChooser.addOption("Left Far", () -> SourceLocations.SOURCE_LEFT_FAR);
+        sourcePosChooser.addOption("Left Middle", () -> SourceLocations.SOURCE_LEFT);
+        sourcePosChooser.addOption("Left Close", () -> SourceLocations.SOURCE_LEFT_CLOSE);
+        sourcePosChooser.addOption("Right Close", () -> SourceLocations.SOURCE_RIGHT_CLOSE);
+        sourcePosChooser.addOption("Right Middle", () -> SourceLocations.SOURCE_RIGHT);
+        sourcePosChooser.addOption("Right Far", () -> SourceLocations.SOURCE_RIGHT_FAR);
         SmartDashboard.putData("Source Pos", sourcePosChooser);
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
-    public Pose2d getSourcePose() {
-        return sourcePosChooser.getSelected();
+    public Pose2d getSourcePose() { // Gets the Driver set source's pose
+        return sourcePosChooser.getSelected().get();
     }
 
-    public SendableChooser<Pose2d> getSourceChooser() {
-        return sourcePosChooser;
+    public Pose2d getClosestSourcePose() { // Gets the closest source to us to get coral
+        return SourceLocations.getClosestSource().get(); // Uses the one from the Source Locations
     }
 
     public class SourceLocations {
-        private SourceLocations() {}
+        public SourceLocations() {}
 
         public static final Pose2d SOURCE_LEFT = new Pose2d(1.121, 7.025, Rotation2d.fromDegrees(-54));
         public static final Pose2d SOURCE_RIGHT = new Pose2d(1.121, 1.027, Rotation2d.fromDegrees(54));
@@ -47,5 +49,12 @@ public class SourceChooser {
                 PoseUtil.offsetPose(SOURCE_RIGHT, 0.5, 0); // TODO fill in actual values
         public static final Pose2d SOURCE_RIGHT_FAR =
                 PoseUtil.offsetPose(SOURCE_RIGHT, -0.5, 0); // TODO fill in actual values
+
+        public static Supplier<Pose2d> getClosestSource() { // Gets the closest source to us to get coral from
+            return () -> (PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_LEFT)
+                            < PoseUtil.getDistance(RobotContainer.getBluePose(), SOURCE_RIGHT)
+                    ? SOURCE_LEFT
+                    : SOURCE_RIGHT);
+        }
     }
 }

@@ -14,12 +14,11 @@ public interface ElevatorIO {
         public double leftElevatorAppliedVolts = 0.0;
         public double rightElevatorCurrentAmps = 0.0;
         public double leftElevatorCurrentAmps = 0.0;
+        public double elevatorSetpoint = 0.0;
     }
 
     /** Updates the set of loggable inputs. */
     default void updateInputs(ElevatorIOInputs inputs) {}
-
-    default void setElevatorPosition(double outputs) {}
 
     default void setElevatorVelocity(double velocityRadperSec) {}
 
