@@ -48,4 +48,5 @@ public class ElevatorFactory {
     public static Command elevatorIntake(Elevator elevator) {
         return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.MIN_HEIGHT), elevator);
     }
+    public static Command
 }
