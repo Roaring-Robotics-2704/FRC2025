@@ -30,6 +30,12 @@ public class AlgaeArmFactory {
         return new RunCommand(()->arm.runVolts(Volts.of(4)), arm).repeatedly().finallyDo(()->arm.runVolts(Volts.zero()));
     }
     public static Command manualAlgaeArmDown(AlgaeArm arm) {
-        return new RunCommand(()->arm.runVolts(Volts.of(4)), arm).repeatedly().finallyDo(()->arm.runVolts(Volts.zero()));
+        return new RunCommand(()->arm.runVolts(Volts.of(-4)), arm).repeatedly().finallyDo(()->arm.runVolts(Volts.zero()));
+    }
+    public static Command manualAlgaeRollerIn(AlgaeArm arm) {
+        return new RunCommand(()->arm.runRollers(0.5), arm).repeatedly().finallyDo(()->arm.runRollers(0));
+    }
+    public static Command manualAlgaeRollerOut(AlgaeArm arm) {
+        return new RunCommand(()->arm.runRollers(-0.5), arm).repeatedly().finallyDo(()->arm.runRollers(0));
     }
 }

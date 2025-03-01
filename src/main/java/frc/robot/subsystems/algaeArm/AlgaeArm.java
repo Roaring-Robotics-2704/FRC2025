@@ -30,4 +30,7 @@ public class AlgaeArm extends SubsystemBase {
     public void runVolts(Voltage volts) {
         algaeArmIO.setAlgaeArmVoltage(volts.in(Volts));
     }
+    public void runRollers(double speed) {
+        algaeArmIO.setRollerSpeed(speed);
+    }
 }

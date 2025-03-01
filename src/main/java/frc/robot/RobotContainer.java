@@ -42,10 +42,15 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
+import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
 import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.algaeArm.AlgaeArm;
+import frc.robot.subsystems.algaeArm.AlgaeArmIO;
+import frc.robot.subsystems.algaeArm.AlgaeArmIOSim;
+import frc.robot.subsystems.algaeArm.AlgaeArmIOSpark;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -88,6 +93,7 @@ public class RobotContainer {
 
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
+    private AlgaeArm algaeArm;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -129,6 +135,7 @@ public class RobotContainer {
                 // subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
+                this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
                 break;
             }
 
@@ -162,6 +169,7 @@ public class RobotContainer {
 
                 this.elevator = new Elevator(new ElevatorIOSim()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
                 break;
             }
             default: {
@@ -175,6 +183,7 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
                 break;
             }
         }
@@ -230,7 +239,6 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Default command, normal field-relative drive
-        if (CONTROLLER == Constants.Controller.XBOX) {
             if (FieldRelative) {
                 drive.setDefaultCommand(DriveCommands.joystickDrive(
                         drive,
@@ -245,32 +253,9 @@ public class RobotContainer {
                         () -> -controller.getRightX()));
             }
 
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            if (FieldRelative) {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                        drive,
-                        () -> -joystick.getRawAxis(1),
-                        () -> -joystick.getRawAxis(0),
-                        () -> -joystick.getRawAxis(2)));
-            } else {
-                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
-                        drive,
-                        () -> -joystick.getRawAxis(1),
-                        () -> -joystick.getRawAxis(0),
-                        () -> -joystick.getRawAxis(2)));
-            }
-
-        } else {
-            drive.setDefaultCommand(Commands.deferredProxy(() -> dynamicAutoBeta));
-        }
 
         // Switch to X pattern when X button is pressed
-        if (CONTROLLER == Constants.Controller.XBOX) {
             controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-        } else {
-            joystick.button(3).onTrue(Commands.runOnce(drive::stopWithX, drive));
-            ;
-        }
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
                 ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
@@ -279,18 +264,13 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
         // gyro
 
-        if (CONTROLLER == Constants.Controller.XBOX) {
             controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            joystick.button(4).onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        }
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        if (CONTROLLER == Constants.Controller.XBOX) {
             controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
             controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
             controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
@@ -299,19 +279,16 @@ public class RobotContainer {
             // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
             // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
             // controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
-            controller.povUp().whileTrue(ElevatorFactory.manualElevatorUp(elevator));
-            controller.povDown().whileTrue(ElevatorFactory.manualElevatorDown(elevator));
+            controller.rightTrigger().whileTrue(ElevatorFactory.manualElevatorUp(elevator));
+            controller.leftTrigger().whileTrue(ElevatorFactory.manualElevatorDown(elevator));
             // controller.povLeft().whileTrue(ElevatorFactory.elevatorIntake(elevator));
             // controller.povRight().whileTrue(ElevatorFactory.elevatorL4(elevator));
             controller.leftBumper().whileTrue(outtake.manualOuttakeCMD());
             controller.rightBumper().whileTrue(outtake.manualIntakeCMD());
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-            joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
-            joystick.button(5).whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-            joystick.button(6).whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            joystick.button(7).whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-        }
+            controller.povLeft().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
+            controller.povRight().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
+            controller.povUp().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
+            controller.povDown().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
     }
 
     /**
