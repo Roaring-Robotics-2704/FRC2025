@@ -31,9 +31,9 @@ public class DriveConstants {
     };
 
     // Zeroed rotation values for each module, see setup instructions
-    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(0); // Front left zero rotation
-    public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0); // Front right zero rotation
-    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(0); // Back left zero rotation
+    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(-90); // Front left zero rotation
+    public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(180); // Front right zero rotation
+    public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(90); // Back left zero rotation
     public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(0); // Back right zero rotation
 
     // Device CAN IDs
