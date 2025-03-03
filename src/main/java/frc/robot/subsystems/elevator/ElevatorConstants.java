@@ -40,8 +40,8 @@ public class ElevatorConstants {
 
     // Heights
     // TODO get real values
-    // public static final double MIN_HEIGHT = 0;
-    // public static final double MAX_HEIGHT = 74;
+    public static final double MIN_HEIGHT = Units.inchesToMeters(0);
+    public static final double MAX_HEIGHT = Units.inchesToMeters(74);
     public static final double L1_HEIGHT = Units.inchesToMeters(18);
     public static final double L2_HEIGHT = Units.inchesToMeters(32);
     public static final double L3_HEIGHT = Units.inchesToMeters(47.5);

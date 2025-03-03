@@ -288,10 +288,6 @@ public class DriveCommands {
                 null,
                 new GoalEndState(0, pose.get().getRotation()));
 
-        if (AutoBuilder.shouldFlip()) {
-            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS); // TODO add flipping
-        } else {
-            return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
-        }
+        return AutoBuilder.pathfindThenFollowPath(path, FINDINGCONSTRAINTS);
     }
 }

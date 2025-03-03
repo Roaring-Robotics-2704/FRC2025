@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.CONTROLLER;
 import static frc.robot.Constants.FieldRelative;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
@@ -41,15 +42,10 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
-import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
 import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.algaeArm.AlgaeArm;
-import frc.robot.subsystems.algaeArm.AlgaeArmIO;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSim;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSpark;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -61,14 +57,10 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO;
 import frc.robot.subsystems.outtake.OuttakeIOSpark;
-import frc.robot.subsystems.remover.Remover;
-import frc.robot.subsystems.remover.RemoverIO;
-import frc.robot.subsystems.remover.RemoverIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -95,8 +87,6 @@ public class RobotContainer {
 
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
-    private AlgaeArm algaeArm;
-    private Remover remover;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -134,12 +124,10 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
                         new VisionIOPhotonVision(
-                                VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)); // Initialize vision
-                // subsystem
+                                VisionConstants.CAMERA_1_NAME,
+                                VisionConstants.robotToCamera1)); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
-                this.remover = new Remover(new RemoverIOSpark()); // Initialize remover subsystem
                 break;
             }
 
@@ -149,17 +137,14 @@ public class RobotContainer {
                         DriveConstants.mapleSimConfig,
                         new Pose2d(3, 3, new Rotation2d())); // Initialize drive simulation
                 // add the simulated drivetrain to the simulation field
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive
-                // simulation to
-                // arena
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive simulation to arena
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOSim(driveSimulation.getModules()[0]),
                         new ModuleIOSim(driveSimulation.getModules()[1]),
                         new ModuleIOSim(driveSimulation.getModules()[2]),
-                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive
-                // subsystem
+                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive subsystem
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
@@ -167,14 +152,10 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 CAMERA_1_NAME,
                                 robotToCamera1,
-                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize
-                // vision
-                // subsystem
+                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize vision subsystem
 
-                this.elevator = new Elevator(new ElevatorIOSim()); // Initialize elevator subsystem
+                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
-                this.remover = new Remover(new RemoverIO() {}); // Initialize remover subsystem
                 break;
             }
             default: {
@@ -188,8 +169,6 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
-                this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
-                this.remover = new Remover(new RemoverIO() {}); // Initialize remover subsystem
                 break;
             }
         }
@@ -198,41 +177,31 @@ public class RobotContainer {
         // Initialize dynamic auto beta command
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize
-        // auto
-        // chooser
+        autoChooser =
+                new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize auto chooser
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
             autoChooser.addOption(
                     "Drive Wheel Radius Characterization",
-                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius
-            // characterization option
+                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius characterization option
             autoChooser.addOption(
                     "Drive Simple FF Characterization",
-                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward
-            // characterization option
+                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward characterization option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Forward)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId
-            // quasistatic forward
-            // option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId quasistatic forward option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Reverse)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId
-            // quasistatic reverse
-            // option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId quasistatic reverse option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Forward)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic
-            // forward option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic forward option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Reverse)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
-            // reverse option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic reverse option
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto); // Add dynamic auto option
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta
-        // option
+        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta option
         // Configure the button bindings
         configureButtonBindings(); // Configure button bindings
     }
@@ -245,51 +214,82 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Default command, normal field-relative drive
-        if (FieldRelative) {
-            drive.setDefaultCommand(DriveCommands.joystickDrive(
-                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            if (FieldRelative) {
+                drive.setDefaultCommand(DriveCommands.joystickDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
+            } else {
+                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
+                        drive,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX()));
+            }
+
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
+            if (FieldRelative) {
+                drive.setDefaultCommand(DriveCommands.joystickDrive(
+                        drive,
+                        () -> -joystick.getRawAxis(1),
+                        () -> -joystick.getRawAxis(0),
+                        () -> -joystick.getRawAxis(2)));
+            } else {
+                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
+                        drive,
+                        () -> -joystick.getRawAxis(1),
+                        () -> -joystick.getRawAxis(0),
+                        () -> -joystick.getRawAxis(2)));
+            }
+
         } else {
-            drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
-                    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+            drive.setDefaultCommand(Commands.deferredProxy(() -> dynamicAutoBeta));
         }
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        } else {
+            joystick.button(3).onTrue(Commands.runOnce(drive::stopWithX, drive));
+            ;
+        }
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
-                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
-                // actual robot pose
-                // during simulation
-                : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
-        // gyro
+                ? (() -> drive.resetOdometry(
+                        driveSimulation
+                                .getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
+                : (() -> drive.resetOdometry(
+                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
 
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
+            joystick.button(4).onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+        }
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-        controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-        controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-        // controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        // controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
-        controller.rightTrigger().whileTrue(ElevatorFactory.elevatorL2(elevator));
-        controller.leftTrigger().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-        // controller.povLeft().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-        // controller.povRight().whileTrue(ElevatorFactory.elevatorL4(elevator));
-        controller.leftBumper().whileTrue(outtake.manualOuttakeCMD());
-        controller.rightBumper().whileTrue(outtake.manualIntakeCMD());
-        controller.povLeft().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
-        controller.povRight().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
-        controller.povUp().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
-        controller.povDown().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
-        joystick.button(1).whileTrue(remover.ArmOut());
-        joystick.button(2).whileTrue(remover.ArmIn());
+        if (CONTROLLER == Constants.Controller.XBOX) {
+            controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
+            controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+            controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+            controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
+            controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+            controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+            controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+            controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
+        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
+            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef(false, false)));
+            joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
+            joystick.button(5).whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+            joystick.button(6).whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+            joystick.button(7).whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
+        }
     }
 
     /**
@@ -379,8 +379,7 @@ public class RobotContainer {
         // Use the rotation of the end pose as the end rotation
         Rotation2d endRotation = end.getRotation();
 
-        // Return a supplier that generates a PathPlannerPath with the calculated
-        // waypoints and constraints
+        // Return a supplier that generates a PathPlannerPath with the calculated waypoints and constraints
         return () -> new PathPlannerPath(
                 // Create waypoints from the start and end poses with the calculated rotations
                 PathPlannerPath.waypointsFromPoses(
@@ -388,11 +387,9 @@ public class RobotContainer {
                         new Pose2d(end.getTranslation(), endRotation)),
                 // Use predefined path constraints
                 PATHCONSTRAINTS,
-                // Define the ideal starting state with a velocity of 0.5 and the calculated end
-                // rotation
+                // Define the ideal starting state with a velocity of 0.5 and the calculated end rotation
                 new IdealStartingState(0.5, endRotation),
-                // Define the goal end state with a velocity of 0.0 and the calculated end
-                // rotation
+                // Define the goal end state with a velocity of 0.0 and the calculated end rotation
                 new GoalEndState(0.0, endRotation));
     }
 

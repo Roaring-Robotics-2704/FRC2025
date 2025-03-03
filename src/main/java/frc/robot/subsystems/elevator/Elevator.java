@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,7 +20,6 @@ public class Elevator extends SubsystemBase {
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-    private Distance goal = Inches.of(0);
     private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.75));
 
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
@@ -42,7 +40,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/Height", inputs.elevatorHeight);
         Logger.recordOutput("Elevator/Setpoint", setpoint.position);
 
-        this.io.runSetpoint(Meters.of(setpoint.position));
+        this.io.runSetpoint(setpoint);
         visualization.update(inputs.elevatorHeight);
 
         // This method will be called once per scheduler run
