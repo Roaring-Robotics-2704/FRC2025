@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
@@ -26,7 +27,7 @@ public interface ElevatorIO {
     default void runVolts(Voltage volts) {}
     ;
 
-    default void runSetpoint(TrapezoidProfile.State position) {}
+    default void runSetpoint(State setpoint) {}
     ;
 
     default void stop() {}
