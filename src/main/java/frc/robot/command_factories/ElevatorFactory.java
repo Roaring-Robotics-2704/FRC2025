@@ -10,9 +10,7 @@ import frc.robot.auto.reef.Branch.Level;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 
-/**
- * Factory class for creating elevator commands.
- */
+/** Factory class for creating elevator commands. */
 public class ElevatorFactory {
     private ElevatorFactory() {} // Private constructor to prevent instantiation
 
@@ -45,7 +43,8 @@ public class ElevatorFactory {
      * @return the command to move the elevator to level 1
      */
     public static Command elevatorL1(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L1_HEIGHT), elevator); // Set height to level 1
+        return new RunCommand(
+                () -> elevator.setElevatorHeight(ElevatorConstants.L1_HEIGHT), elevator); // Set height to level 1
     }
 
     /**
@@ -55,7 +54,8 @@ public class ElevatorFactory {
      * @return the command to move the elevator to level 2
      */
     public static Command elevatorL2(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L2_HEIGHT), elevator); // Set height to level 2
+        return new RunCommand(
+                () -> elevator.setElevatorHeight(ElevatorConstants.L2_HEIGHT), elevator); // Set height to level 2
     }
 
     /**
@@ -65,7 +65,8 @@ public class ElevatorFactory {
      * @return the command to move the elevator to level 3
      */
     public static Command elevatorL3(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L3_HEIGHT), elevator); // Set height to level 3
+        return new RunCommand(
+                () -> elevator.setElevatorHeight(ElevatorConstants.L3_HEIGHT), elevator); // Set height to level 3
     }
 
     /**
@@ -75,7 +76,8 @@ public class ElevatorFactory {
      * @return the command to move the elevator to level 4
      */
     public static Command elevatorL4(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L4_HEIGHT), elevator); // Set height to level 4
+        return new RunCommand(
+                () -> elevator.setElevatorHeight(ElevatorConstants.L4_HEIGHT), elevator); // Set height to level 4
     }
 
     /**
@@ -85,7 +87,9 @@ public class ElevatorFactory {
      * @return the command to move the elevator to the intake position
      */
     public static Command elevatorIntake(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.INTAKE_HEIGHT), elevator); // Set height to intake position
+        return new RunCommand(
+                () -> elevator.setElevatorHeight(ElevatorConstants.INTAKE_HEIGHT),
+                elevator); // Set height to intake position
     }
 
     /**

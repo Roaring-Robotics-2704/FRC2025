@@ -11,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.algaeArm.AlgaeArm;
 import frc.robot.subsystems.algaeArm.AlgaeArmConstants;
 
-/**
- * Factory class for creating commands to control the AlgaeArm.
- */
+/** Factory class for creating commands to control the AlgaeArm. */
 public class AlgaeArmFactory {
 
     /**

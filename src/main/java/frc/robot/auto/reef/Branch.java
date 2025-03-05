@@ -7,9 +7,7 @@ package frc.robot.auto.reef;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.auto.reef.Reef.Face;
 
-/**
- * Represents a branch in the reef with different levels and a pose.
- */
+/** Represents a branch in the reef with different levels and a pose. */
 public class Branch {
     private Boolean level4 = false; // Status of level 4
     private Boolean level3 = false; // Status of level 3
@@ -32,17 +30,13 @@ public class Branch {
         this.face = face; // Initialize face
     }
 
-    /**
-     * Represents the side of the branch.
-     */
+    /** Represents the side of the branch. */
     public enum Side {
         LEFT, // Left side
         RIGHT // Right side
     }
 
-    /**
-     * Represents the levels of the branch.
-     */
+    /** Represents the levels of the branch. */
     public enum Level {
         L4, // Level 4
         L3, // Level 3

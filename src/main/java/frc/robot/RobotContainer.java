@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.CONTROLLER;
-import static frc.robot.Constants.FieldRelative;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
@@ -61,6 +59,9 @@ import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.outtake.Outtake;
 import frc.robot.subsystems.outtake.OuttakeIO;
 import frc.robot.subsystems.outtake.OuttakeIOSpark;
+import frc.robot.subsystems.remover.Remover;
+import frc.robot.subsystems.remover.RemoverIO;
+import frc.robot.subsystems.remover.RemoverIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -87,6 +88,7 @@ public class RobotContainer {
 
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
+    private Remover remover;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -128,6 +130,7 @@ public class RobotContainer {
                                 VisionConstants.robotToCamera1)); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
+                this.remover = new Remover(new RemoverIOSpark());
                 break;
             }
 
@@ -156,6 +159,8 @@ public class RobotContainer {
 
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.remover = new Remover(new RemoverIO() {});
+
                 break;
             }
             default: {
@@ -169,6 +174,8 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.remover = new Remover(new RemoverIO() {});
+
                 break;
             }
         }
@@ -214,47 +221,12 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Default command, normal field-relative drive
-        if (CONTROLLER == Constants.Controller.XBOX) {
-            if (FieldRelative) {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
-            } else {
-                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
-                        drive,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getRightX()));
-            }
-
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            if (FieldRelative) {
-                drive.setDefaultCommand(DriveCommands.joystickDrive(
-                        drive,
-                        () -> -joystick.getRawAxis(1),
-                        () -> -joystick.getRawAxis(0),
-                        () -> -joystick.getRawAxis(2)));
-            } else {
-                drive.setDefaultCommand(DriveCommands.RobotOrientedDrive(
-                        drive,
-                        () -> -joystick.getRawAxis(1),
-                        () -> -joystick.getRawAxis(0),
-                        () -> -joystick.getRawAxis(2)));
-            }
-
-        } else {
-            drive.setDefaultCommand(Commands.deferredProxy(() -> dynamicAutoBeta));
-        }
+        drive.setDefaultCommand(DriveCommands.joystickDrive(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
         // Switch to X pattern when X button is pressed
-        if (CONTROLLER == Constants.Controller.XBOX) {
-            controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-        } else {
-            joystick.button(3).onTrue(Commands.runOnce(drive::stopWithX, drive));
-            ;
-        }
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
                 ? (() -> drive.resetOdometry(
@@ -263,33 +235,23 @@ public class RobotContainer {
                 : (() -> drive.resetOdometry(
                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
 
-        if (CONTROLLER == Constants.Controller.XBOX) {
-            controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            joystick.button(4).onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-        }
+        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        if (CONTROLLER == Constants.Controller.XBOX) {
-            controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-            controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-            controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            controller.y().whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-            controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-            controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-            controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-            controller.povUp().onTrue(ElevatorFactory.elevatorL4(elevator));
-        } else if (CONTROLLER == Constants.Controller.JOYSTICK) {
-            joystick.button(1).whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-            joystick.button(2).whileTrue(Commands.deferredProxy(GoToSource()));
-            joystick.button(5).whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-            joystick.button(6).whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-            joystick.button(7).whileTrue(Commands.deferredProxy(() -> dynamicAutoBeta));
-        }
+        controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
+        controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
+        controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
+        controller.rightBumper().whileTrue(remover.ArmOut());
+        controller.leftBumper().whileTrue(remover.ArmIn());
     }
 
     /**

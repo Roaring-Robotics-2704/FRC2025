@@ -12,7 +12,6 @@ public final class Constants {
     public static final Level PRIORITY_LEVEL = Level.L3;
 
     // Controller
-    public static final Controller CONTROLLER = Controller.XBOX;
     public static final Boolean FieldRelative = true;
 
     // General Constants
@@ -31,12 +30,6 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
-    }
-
-    public enum Controller {
-        XBOX,
-        JOYSTICK,
-        NONE
     }
 
     public static final int RECHECK_SECONDS = 12;

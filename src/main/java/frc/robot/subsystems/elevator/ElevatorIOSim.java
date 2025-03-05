@@ -49,8 +49,8 @@ public class ElevatorIOSim implements ElevatorIO {
 
     @Override
     public void runSetpoint(TrapezoidProfile.State setpoint) {
-        double output = MathUtil.clamp(
-                pidController.calculate(m_elevatorSim.getPositionMeters(), setpoint.position), -12, 12);
+        double output =
+                MathUtil.clamp(pidController.calculate(m_elevatorSim.getPositionMeters(), setpoint.position), -12, 12);
         m_elevatorSim.setInputVoltage(output);
     }
 }

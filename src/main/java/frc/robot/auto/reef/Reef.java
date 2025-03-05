@@ -19,9 +19,7 @@ public class Reef {
     // Array to hold the six faces of the reef
     static Face[] faces = new Face[6]; // Array to hold the six faces of the reef
 
-    /**
-     * Private constructor to initialize the faces with their respective positions and orientations.
-     */
+    /** Private constructor to initialize the faces with their respective positions and orientations. */
     public Reef() {
         faces[0] = new Face(F_LEFT, F_RIGHT, FaceEnum.FRONT); // Initializing face 0
         faces[1] = new Face(FL_LEFT, FL_RIGHT, FaceEnum.FRONT_LEFT); // Initializing face 1
@@ -182,7 +180,8 @@ public class Reef {
             }
         }
         try {
-            System.out.println("Face: " + closestBranch.getFace().getName() + " Side: " + closestBranch.getSide()); // Print closest face and side
+            System.out.println("Face: " + closestBranch.getFace().getName() + " Side: "
+                    + closestBranch.getSide()); // Print closest face and side
         } catch (Exception e) {
             System.out.println("Error getting face name: " + e.getMessage()); // Print error message
         }
@@ -231,7 +230,8 @@ public class Reef {
      */
     public boolean isReefFull() {
         for (Face face : faces) { // Iterate through faces
-            if (face.getSelected() && (!face.leftBranch.isFull() || !face.rightBranch.isFull())) { // If face is selected and not full
+            if (face.getSelected()
+                    && (!face.leftBranch.isFull() || !face.rightBranch.isFull())) { // If face is selected and not full
                 return false; // Return false
             }
         }
@@ -239,18 +239,29 @@ public class Reef {
     }
 
     // Pose2d constants representing the positions and orientations of the branches on each face
-    private static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60)); // Pose of front left right branch
-    private static final Pose2d FL_LEFT = new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60)); // Pose of front left left branch
+    private static final Pose2d FL_RIGHT =
+            new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60)); // Pose of front left right branch
+    private static final Pose2d FL_LEFT =
+            new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60)); // Pose of front left left branch
     private static final Pose2d F_LEFT = new Pose2d(3.2, 4.19, Rotation2d.fromDegrees(0)); // Pose of front left branch
-    private static final Pose2d F_RIGHT = new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0)); // Pose of front right branch
-    private static final Pose2d FR_LEFT = new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60)); // Pose of front right left branch
-    private static final Pose2d FR_RIGHT = new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60)); // Pose of front right right branch
-    private static final Pose2d BL_LEFT = new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120)); // Pose of back left left branch
-    private static final Pose2d BL_RIGHT = new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120)); // Pose of back left right branch
-    private static final Pose2d B_LEFT = new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180)); // Pose of back left branch
-    private static final Pose2d B_RIGHT = new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180)); // Pose of back right branch
-    private static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120)); // Pose of back right left branch
-    private static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120)); // Pose of back right right branch
+    private static final Pose2d F_RIGHT =
+            new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0)); // Pose of front right branch
+    private static final Pose2d FR_LEFT =
+            new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60)); // Pose of front right left branch
+    private static final Pose2d FR_RIGHT =
+            new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60)); // Pose of front right right branch
+    private static final Pose2d BL_LEFT =
+            new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120)); // Pose of back left left branch
+    private static final Pose2d BL_RIGHT =
+            new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120)); // Pose of back left right branch
+    private static final Pose2d B_LEFT =
+            new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180)); // Pose of back left branch
+    private static final Pose2d B_RIGHT =
+            new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180)); // Pose of back right branch
+    private static final Pose2d BR_LEFT =
+            new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120)); // Pose of back right left branch
+    private static final Pose2d BR_RIGHT =
+            new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120)); // Pose of back right right branch
 
     /**
      * Get the lesser level compared to the given level.

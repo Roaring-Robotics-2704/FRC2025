@@ -18,7 +18,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -60,6 +59,7 @@ public class ElevatorIOSpark implements ElevatorIO {
                 5,
                 () -> rightElevatorMotor.configure(
                         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        offset = getHeight().in(Meters);
     }
 
     @Override
@@ -85,10 +85,10 @@ public class ElevatorIOSpark implements ElevatorIO {
     @Override
     public void runSetpoint(TrapezoidProfile.State setpoint) {
         double output = MathUtil.clamp(
-        pidController.calculate(getHeight().in(Meters), setpoint.position) +
-        feedForward.calculate(setpoint.velocity),
-        -3, 3
-        );
+                pidController.calculate(getHeight().in(Meters), setpoint.position)
+                        + feedForward.calculate(setpoint.velocity),
+                -3,
+                3);
         leftElevatorMotor.set(output);
         rightElevatorMotor.set(output);
     }
@@ -97,6 +97,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
         return Meters.of((elevatorEncoder.get() * Units.inchesToMeters(120)) - offset);
     }
+
     private double getVelocity() {
         // Calculate the velocity by comparing the current height with the previous height
         double currentHeight = getHeight().in(Meters);
