@@ -28,14 +28,14 @@ public class ElevatorConstants {
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);
     // PID Constants
-    public static final double ELEVATOR_KP = 0.55;
+    public static final double ELEVATOR_KP = 2;
     public static final double ELEVATOR_KI = 0;
     public static final double ELEVATOR_KD = 0.0;
 
     // Feedforward Constants
-    public static final double kS = 0.0;
+    public static final double kS = 0.02;
     public static final double kG = 0.05;
-    public static final double kV = 3.69037 / 20;
+    public static final double kV = 3.69037 / 12;
     public static final double kA = 0.0;
 
     // Heights
