@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -20,7 +21,7 @@ public class Elevator extends SubsystemBase {
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(0.5, 0.75));
+    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(2, 1));
 
     private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
 
@@ -52,5 +53,13 @@ public class Elevator extends SubsystemBase {
 
     public void setElevatorVolts(double volts) {
         io.runVolts(Volts.of(volts));
+    }
+
+    public void setElevatorVolts(Voltage volts) {
+        io.runVolts(volts);
+    }
+
+    public double getVelocity() {
+        return inputs.elevatorVelocity;
     }
 }

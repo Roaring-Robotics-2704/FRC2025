@@ -379,4 +379,8 @@ public class RobotContainer {
                         .get(),
                 FINDINGCONSTRAINTS);
     }
+
+    public void transition() {
+        elevator.setElevatorHeight(0);
+    }
 }

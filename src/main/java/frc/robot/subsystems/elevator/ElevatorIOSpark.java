@@ -43,6 +43,7 @@ public class ElevatorIOSpark implements ElevatorIO {
         rightElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_2, MotorType.kBrushless);
         pidController = new PIDController(
                 ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD);
+
         pidController.setIntegratorRange(-12, 12);
 
         // Configure drive motor
@@ -87,8 +88,8 @@ public class ElevatorIOSpark implements ElevatorIO {
         double output = MathUtil.clamp(
                 pidController.calculate(getHeight().in(Meters), setpoint.position)
                         + feedForward.calculate(setpoint.velocity),
-                -3,
-                3);
+                -3.0,
+                3.0);
         leftElevatorMotor.set(output);
         rightElevatorMotor.set(output);
     }
