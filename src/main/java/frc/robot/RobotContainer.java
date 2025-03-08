@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
@@ -105,7 +104,6 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller; // Xbox controller
-    private final CommandJoystick joystick; // Joystick
 
     ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
@@ -116,7 +114,6 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize Controller
         controller = new CommandXboxController(0); // Initialize Xbox controller
-        joystick = new CommandJoystick(2); // Initialize joystick
 
         switch (Constants.CURRENT_MODE) {
             case REAL: {

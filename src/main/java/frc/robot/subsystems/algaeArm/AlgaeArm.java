@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
 public class AlgaeArm extends SubsystemBase {
     private AlgaeArmIO algaeArmIO;
     private final AlgaeArmIOInputsAutoLogged inputs = new AlgaeArmIOInputsAutoLogged();
-    Rotation2d setpoint = new Rotation2d().kZero;
+    Rotation2d setpoint = Rotation2d.kZero;
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
