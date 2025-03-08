@@ -11,7 +11,7 @@ public interface AlgaeArmIO {
     @AutoLog
     class AlgaeArmIOInputs {
 
-        public double algaePivotPositionRad = 0.0;
+        public double algaePivotPositionDeg = 0.0;
         public double algaePivotVelocity = 0.0;
         public double algaePivotAppliedVolts = 0.0;
         public double algaePivotAmps = 0.0;

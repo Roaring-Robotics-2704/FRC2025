@@ -39,7 +39,7 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
-import frc.robot.command_factories.AlgaeArmFactory;
+import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
 import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
@@ -252,18 +252,22 @@ public class RobotContainer {
         controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
         controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
         controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        // controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
-        // controller.rightBumper().whileTrue(remover.ArmOut());
-        // controller.leftBumper().whileTrue(remover.ArmIn());
-        controller.rightBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
-        controller.leftBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
-        controller.rightTrigger().whileTrue(AlgaeArmFactory.AlgaeArmHold(algaeArm));
-        controller.leftTrigger().whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
-        controller.povUp().whileTrue(remover.ArmOut());
-        controller.povDown().whileTrue(remover.ArmIn());
+        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
+        //controller.rightBumper().whileTrue(remover.ArmOut());
+        //controller.leftBumper().whileTrue(remover.ArmIn());
+        // controller.rightBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
+        // controller.leftBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
+        // controller.rightTrigger().whileTrue(AlgaeArmFactory.AlgaeArmHold(algaeArm));
+        // controller.leftTrigger().whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
+        // controller.povUp().whileTrue(remover.ArmOut());
+        // controller.povDown().whileTrue(remover.ArmIn());
+        // controller.povUp().whileTrue(algaeArm.sysIdDynamic(Direction.kForward));
+        // controller.povDown().whileTrue(algaeArm.sysIdDynamic(Direction.kReverse));
+        // controller.povLeft().whileTrue(algaeArm.sysIdStatic(Direction.kForward));
+        // controller.povRight().whileTrue(algaeArm.sysIdStatic(Direction.kReverse));
     }
 
     /**

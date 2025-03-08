@@ -20,13 +20,11 @@ public class Remover extends SubsystemBase {
 
     public Command ArmOut() { // TODO add elevator controls
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(RemoverConstants.ROLLER_SPEED))
-                .repeatedly()
                 .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 
     public Command ArmIn() { // TODO add elevator controls
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(-RemoverConstants.ROLLER_SPEED))
-                .repeatedly()
                 .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 }
