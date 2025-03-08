@@ -9,6 +9,7 @@ public class OuttakeConstants {
 
     public static final int OUTTAKE_ID = 15;
     public static final int OUTTAKE_BEAMBREAK_ID = 21;
+    public static final double CURRENT_LIMIT = 15;
 
     public static final double OUTTAKE_SPEED = .3; // Change speeds and times (in seconds) when testing physical motors
     public static final double OUTTAKE_TIME = .1;

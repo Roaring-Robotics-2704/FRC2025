@@ -6,10 +6,12 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -21,11 +23,20 @@ public class Elevator extends SubsystemBase {
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-    private final TrapezoidProfile m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(2, 1));
 
-    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+    private ProfiledPIDController controller = new ProfiledPIDController(
+            ElevatorConstants.ELEVATOR_KP,
+            ElevatorConstants.ELEVATOR_KI,
+            ElevatorConstants.ELEVATOR_KD,
+            new TrapezoidProfile.Constraints(2, 1));
 
-    private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
+    private ElevatorFeedforward feedforward = new ElevatorFeedforward(
+            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+
+    private SysIdRoutine sysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                    null, null, null, state -> Logger.recordOutput("Elevator/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
 
     public Elevator(ElevatorIO io) {
         this.io = io;
@@ -35,20 +46,19 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         this.io.updateInputs(inputs);
-        setpoint = m_profile.calculate(0.02, setpoint, m_goal);
         Logger.processInputs("Elevator", inputs);
-        Logger.recordOutput("Elevator/Goal", m_goal.position);
+        Logger.recordOutput("Elevator/Goal", controller.getGoal().position);
         Logger.recordOutput("Elevator/Height", inputs.elevatorHeight);
-        Logger.recordOutput("Elevator/Setpoint", setpoint.position);
-
-        this.io.runSetpoint(setpoint);
+        Logger.recordOutput("Elevator/Setpoint", controller.getSetpoint().position);
         visualization.update(inputs.elevatorHeight);
+        io.runVolts(Volts.of(controller.calculate(inputs.elevatorHeight)
+                + feedforward.calculate(controller.getSetpoint().velocity)));
 
         // This method will be called once per scheduler run
     }
 
     public void setElevatorHeight(double height) {
-        m_goal = new State(height, 0);
+        controller.setGoal(height);
     }
 
     public void setElevatorVolts(double volts) {
@@ -61,5 +71,13 @@ public class Elevator extends SubsystemBase {
 
     public double getVelocity() {
         return inputs.elevatorVelocity;
+    }
+
+    private Elevator local() {
+        return this;
+    }
+
+    public SysIdRoutine getSysIdRoutine() {
+        return sysIdRoutine;
     }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.algaeArm;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface AlgaeArmIO {
@@ -24,7 +25,7 @@ public interface AlgaeArmIO {
 
     default void setAlgaeArmVoltage(double voltage) {}
 
-    default void setAlgaeArmPosition(double positionRad) {}
+    default void setAlgaeArmPosition(Rotation2d rotation) {}
 
     default void setRollerSpeed(double speed) {}
 }

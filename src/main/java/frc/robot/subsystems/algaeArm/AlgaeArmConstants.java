@@ -5,11 +5,12 @@ import edu.wpi.first.math.util.Units;
 public class AlgaeArmConstants {
     public static final int PIVOT_MOTOR_CANID = 22;
     public static final int ROLLER_MOTOR_CANID = 23;
+    public static final int FOLLOW_MOTOR_CANID = 21;
 
     public static final double ROLLERS_SPEED = 1.0;
     public static final double PIVOT_SPEED = 1.0;
 
-    public static final double ALGAE_ARM_KP = 0.0;
+    public static final double ALGAE_ARM_KP = 1;
     public static final double ALGAE_ARM_KI = 0.0;
     public static final double ALGAE_ARM_KD = 0.0;
 

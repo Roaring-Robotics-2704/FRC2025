@@ -40,10 +40,14 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
-import frc.robot.command_factories.ElevatorFactory;
+import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
 import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.subsystems.algaeArm.AlgaeArm;
+import frc.robot.subsystems.algaeArm.AlgaeArmIO;
+import frc.robot.subsystems.algaeArm.AlgaeArmIOSim;
+import frc.robot.subsystems.algaeArm.AlgaeArmIOSpark;
 import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -89,6 +93,7 @@ public class RobotContainer {
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
+    private AlgaeArm algaeArm;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -131,6 +136,8 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIOSpark());
+                this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
+
                 break;
             }
 
@@ -160,6 +167,7 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
+                this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
 
                 break;
             }
@@ -175,6 +183,7 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
+                this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
 
                 break;
             }
@@ -246,12 +255,18 @@ public class RobotContainer {
         controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
         controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
         controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
-        controller.rightBumper().whileTrue(remover.ArmOut());
-        controller.leftBumper().whileTrue(remover.ArmIn());
+        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        // controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
+        // controller.rightBumper().whileTrue(remover.ArmOut());
+        // controller.leftBumper().whileTrue(remover.ArmIn());
+        controller.rightBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
+        controller.leftBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
+        controller.rightTrigger().whileTrue(AlgaeArmFactory.AlgaeArmHold(algaeArm));
+        controller.leftTrigger().whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
+        controller.povUp().whileTrue(remover.ArmOut());
+        controller.povDown().whileTrue(remover.ArmIn());
     }
 
     /**

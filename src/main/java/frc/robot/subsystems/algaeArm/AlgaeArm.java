@@ -6,12 +6,15 @@ package frc.robot.subsystems.algaeArm;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class AlgaeArm extends SubsystemBase {
     private AlgaeArmIO algaeArmIO;
     private final AlgaeArmIOInputsAutoLogged inputs = new AlgaeArmIOInputsAutoLogged();
+    Rotation2d setpoint = new Rotation2d().kZero;
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
@@ -22,10 +25,12 @@ public class AlgaeArm extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         algaeArmIO.updateInputs(inputs);
+        algaeArmIO.setAlgaeArmPosition(setpoint);
+        Logger.recordOutput("Arm/Setpoint", setpoint.getDegrees());
     }
 
     public void setPivotAngle(Double angle) {
-        algaeArmIO.setAlgaeArmPosition(angle);
+        setpoint = Rotation2d.fromRadians(angle);
     }
 
     public void runVolts(Voltage volts) {

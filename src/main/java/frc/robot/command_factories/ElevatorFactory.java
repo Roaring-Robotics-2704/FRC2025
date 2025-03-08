@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -172,5 +174,19 @@ public class ElevatorFactory {
                             System.out.println("\tkS: " + formatter.format(kS));
                             System.out.println("\tkV: " + formatter.format(kV));
                         }));
+    }
+
+    public static Command ElevatorSysIDDynamic(Elevator elevator, Direction direction) {
+        return elevator.getSysIdRoutine().dynamic(direction);
+    }
+
+    public static Command ElevatorSysIDStatic(Elevator elevator, Direction direction) {
+        return elevator.getSysIdRoutine().quasistatic(direction);
+    }
+
+    public static Command elevatorQuasistaticTest(Elevator elevator, Trigger trigger) {
+        return Commands.sequence(
+                ElevatorSysIDStatic(elevator, Direction.kForward).repeatedly().until(() -> !trigger.getAsBoolean()),
+                ElevatorSysIDStatic(elevator, Direction.kReverse).repeatedly().until(trigger::getAsBoolean));
     }
 }

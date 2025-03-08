@@ -3,6 +3,7 @@ package frc.robot.subsystems.algaeArm;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -46,8 +47,8 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     public AlgaeArmIOSim() {}
 
     @Override
-    public void setAlgaeArmPosition(double radians) {
-        m_armSim.setInput(m_controller.calculate(m_armSim.getAngleRads(), radians));
+    public void setAlgaeArmPosition(Rotation2d rotation) {
+        m_armSim.setInput(m_controller.calculate(m_armSim.getAngleRads(), rotation.getDegrees()));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -14,7 +13,6 @@ public interface ElevatorIO {
         public double leftElevatorAppliedVolts = 0.0;
         public double rightElevatorCurrentAmps = 0.0;
         public double leftElevatorCurrentAmps = 0.0;
-        public double elevatorSetpoint = 0.0;
     }
 
     /** Updates the set of loggable inputs. */
@@ -23,9 +21,6 @@ public interface ElevatorIO {
     default void setElevatorVelocity(double velocityRadperSec) {}
 
     default void runVolts(Voltage volts) {}
-    ;
-
-    default void runSetpoint(State setpoint) {}
     ;
 
     default void stop() {}

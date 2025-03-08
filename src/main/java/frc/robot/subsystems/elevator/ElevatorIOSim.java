@@ -6,9 +6,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -45,12 +43,5 @@ public class ElevatorIOSim implements ElevatorIO {
     @Override
     public void runVolts(Voltage volts) {
         m_elevatorSim.setInputVoltage(volts.in(Volts));
-    }
-
-    @Override
-    public void runSetpoint(TrapezoidProfile.State setpoint) {
-        double output =
-                MathUtil.clamp(pidController.calculate(m_elevatorSim.getPositionMeters(), setpoint.position), -12, 12);
-        m_elevatorSim.setInputVoltage(output);
     }
 }

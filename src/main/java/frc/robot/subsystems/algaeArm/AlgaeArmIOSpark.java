@@ -1,7 +1,5 @@
 package frc.robot.subsystems.algaeArm;
 
-import static frc.robot.subsystems.drive.DriveConstants.DRIVE_VELOCITY_FACTOR;
-import static frc.robot.subsystems.drive.DriveConstants.TURN_POSITION_FACTOR;
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -14,10 +12,12 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public class AlgaeArmIOSpark implements AlgaeArmIO {
     private SparkMax rollerMotor;
     private SparkMax pivotMotor;
+    private SparkMax pivotFollowMotor;
     private AbsoluteEncoder throughBore;
     private SparkClosedLoopController pivotController;
 
@@ -25,17 +25,19 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
 
         rollerMotor = new SparkMax(AlgaeArmConstants.ROLLER_MOTOR_CANID, MotorType.kBrushless);
         pivotMotor = new SparkMax(AlgaeArmConstants.PIVOT_MOTOR_CANID, MotorType.kBrushless);
+        pivotFollowMotor = new SparkMax(AlgaeArmConstants.FOLLOW_MOTOR_CANID, MotorType.kBrushless);
+
         throughBore = pivotMotor.getAbsoluteEncoder();
 
         pivotController = pivotMotor.getClosedLoopController();
 
         // Configure drive motor
-        var driveConfig = new SparkMaxConfig();
+        SparkMaxConfig driveConfig = new SparkMaxConfig();
+        SparkMaxConfig followConfig = new SparkMaxConfig();
         driveConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(40).voltageCompensation(12.0);
         driveConfig
                 .encoder
-                .positionConversionFactor(TURN_POSITION_FACTOR)
-                .velocityConversionFactor(DRIVE_VELOCITY_FACTOR)
+                .positionConversionFactor(360)
                 .uvwMeasurementPeriod(10)
                 .uvwAverageDepth(2);
         driveConfig
@@ -57,11 +59,17 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
                 5,
                 () -> pivotMotor.configure(
                         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        followConfig.follow(pivotMotor, false);
+        tryUntilOk(
+                pivotFollowMotor,
+                5,
+                () -> pivotFollowMotor.configure(
+                        followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
     @Override
-    public void setAlgaeArmPosition(double radians) {
-        pivotController.setReference(radians, ControlType.kPosition);
+    public void setAlgaeArmPosition(Rotation2d rotation) {
+        pivotController.setReference(rotation.getDegrees(), ControlType.kPosition);
     }
 
     @Override
