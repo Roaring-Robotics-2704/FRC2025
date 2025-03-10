@@ -43,8 +43,8 @@ public class ElevatorConstants {
     public static final double MIN_HEIGHT = Units.inchesToMeters(0);
     public static final double MAX_HEIGHT = Units.inchesToMeters(74);
     public static final double L1_HEIGHT = Units.inchesToMeters(18);
-    public static final double L2_HEIGHT = Units.inchesToMeters(32);
-    public static final double L3_HEIGHT = Units.inchesToMeters(47.5);
-    public static final double L4_HEIGHT = Units.inchesToMeters(72);
+    public static final double L2_HEIGHT = Units.inchesToMeters(35);
+    public static final double L3_HEIGHT = Units.inchesToMeters(51.5);
+    public static final double L4_HEIGHT = Units.inchesToMeters(76);
     public static final double INTAKE_HEIGHT = Units.inchesToMeters(2);
 }

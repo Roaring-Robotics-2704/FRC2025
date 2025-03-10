@@ -10,6 +10,9 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
@@ -20,6 +23,7 @@ public class Elevator extends SubsystemBase {
     /** Creates a new Elevator. */
     private final ElevatorIO io;
 
+
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -28,7 +32,7 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.ELEVATOR_KP,
             ElevatorConstants.ELEVATOR_KI,
             ElevatorConstants.ELEVATOR_KD,
-            new TrapezoidProfile.Constraints(2, 1));
+            new TrapezoidProfile.Constraints(4, 2));
 
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
@@ -39,6 +43,7 @@ public class Elevator extends SubsystemBase {
             new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
 
     public Elevator(ElevatorIO io) {
+        SmartDashboard.putData("Elevator PID", controller);
         this.io = io;
         io.init();
     }
