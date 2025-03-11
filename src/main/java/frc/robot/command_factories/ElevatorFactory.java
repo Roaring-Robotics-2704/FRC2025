@@ -189,10 +189,10 @@ public class ElevatorFactory {
                 ElevatorSysIDStatic(elevator, Direction.kForward).until(() -> !trigger.getAsBoolean()),
                 ElevatorSysIDStatic(elevator, Direction.kReverse).until(trigger::getAsBoolean));
     }
+
     public static Command elevatorDynamicTest(Elevator elevator, Trigger trigger) {
         return Commands.sequence(
-            ElevatorSysIDDynamic(elevator, Direction.kForward).until(()->!trigger.getAsBoolean()),
-            ElevatorSysIDDynamic(elevator, Direction.kReverse).until(trigger::getAsBoolean)
-        );
+                ElevatorSysIDDynamic(elevator, Direction.kForward).until(() -> !trigger.getAsBoolean()),
+                ElevatorSysIDDynamic(elevator, Direction.kReverse).until(trigger::getAsBoolean));
     }
 }

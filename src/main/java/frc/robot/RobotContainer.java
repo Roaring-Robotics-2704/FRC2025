@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.buttonBoard.ButtonBoardConstants.BB_PORT;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
 import static frc.robot.subsystems.vision.VisionConstants.CAMERA_0_NAME;
@@ -32,7 +33,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
@@ -44,7 +44,6 @@ import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
 import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.buttonBoard.ButtonBoard;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -100,9 +99,9 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller; // Xbox controller
-    private final CommandJoystick joystick; // Joystick
+    private final CommandXboxController controller2; // Joystick
 
-    ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
+    // ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser; // Auto chooser
@@ -111,7 +110,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize Controller
         controller = new CommandXboxController(0); // Initialize Xbox controller
-        joystick = new CommandJoystick(2); // Initialize joystick
+        controller2 = new CommandXboxController(BB_PORT);
 
         switch (Constants.CURRENT_MODE) {
             case REAL: {
@@ -246,12 +245,27 @@ public class RobotContainer {
         controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
         controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
         controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-        controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
-        controller.rightBumper().whileTrue(remover.ArmOut());
-        controller.leftBumper().whileTrue(remover.ArmIn());
+        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
+        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
+        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
+        // controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
+        // controller.rightBumper().whileTrue(remover.ArmOut());
+        // controller.leftBumper().whileTrue(remover.ArmIn());
+
+        controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
+        controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator, Level.L2));
+        controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator, Level.L1));
+        controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator, Level.L3));
+        controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+
+        // Trigger bindings
+        // controller.leftTrigger().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
+        // controller.rightTrigger().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
+        // controller.leftBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
+        // controller.rightBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
+
+        controller2.b().whileTrue(remover.ArmOut());
+        controller2.x().whileTrue(remover.ArmIn());
     }
 
     /**

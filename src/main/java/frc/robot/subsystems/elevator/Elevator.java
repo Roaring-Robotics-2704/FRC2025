@@ -5,13 +5,13 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.elevator.ElevatorConstants.MAX_ELEVATOR_VOLTAGE;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -22,7 +22,6 @@ public class Elevator extends SubsystemBase {
     boolean manual = false;
     /** Creates a new Elevator. */
     private final ElevatorIO io;
-
 
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
@@ -56,8 +55,10 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/Height", inputs.elevatorHeight);
         Logger.recordOutput("Elevator/Setpoint", controller.getSetpoint().position);
         visualization.update(inputs.elevatorHeight);
-        io.runVolts(Volts.of(controller.calculate(inputs.elevatorHeight)
-                + feedforward.calculate(controller.getSetpoint().velocity)));
+        io.runVolts(Volts.of(MathUtil.clamp(
+                controller.calculate(inputs.elevatorHeight) + feedforward.calculate(controller.getSetpoint().velocity),
+                -MAX_ELEVATOR_VOLTAGE,
+                MAX_ELEVATOR_VOLTAGE)));
 
         // This method will be called once per scheduler run
     }
