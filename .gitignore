@@ -188,5 +188,3 @@ compile_commands.json
 # Version file
 src/main/java/frc/robot/BuildConstants.java
 
-# Random files
-.apt_generated/

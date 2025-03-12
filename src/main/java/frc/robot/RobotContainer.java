@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.*;
 import static frc.robot.subsystems.buttonBoard.ButtonBoardConstants.BB_PORT;
 import static frc.robot.subsystems.drive.DriveConstants.FINDINGCONSTRAINTS;
 import static frc.robot.subsystems.drive.DriveConstants.PATHCONSTRAINTS;
@@ -90,6 +91,7 @@ public class RobotContainer {
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
+    private boolean manualControls = false;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
@@ -113,7 +115,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         // Initialize Controller
-        controller = new CommandXboxController(0); // Initialize Xbox controller
+        controller = new CommandXboxController(DRIVE_CONTROLLER); // Initialize Xbox controller
         controller2 = new CommandXboxController(BB_PORT);
 
         heightChooser.setDefaultOption("L4", Level.L4); // Set default height option
@@ -255,12 +257,10 @@ public class RobotContainer {
         controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
         controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
         controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
-        // controller.povDown().onTrue(ElevatorFactory.elevatorL1(elevator));
-        // controller.povLeft().onTrue(ElevatorFactory.elevatorL2(elevator));
-        // controller.povRight().onTrue(ElevatorFactory.elevatorL3(elevator));
-        // controller.povUp().onTrue(ElevatorFactory.elevatorIntake(elevator));
-        // controller.rightBumper().whileTrue(remover.ArmOut());
-        // controller.leftBumper().whileTrue(remover.ArmIn());
+
+        controller.leftTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
+        controller.rightTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
+        controller.rightBumper().whileTrue(outtake.outtakeReverseCMD());
 
         controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
         controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator, Level.L2));

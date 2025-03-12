@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.algaeArm;
 
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.algaeArm.AlgaeArmConstants.*;
 
@@ -21,11 +22,16 @@ public class AlgaeArm extends SubsystemBase {
     private AlgaeArmIO algaeArmIO;
     private final AlgaeArmIOInputsAutoLogged inputs = new AlgaeArmIOInputsAutoLogged();
     private SysIdRoutine sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(null, null, null, state -> Logger.recordOutput("Arm/SysIdState", state.toString())),
+            new SysIdRoutine.Config(
+                    Volts.of(0.5).per(Second),
+                    Volts.of(1),
+                    null,
+                    state -> Logger.recordOutput("Arm/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(this::runVolts, null, this));
+
     private ProfiledPIDController controller =
             new ProfiledPIDController(ALGAE_ARM_KP, ALGAE_ARM_KI, ALGAE_ARM_KD, new Constraints(0.5, 0.5));
-            
+
     private ArmFeedforward feedforward = new ArmFeedforward(KS, KG, KV);
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {

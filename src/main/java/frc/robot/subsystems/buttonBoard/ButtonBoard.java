@@ -12,7 +12,6 @@ import frc.robot.auto.reef.Branch;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
-import frc.robot.auto.reef.Reef.FaceEnum;
 
 public class ButtonBoard extends SubsystemBase {
     Reef reef;
@@ -28,30 +27,30 @@ public class ButtonBoard extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        if (board.getRawButtonPressed(REEF_NEAR_CENTER)) {
-            reef.getReefSide(FaceEnum.FRONT)
-                    .setSelected(!reef.getReefSide(FaceEnum.FRONT).getSelected());
-        }
-        if (board.getRawButtonPressed(REEF_NEAR_LEFT)) {
-            reef.getReefSide(FaceEnum.FRONT_LEFT)
-                    .setSelected(!reef.getReefSide(FaceEnum.FRONT_LEFT).getSelected());
-        }
-        if (board.getRawButtonPressed(REEF_NEAR_RIGHT)) {
-            reef.getReefSide(FaceEnum.FRONT_RIGHT)
-                    .setSelected(!reef.getReefSide(FaceEnum.FRONT_RIGHT).getSelected());
-        }
-        if (board.getRawButtonPressed(REEF_FAR_LEFT)) {
-            reef.getReefSide(FaceEnum.BACK_LEFT)
-                    .setSelected(!reef.getReefSide(FaceEnum.BACK_LEFT).getSelected());
-        }
-        if (board.getRawButtonPressed(REEF_FAR_RIGHT)) {
-            reef.getReefSide(FaceEnum.BACK_RIGHT)
-                    .setSelected(!reef.getReefSide(FaceEnum.BACK_RIGHT).getSelected());
-        }
-        if (board.getRawButtonPressed(REEF_FAR_CENTER)) {
-            reef.getReefSide(FaceEnum.BACK)
-                    .setSelected(!reef.getReefSide(FaceEnum.BACK).getSelected());
-        }
+        // if (board.getRawButtonPressed(REEF_NEAR_CENTER)) {
+        //     reef.getReefSide(FaceEnum.FRONT)
+        //             .setSelected(!reef.getReefSide(FaceEnum.FRONT).getSelected());
+        // }
+        // if (board.getRawButtonPressed(REEF_NEAR_LEFT)) {
+        //     reef.getReefSide(FaceEnum.FRONT_LEFT)
+        //             .setSelected(!reef.getReefSide(FaceEnum.FRONT_LEFT).getSelected());
+        // }
+        // if (board.getRawButtonPressed(REEF_NEAR_RIGHT)) {
+        //     reef.getReefSide(FaceEnum.FRONT_RIGHT)
+        //             .setSelected(!reef.getReefSide(FaceEnum.FRONT_RIGHT).getSelected());
+        // }
+        // if (board.getRawButtonPressed(REEF_FAR_LEFT)) {
+        //     reef.getReefSide(FaceEnum.BACK_LEFT)
+        //             .setSelected(!reef.getReefSide(FaceEnum.BACK_LEFT).getSelected());
+        // }
+        // if (board.getRawButtonPressed(REEF_FAR_RIGHT)) {
+        //     reef.getReefSide(FaceEnum.BACK_RIGHT)
+        //             .setSelected(!reef.getReefSide(FaceEnum.BACK_RIGHT).getSelected());
+        // }
+        // if (board.getRawButtonPressed(REEF_FAR_CENTER)) {
+        //     reef.getReefSide(FaceEnum.BACK)
+        //             .setSelected(!reef.getReefSide(FaceEnum.BACK).getSelected());
+        // }
 
         if (board.getRawButton(ButtonBoardConstants.LEVEL_4R)) {
             currentLevel = Level.L4;

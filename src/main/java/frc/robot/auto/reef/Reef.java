@@ -4,7 +4,6 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
@@ -22,7 +21,6 @@ public class Reef {
     static Face[] faces = new Face[6]; // Array to hold the six faces of the reef
     private static SendableChooser<Face> chooser = new SendableChooser<>(); // Chooser for selecting a face
 
-
     /** Private constructor to initialize the faces with their respective positions and orientations. */
     public Reef() {
         faces[0] = new Face(F_LEFT, F_RIGHT, FaceEnum.FRONT); // Initializing face 0
@@ -31,14 +29,12 @@ public class Reef {
         faces[3] = new Face(B_LEFT, B_RIGHT, FaceEnum.BACK); // Initializing face 3
         faces[4] = new Face(BR_LEFT, BR_RIGHT, FaceEnum.BACK_RIGHT); // Initializing face 4
         faces[5] = new Face(FR_LEFT, FR_RIGHT, FaceEnum.FRONT_RIGHT); // Initializing face 5
-
     }
 
     /** The Face class represents a face of the reef, containing two branches and a selection status. */
     public class Face {
         Branch rightBranch; // Right branch of the face
         Branch leftBranch; // Left branch of the face
-        Boolean isSelected = true; // Selection status of the face
         FaceEnum faceEnum; // Type of the face
 
         /**
@@ -66,24 +62,6 @@ public class Reef {
             } else {
                 return leftBranch; // Return left branch
             }
-        }
-
-        /**
-         * Set the selection status of the face.
-         *
-         * @param status Selection status (true if selected, false otherwise)
-         */
-        public void setSelected(Boolean status) {
-            isSelected = status; // Set selection status
-        }
-
-        /**
-         * Get the selection status of the face.
-         *
-         * @return Selection status (true if selected, false otherwise)
-         */
-        public Boolean getSelected() {
-            return isSelected; // Return selection status
         }
 
         /**
@@ -132,20 +110,18 @@ public class Reef {
     public Branch[] checkHeightAvailability(Level level, boolean useVision) {
         List<Branch> branches = new ArrayList<>(); // List to hold available branches
         for (Face face : faces) { // Iterate through faces
-            if (face.getSelected()) { // If face is selected
-                Branch rightBranch = face.getBranch(Side.RIGHT); // Get right branch
-                Branch leftBranch = face.getBranch(Side.LEFT); // Get left branch
-                if (useVision) { // If using vision
-                    if (!rightBranch.getCoralStatus(level)) { // If right branch is available
-                        branches.add(rightBranch); // Add right branch to list
-                    }
-                    if (!leftBranch.getCoralStatus(level)) { // If left branch is available
-                        branches.add(leftBranch); // Add left branch to list
-                    }
-                } else {
-                    branches.add(leftBranch); // Add left branch to list
+            Branch rightBranch = face.getBranch(Side.RIGHT); // Get right branch
+            Branch leftBranch = face.getBranch(Side.LEFT); // Get left branch
+            if (useVision) { // If using vision
+                if (!rightBranch.getCoralStatus(level)) { // If right branch is available
                     branches.add(rightBranch); // Add right branch to list
                 }
+                if (!leftBranch.getCoralStatus(level)) { // If left branch is available
+                    branches.add(leftBranch); // Add left branch to list
+                }
+            } else {
+                branches.add(leftBranch); // Add left branch to list
+                branches.add(rightBranch); // Add right branch to list
             }
         }
         return branches.toArray(new Branch[branches.size()]); // Return array of available branches
@@ -206,9 +182,7 @@ public class Reef {
         }
         List<Face> availablefaces = new ArrayList<>(); // List to hold available faces
         for (Face face : faces) { // Iterate through faces
-            if (face.getSelected()) { // If face is selected
-                availablefaces.add(face); // Add face to list
-            }
+            availablefaces.add(face); // Add face to list
         }
         if (availablefaces.isEmpty()) { // If no faces are available
             availablefaces.add(FaceEnum.FRONT.getFace()); // Add front face to list
@@ -236,38 +210,39 @@ public class Reef {
      */
     public boolean isReefFull() {
         for (Face face : faces) { // Iterate through faces
-            if (face.getSelected()
-                    && (!face.leftBranch.isFull() || !face.rightBranch.isFull())) { // If face is selected and not full
-                return false; // Return false
+            if ((face.leftBranch.isFull() && face.rightBranch.isFull())) { // If face is selected and not full
+
+                return false; // Return false if there is still open space
             }
         }
-        return true; // Return true
+        return true; // Return true if reef is full
     }
 
-    // Pose2d constants representing the positions and orientations of the branches on each face
-    private static final Pose2d FL_RIGHT =
-            new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60)); // Pose of front left right branch
-    private static final Pose2d FL_LEFT =
-            new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60)); // Pose of front left left branch
+    // Pose2d constants representing the positions and orientations of the branches
+    // on each face
+    private static final Pose2d FL_RIGHT = new Pose2d(3.703, 5.06, Rotation2d.fromDegrees(-60)); // Pose of front left
+    // right branch
+    private static final Pose2d FL_LEFT = new Pose2d(3.987, 5.224, Rotation2d.fromDegrees(-60)); // Pose of front left
+    // left branch
     private static final Pose2d F_LEFT = new Pose2d(3.2, 4.19, Rotation2d.fromDegrees(0)); // Pose of front left branch
-    private static final Pose2d F_RIGHT =
-            new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0)); // Pose of front right branch
-    private static final Pose2d FR_LEFT =
-            new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60)); // Pose of front right left branch
-    private static final Pose2d FR_RIGHT =
-            new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60)); // Pose of front right right branch
-    private static final Pose2d BL_LEFT =
-            new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120)); // Pose of back left left branch
-    private static final Pose2d BL_RIGHT =
-            new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120)); // Pose of back left right branch
-    private static final Pose2d B_LEFT =
-            new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180)); // Pose of back left branch
-    private static final Pose2d B_RIGHT =
-            new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180)); // Pose of back right branch
-    private static final Pose2d BR_LEFT =
-            new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120)); // Pose of back right left branch
-    private static final Pose2d BR_RIGHT =
-            new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120)); // Pose of back right right branch
+    private static final Pose2d F_RIGHT = new Pose2d(3.2, 3.862, Rotation2d.fromDegrees(0)); // Pose of front right
+    // branch
+    private static final Pose2d FR_LEFT = new Pose2d(3.703, 2.992, Rotation2d.fromDegrees(60)); // Pose of front right
+    // left branch
+    private static final Pose2d FR_RIGHT = new Pose2d(3.987, 2.828, Rotation2d.fromDegrees(60)); // Pose of front right
+    // right branch
+    private static final Pose2d BL_LEFT = new Pose2d(5.276, 5.06, Rotation2d.fromDegrees(-120)); // Pose of back left
+    // left branch
+    private static final Pose2d BL_RIGHT = new Pose2d(4.992, 5.224, Rotation2d.fromDegrees(-120)); // Pose of back left
+    // right branch
+    private static final Pose2d B_LEFT = new Pose2d(5.778, 3.862, Rotation2d.fromDegrees(180)); // Pose of back left
+    // branch
+    private static final Pose2d B_RIGHT = new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180)); // Pose of back right
+    // branch
+    private static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120)); // Pose of back right
+    // left branch
+    private static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120)); // Pose of back right
+    // right branch
 
     /**
      * Get the lesser level compared to the given level.

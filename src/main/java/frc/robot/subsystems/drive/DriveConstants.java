@@ -31,10 +31,10 @@ public class DriveConstants {
     };
 
     // Zeroed rotation values for each module, see setup instructions
-    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(0); // Front left zero rotation
+    public static final Rotation2d frontLeftZeroRotation = Rotation2d.fromDegrees(90); // Front left zero rotation
     public static final Rotation2d frontRightZeroRotation = Rotation2d.fromDegrees(0.0); // Front right zero rotation
     public static final Rotation2d backLeftZeroRotation = Rotation2d.fromDegrees(0); // Back left zero rotation
-    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(0); // Back right zero rotation
+    public static final Rotation2d backRightZeroRotation = Rotation2d.fromDegrees(90); // Back right zero rotation
 
     // Device CAN IDs
     public static final int PIGEON_CAN_ID = 9; // Pigeon CAN ID
@@ -91,8 +91,8 @@ public class DriveConstants {
     public static final double TURN_MAX_INPUT = 2 * Math.PI; // Radians
 
     // PathPlanner configuration
-    public static final double ROBOT_MASS = Units.lbsToKilograms(95); // Robot mass in kilograms
-    public static final double ROBOT_MOI = 6.883; // Moment of inertia
+    public static final double ROBOT_MASS = 49.215; // Robot mass in kilograms
+    public static final double ROBOT_MOI = 6.883; // Moment of inertia TODO Change this
     public static final double WHEEL_COF = 1.2; // Coefficient of friction
     public static final RobotConfig ppConfig = new RobotConfig(
             ROBOT_MASS,

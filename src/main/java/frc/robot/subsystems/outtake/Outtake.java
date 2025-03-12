@@ -5,9 +5,8 @@
 package frc.robot.subsystems.outtake;
 
 import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_SPEED;
-import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_TIME;
 import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_SPEED;
-import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_TIME;
+import static frc.robot.subsystems.outtake.OuttakeConstants.REVERSE_SPEED;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -29,30 +28,40 @@ public class Outtake extends SubsystemBase {
         outtake.updateInputs(outtakeInputs);
     }
 
-    public Command
-            outtakeOutCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
-
-        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
-                .repeatedly()
-                .withTimeout(OUTTAKE_TIME)
-                .andThen(() -> outtake.setSpeed(0));
+    public Command outtakeOutCmd(
+            boolean useSensor) { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to change)
+        if (Boolean.TRUE.equals(useSensor)) {
+            return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
+                    .repeatedly()
+                    .until(() -> !outtakeInputs.outtakeLoaded)
+                    .finallyDo(() -> outtake.setSpeed(0));
+        } else {
+            return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
+                    .repeatedly()
+                    .finallyDo(() -> outtake.setSpeed(0));
+        }
     }
 
-    public Command outtakeInCmd() {
+    public Command outtakeInCmd(boolean useSensor) {
 
-        return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
-                .repeatedly()
-                .withTimeout(INTAKE_TIME)
-                .andThen(() -> outtake.setSpeed(0));
+        if (Boolean.TRUE.equals(useSensor)) {
+            return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                    .repeatedly()
+                    .until(() -> outtakeInputs.outtakeLoaded)
+                    .finallyDo(() -> outtake.setSpeed(0));
+        } else {
+            return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                    .repeatedly()
+                    .finallyDo(() -> outtake.setSpeed(0));
+        }
     }
 
-    Command outtakeOutSlowCmd() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
+    public Command outtakeReverseCMD() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
         // change)
 
-        return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED * .5))
+        return new RunCommand(() -> outtake.setSpeed(REVERSE_SPEED))
                 .repeatedly()
-                .withTimeout(OUTTAKE_TIME * 2)
-                .andThen(() -> outtake.setSpeed(0));
+                .finallyDo(() -> outtake.setSpeed(0));
     }
 
     public Command manualOuttakeCMD() {

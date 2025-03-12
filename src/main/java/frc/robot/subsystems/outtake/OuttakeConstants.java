@@ -12,7 +12,7 @@ public class OuttakeConstants {
     public static final double CURRENT_LIMIT = 15;
 
     public static final double OUTTAKE_SPEED = .3; // Change speeds and times (in seconds) when testing physical motors
-    public static final double OUTTAKE_TIME = .1;
-    public static final double INTAKE_SPEED = -.3;
-    public static final double INTAKE_TIME = .2;
+    public static final double INTAKE_SPEED = 0.3;
+    public static final double REVERSE_SPEED =
+            -0.2; // Change speeds and times (in seconds) when testing physical motors
 }

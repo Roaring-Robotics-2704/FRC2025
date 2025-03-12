@@ -8,21 +8,22 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 // Defines the Outtake Class for spark motors and its prtoperties
 
 public class OuttakeIOSpark implements OuttakeIO {
     private SparkMax motor;
-    private DigitalInput outtakeBeambreak;
 
     public OuttakeIOSpark() {
         motor = new SparkMax(OUTTAKE_ID, MotorType.kBrushless);
-        outtakeBeambreak = new DigitalInput(OuttakeConstants.OUTTAKE_BEAMBREAK_ID);
         SparkMaxConfig config = new SparkMaxConfig();
 
         config.smartCurrentLimit(CURRENT_LIMIT).voltageCompensation(12);
+        config.limitSwitch.forwardLimitSwitchEnabled(false);
+        config.limitSwitch.reverseLimitSwitchEnabled(false);
+        config.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
 
         tryUntilOk(
                 motor,
@@ -41,6 +42,6 @@ public class OuttakeIOSpark implements OuttakeIO {
         inputs.velocityRadPerSec = motor.getEncoder().getVelocity();
         inputs.voltage = motor.getBusVoltage();
         inputs.currentAmps = motor.getOutputCurrent();
-        inputs.outtakeLoaded = outtakeBeambreak.get();
+        inputs.outtakeLoaded = motor.getForwardLimitSwitch().isPressed();
     }
 }

@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class ElevatorConstants {
     private ElevatorConstants() {}
 
-    public static final double MAX_ELEVATOR_VOLTAGE = 2;
+    public static final double MAX_ELEVATOR_VOLTAGE = 5;
 
     // Motor IDs
     public static final int ELEVATOR_MOTOR_1 = 12;

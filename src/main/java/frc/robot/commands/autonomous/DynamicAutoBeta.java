@@ -77,11 +77,11 @@ public class DynamicAutoBeta extends SequentialCommandGroup {
     }
 
     public Supplier<Command> Outtake() {
-        return () -> outtake.outtakeOutCmd(); // Run outtake command
+        return () -> outtake.outtakeOutCmd(true); // Run outtake command
     }
 
     public Supplier<Command> Intake() {
-        return () -> outtake.outtakeInCmd(); // Run intake command
+        return () -> outtake.outtakeInCmd(true); // Run intake command
     }
 
     public Supplier<Command> FillReefSlot() {

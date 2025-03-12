@@ -5,7 +5,7 @@ import edu.wpi.first.math.util.Units;
 public class RemoverConstants {
     public static final int REMOVER_CANID = 16;
 
-    public static final double ROLLER_SPEED = 0.8;
+    public static final double ROLLER_SPEED = 0.2;
     public static final double CURRENT_LIMIT = 15;
     public static final double LOWER_HEIGHT = Units.inchesToMeters(0); // TODO: Change this to the correct value
     public static final double UPPER_HEIGHT = Units.inchesToMeters(0); // TODO: Change this to the correct value
