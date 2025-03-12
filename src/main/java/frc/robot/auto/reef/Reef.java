@@ -3,6 +3,8 @@ package frc.robot.auto.reef;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
@@ -18,6 +20,8 @@ import java.util.List;
 public class Reef {
     // Array to hold the six faces of the reef
     static Face[] faces = new Face[6]; // Array to hold the six faces of the reef
+    private static SendableChooser<Face> chooser = new SendableChooser<>(); // Chooser for selecting a face
+
 
     /** Private constructor to initialize the faces with their respective positions and orientations. */
     public Reef() {
@@ -27,6 +31,7 @@ public class Reef {
         faces[3] = new Face(B_LEFT, B_RIGHT, FaceEnum.BACK); // Initializing face 3
         faces[4] = new Face(BR_LEFT, BR_RIGHT, FaceEnum.BACK_RIGHT); // Initializing face 4
         faces[5] = new Face(FR_LEFT, FR_RIGHT, FaceEnum.FRONT_RIGHT); // Initializing face 5
+
     }
 
     /** The Face class represents a face of the reef, containing two branches and a selection status. */
@@ -34,7 +39,7 @@ public class Reef {
         Branch rightBranch; // Right branch of the face
         Branch leftBranch; // Left branch of the face
         Boolean isSelected = true; // Selection status of the face
-        FaceEnum face; // Type of the face
+        FaceEnum faceEnum; // Type of the face
 
         /**
          * Constructor to initialize the face with left and right branch poses and its type.
@@ -46,7 +51,7 @@ public class Reef {
         public Face(Pose2d leftPose, Pose2d rightPose, FaceEnum face) {
             rightBranch = new Branch(Side.RIGHT, rightPose, this); // Initializing right branch
             leftBranch = new Branch(Side.LEFT, leftPose, this); // Initializing left branch
-            this.face = face; // Setting the face type
+            this.faceEnum = face; // Setting the face type
         }
 
         /**
@@ -87,7 +92,8 @@ public class Reef {
          * @return Name of the face
          */
         public String getName() {
-            return face.name(); // Return name of the face
+
+            return faceEnum.toString(); // Return name of the face
         }
     }
 

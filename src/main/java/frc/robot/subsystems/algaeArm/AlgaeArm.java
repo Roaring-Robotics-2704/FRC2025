@@ -25,6 +25,7 @@ public class AlgaeArm extends SubsystemBase {
             new SysIdRoutine.Mechanism(this::runVolts, null, this));
     private ProfiledPIDController controller =
             new ProfiledPIDController(ALGAE_ARM_KP, ALGAE_ARM_KI, ALGAE_ARM_KD, new Constraints(0.5, 0.5));
+            
     private ArmFeedforward feedforward = new ArmFeedforward(KS, KG, KV);
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {

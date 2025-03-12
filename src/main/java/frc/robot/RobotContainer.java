@@ -31,6 +31,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -91,6 +93,8 @@ public class RobotContainer {
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
+    private static SendableChooser<Level> heightChooser =
+            new SendableChooser<>(); // Sendable chooser for selecting height
 
     private static DynamicAuto dynamicAuto; // Dynamic auto command
     private static Command dynamicAutoBeta; // Dynamic auto beta command
@@ -111,6 +115,12 @@ public class RobotContainer {
         // Initialize Controller
         controller = new CommandXboxController(0); // Initialize Xbox controller
         controller2 = new CommandXboxController(BB_PORT);
+
+        heightChooser.setDefaultOption("L4", Level.L4); // Set default height option
+        heightChooser.addOption("L3", Level.L3); // Add L3 option
+        heightChooser.addOption("L2", Level.L2); // Add L2 option
+        heightChooser.addOption("L1", Level.L1); // Add L1 option
+        SmartDashboard.putData("Height Chooser", heightChooser);
 
         switch (Constants.CURRENT_MODE) {
             case REAL: {
@@ -325,7 +335,7 @@ public class RobotContainer {
                                                         (targetSource
                                                                 ? sourceChooser.getClosestSourcePose()
                                                                 : AutoBuilder.getCurrentPose()),
-                                                        Level.L3,
+                                                        heightChooser.getSelected(),
                                                         useVision)
                                                 .getPose(),
                                         -Units.feetToMeters(1),
@@ -334,7 +344,7 @@ public class RobotContainer {
                                                 (targetSource
                                                         ? sourceChooser.getClosestSourcePose()
                                                         : AutoBuilder.getCurrentPose()),
-                                                Level.L3,
+                                                heightChooser.getSelected(),
                                                 useVision)
                                         .getPose())
                         .get(),
