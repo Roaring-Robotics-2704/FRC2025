@@ -31,14 +31,17 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.ELEVATOR_KP,
             ElevatorConstants.ELEVATOR_KI,
             ElevatorConstants.ELEVATOR_KD,
-            new TrapezoidProfile.Constraints(4, 2));
+            new TrapezoidProfile.Constraints(3, 0.5));
 
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
 
     private SysIdRoutine sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                    null, null, null, state -> Logger.recordOutput("Elevator/SysIdState", state.toString())),
+                    Volts.of(0.5).per(Second),
+                    Volts.of(2),
+                    null,
+                    state -> Logger.recordOutput("Elevator/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
 
     public Elevator(ElevatorIO io) {

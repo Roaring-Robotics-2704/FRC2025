@@ -268,12 +268,16 @@ public class RobotContainer {
         controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator, Level.L3));
         controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
 
+        if (!COMPETITION) {
+            controller.povUp().onTrue(ElevatorFactory.elevatorDynamicTest(elevator, controller.povUp()));
+            controller.povDown().onTrue(ElevatorFactory.elevatorQuasistaticTest(elevator, controller.povDown()));
+        }
+
         // Trigger bindings
         // controller.leftTrigger().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
         // controller.rightTrigger().whileTrue(AlgaeArmFactory.manualAlgaeArmUp(algaeArm));
         // controller.leftBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerOut(algaeArm));
         // controller.rightBumper().whileTrue(AlgaeArmFactory.manualAlgaeRollerIn(algaeArm));
-
         controller2.b().whileTrue(remover.ArmOut());
         controller2.x().whileTrue(remover.ArmIn());
     }

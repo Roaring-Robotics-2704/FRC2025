@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.auto.reef.Branch.Level;
@@ -187,12 +188,14 @@ public class ElevatorFactory {
     public static Command elevatorQuasistaticTest(Elevator elevator, Trigger trigger) {
         return Commands.sequence(
                 ElevatorSysIDStatic(elevator, Direction.kForward).until(() -> !trigger.getAsBoolean()),
-                ElevatorSysIDStatic(elevator, Direction.kReverse).until(trigger::getAsBoolean));
+                ElevatorSysIDStatic(elevator, Direction.kReverse).until(trigger::getAsBoolean),
+                new WaitUntilCommand(() -> !trigger.getAsBoolean()));
     }
 
     public static Command elevatorDynamicTest(Elevator elevator, Trigger trigger) {
         return Commands.sequence(
                 ElevatorSysIDDynamic(elevator, Direction.kForward).until(() -> !trigger.getAsBoolean()),
-                ElevatorSysIDDynamic(elevator, Direction.kReverse).until(trigger::getAsBoolean));
+                ElevatorSysIDDynamic(elevator, Direction.kReverse).until(trigger::getAsBoolean),
+                new WaitUntilCommand(() -> !trigger.getAsBoolean()));
     }
 }

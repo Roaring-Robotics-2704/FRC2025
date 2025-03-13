@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class ElevatorConstants {
     private ElevatorConstants() {}
 
-    public static final double MAX_ELEVATOR_VOLTAGE = 5;
+    public static final double MAX_ELEVATOR_VOLTAGE = 10;
 
     // Motor IDs
     public static final int ELEVATOR_MOTOR_1 = 12;
@@ -30,15 +30,15 @@ public class ElevatorConstants {
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);
     // PID Constants
-    public static final double ELEVATOR_KP = 2;
+    public static final double ELEVATOR_KP = 12; // 37.052;
     public static final double ELEVATOR_KI = 0;
-    public static final double ELEVATOR_KD = 0.0;
+    public static final double ELEVATOR_KD = 0; // 3.1904;
 
     // Feedforward Constants
-    public static final double kS = 0.02;
-    public static final double kG = 0.05;
-    public static final double kV = 3.69037 / 12;
-    public static final double kA = 0.0;
+    public static final double kS = 0.0;
+    public static final double kG = 0; // 0.5; // 1.2676;
+    public static final double kV = 0.2;
+    public static final double kA = 0; // 1; // 0.23908;
 
     // Heights
     // TODO get real values

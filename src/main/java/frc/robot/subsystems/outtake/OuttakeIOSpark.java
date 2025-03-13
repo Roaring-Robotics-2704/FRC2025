@@ -24,6 +24,7 @@ public class OuttakeIOSpark implements OuttakeIO {
         config.limitSwitch.forwardLimitSwitchEnabled(false);
         config.limitSwitch.reverseLimitSwitchEnabled(false);
         config.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
+        config.limitSwitch.setSparkMaxDataPortConfig();
 
         tryUntilOk(
                 motor,
