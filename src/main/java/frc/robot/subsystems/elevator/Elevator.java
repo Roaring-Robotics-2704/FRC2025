@@ -89,4 +89,8 @@ public class Elevator extends SubsystemBase {
     public SysIdRoutine getSysIdRoutine() {
         return sysIdRoutine;
     }
+
+    public double getHeight() {
+        return inputs.elevatorHeight;
+    }
 }

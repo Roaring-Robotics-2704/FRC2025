@@ -140,7 +140,7 @@ public class RobotContainer {
                                 VisionConstants.CAMERA_1_NAME,
                                 VisionConstants.robotToCamera1)); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
-                this.outtake = new Outtake(new OuttakeIOSpark()); // Initialize outtake subsystem
+                this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIOSpark());
                 break;
             }
@@ -169,7 +169,7 @@ public class RobotContainer {
                                 driveSimulation::getSimulatedDriveTrainPose)); // Initialize vision subsystem
 
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
-                this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
 
                 break;
@@ -184,7 +184,7 @@ public class RobotContainer {
                         new ModuleIO() {}); // Initialize drive subsystem
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
-                this.outtake = new Outtake(new OuttakeIO() {}); // Initialize outtake subsystem
+                this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
 
                 break;

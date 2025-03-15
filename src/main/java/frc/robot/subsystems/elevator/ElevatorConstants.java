@@ -30,23 +30,24 @@ public class ElevatorConstants {
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);
     // PID Constants
-    public static final double ELEVATOR_KP = 12; // 37.052;
+    public static final double ELEVATOR_KP = 36; // 37.052;
     public static final double ELEVATOR_KI = 0;
     public static final double ELEVATOR_KD = 0; // 3.1904;
 
     // Feedforward Constants
     public static final double kS = 0.0;
-    public static final double kG = 0; // 0.5; // 1.2676;
-    public static final double kV = 0.2;
-    public static final double kA = 0; // 1; // 0.23908;
+    public static final double kG = 0.7; // 0.5; // 1.2676;
+    public static final double kV = 2.2;
+    public static final double kA = 0.9; // 1; // 0.23908;
 
     // Heights
+    public static final double OFFSET = Units.inchesToMeters(18);
     // TODO get real values
-    public static final double MIN_HEIGHT = Units.inchesToMeters(0);
-    public static final double MAX_HEIGHT = Units.inchesToMeters(74);
-    public static final double L1_HEIGHT = Units.inchesToMeters(18);
-    public static final double L2_HEIGHT = Units.inchesToMeters(35);
-    public static final double L3_HEIGHT = Units.inchesToMeters(51.5);
-    public static final double L4_HEIGHT = Units.inchesToMeters(76);
-    public static final double INTAKE_HEIGHT = Units.inchesToMeters(2);
+    public static final double MIN_HEIGHT = Units.inchesToMeters(0); // simulation only
+    public static final double MAX_HEIGHT = Units.inchesToMeters(74); // simulation only
+    public static final double L1_HEIGHT = Units.inchesToMeters(20) - OFFSET;
+    public static final double L2_HEIGHT = Units.inchesToMeters(33) - OFFSET;
+    public static final double L3_HEIGHT = Units.inchesToMeters(47) - OFFSET;
+    public static final double L4_HEIGHT = Units.inchesToMeters(70) - OFFSET;
+    public static final double INTAKE_HEIGHT = Units.inchesToMeters(0);
 }
