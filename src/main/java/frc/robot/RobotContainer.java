@@ -36,6 +36,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
@@ -70,6 +72,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.PoseUtil;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -92,14 +95,15 @@ public class RobotContainer {
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
     private boolean manualControls = false;
+    private Set<Subsystem> autoReqs;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
-    private static SendableChooser<Level> heightChooser =
-            new SendableChooser<>(); // Sendable chooser for selecting height
+    private static SendableChooser<Level> heightChooser = new SendableChooser<>(); // Sendable chooser for selecting
+    // height
 
     private static DynamicAuto dynamicAuto; // Dynamic auto command
-    private static Command dynamicAutoBeta; // Dynamic auto beta command
+    private static DynamicAutoBeta dynamicAutoBeta; // Dynamic auto beta command
 
     private static SwerveDriveSimulation driveSimulation = null; // Swerve drive simulation
 
@@ -137,10 +141,11 @@ public class RobotContainer {
                         drive,
                         new VisionIOPhotonVision(VisionConstants.CAMERA_0_NAME, VisionConstants.robotToCamera0),
                         new VisionIOPhotonVision(
-                                VisionConstants.CAMERA_1_NAME,
-                                VisionConstants.robotToCamera1)); // Initialize vision subsystem
+                                VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)); // Initialize vision
+                // subsystem
                 this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
-                this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake subsystem
+                this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake
+                // subsystem
                 this.remover = new Remover(new RemoverIOSpark());
                 break;
             }
@@ -151,14 +156,17 @@ public class RobotContainer {
                         DriveConstants.mapleSimConfig,
                         new Pose2d(3, 3, new Rotation2d())); // Initialize drive simulation
                 // add the simulated drivetrain to the simulation field
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive simulation to arena
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation); // Add drive
+                // simulation to
+                // arena
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOSim(driveSimulation.getModules()[0]),
                         new ModuleIOSim(driveSimulation.getModules()[1]),
                         new ModuleIOSim(driveSimulation.getModules()[2]),
-                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive subsystem
+                        new ModuleIOSim(driveSimulation.getModules()[3])); // Initialize drive
+                // subsystem
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
@@ -166,7 +174,9 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 CAMERA_1_NAME,
                                 robotToCamera1,
-                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize vision subsystem
+                                driveSimulation::getSimulatedDriveTrainPose)); // Initialize
+                // vision
+                // subsystem
 
                 this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
@@ -191,35 +201,46 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive); // Initialize dynamic auto command
-        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake).asProxy();
+        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake);
+        autoReqs = Set.of(drive, elevator, outtake);
         // Initialize dynamic auto beta command
 
         // Set up auto routines
-        autoChooser =
-                new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize auto chooser
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize
+        // auto
+        // chooser
         if (Boolean.FALSE.equals(Constants.COMPETITION)) {
             // Set up SysId routines
             autoChooser.addOption(
                     "Drive Wheel Radius Characterization",
-                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius characterization option
+                    DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius
+            // characterization option
             autoChooser.addOption(
                     "Drive Simple FF Characterization",
-                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward characterization option
+                    DriveCommands.feedforwardCharacterization(drive)); // Add feedforward
+            // characterization option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Forward)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId quasistatic forward option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); // Add SysId
+            // quasistatic forward
+            // option
             autoChooser.addOption(
                     "Drive SysId (Quasistatic Reverse)",
-                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId quasistatic reverse option
+                    drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId
+            // quasistatic reverse
+            // option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Forward)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic forward option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic
+            // forward option
             autoChooser.addOption(
                     "Drive SysId (Dynamic Reverse)",
-                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic reverse option
+                    drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
+            // reverse option
         }
         autoChooser.addOption("Dynamic Auto", dynamicAuto); // Add dynamic auto option
-        autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta option
+        // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); // Add dynamic auto beta
+        // option
         // Configure the button bindings
         configureButtonBindings(); // Configure button bindings
     }
@@ -230,6 +251,14 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        // NamedCommands.registerCommand("Elevator L4", ElevatorFactory.elevatorL4(elevator));
+        // NamedCommands.registerCommand("Elevator L3", ElevatorFactory.elevatorL3(elevator));
+        // NamedCommands.registerCommand("Elevator L2", ElevatorFactory.elevatorL2(elevator));
+        // NamedCommands.registerCommand("Elevator L1", ElevatorFactory.elevatorL1(elevator));
+        // NamedCommands.registerCommand("Elevator Intake", ElevatorFactory.elevatorIntake(elevator));
+
+        // NamedCommands.registerCommand("Intake", outtake.outtakeInCmd(true));
+        // NamedCommands.registerCommand("Outtake", outtake.outtakeOutCmd(true));
 
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
@@ -240,11 +269,11 @@ public class RobotContainer {
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
-                ? (() -> drive.resetOdometry(
-                        driveSimulation
-                                .getSimulatedDriveTrainPose())) // reset odometry to actual robot pose during simulation
-                : (() -> drive.resetOdometry(
-                        new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero gyro
+                ? (() -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())) // reset odometry to
+                // actual robot pose
+                // during simulation
+                : (() -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()))); // zero
+        // gyro
 
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
@@ -255,8 +284,8 @@ public class RobotContainer {
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
         controller.a().whileTrue(Commands.deferredProxy(GoToReef(false, false)));
-        controller.x().whileTrue(Commands.deferredProxy(GoToSource(Side.LEFT)));
-        controller.b().whileTrue(Commands.deferredProxy(GoToSource(Side.RIGHT)));
+        controller.x().whileTrue(GoToSource(Side.LEFT));
+        controller.b().whileTrue(GoToSource(Side.RIGHT));
 
         controller.leftTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
         controller.rightTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
@@ -267,11 +296,22 @@ public class RobotContainer {
         controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator, Level.L1));
         controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator, Level.L3));
         controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        controller2
+                .y()
+                .whileTrue(Commands.sequence(
+                        Commands.defer(GoToReef(true, false), autoReqs),
+                        Commands.defer(ElevatorUp(), autoReqs),
+                        new WaitCommand(1),
+                        Commands.defer(Outtake(), autoReqs),
+                        Commands.defer(FillReefSlot(), autoReqs),
+                        Commands.defer(ElevatorDown(), autoReqs),
+                        GoToSource(Side.LEFT),
+                        Commands.defer(Intake(), autoReqs)));
 
-        if (!COMPETITION) {
-            controller.povUp().onTrue(ElevatorFactory.elevatorDynamicTest(elevator, controller.povUp()));
-            controller.povDown().onTrue(ElevatorFactory.elevatorQuasistaticTest(elevator, controller.povDown()));
-        }
+        // if (!COMPETITION) {
+        //     controller.povUp().onTrue(ElevatorFactory.elevatorDynamicTest(elevator, controller.povUp()));
+        //     controller.povDown().onTrue(ElevatorFactory.elevatorQuasistaticTest(elevator, controller.povDown()));
+        // }
 
         // Trigger bindings
         // controller.leftTrigger().whileTrue(AlgaeArmFactory.manualAlgaeArmDown(algaeArm));
@@ -344,13 +384,16 @@ public class RobotContainer {
                                                 .getPose(),
                                         -Units.feetToMeters(1),
                                         0),
-                                reef.getclosestBranch(
-                                                (targetSource
-                                                        ? sourceChooser.getClosestSourcePose()
-                                                        : AutoBuilder.getCurrentPose()),
-                                                heightChooser.getSelected(),
-                                                useVision)
-                                        .getPose())
+                                PoseUtil.offsetPose(
+                                        reef.getclosestBranch(
+                                                        (targetSource
+                                                                ? sourceChooser.getClosestSourcePose()
+                                                                : AutoBuilder.getCurrentPose()),
+                                                        heightChooser.getSelected(),
+                                                        useVision)
+                                                .getPose(),
+                                        -Units.inchesToMeters(2),
+                                        0))
                         .get(),
                 FINDINGCONSTRAINTS);
     }
@@ -369,7 +412,8 @@ public class RobotContainer {
         // Use the rotation of the end pose as the end rotation
         Rotation2d endRotation = end.getRotation();
 
-        // Return a supplier that generates a PathPlannerPath with the calculated waypoints and constraints
+        // Return a supplier that generates a PathPlannerPath with the calculated
+        // waypoints and constraints
         return () -> new PathPlannerPath(
                 // Create waypoints from the start and end poses with the calculated rotations
                 PathPlannerPath.waypointsFromPoses(
@@ -377,25 +421,27 @@ public class RobotContainer {
                         new Pose2d(end.getTranslation(), endRotation)),
                 // Use predefined path constraints
                 PATHCONSTRAINTS,
-                // Define the ideal starting state with a velocity of 0.5 and the calculated end rotation
+                // Define the ideal starting state with a velocity of 0.5 and the calculated end
+                // rotation
                 new IdealStartingState(0.5, endRotation),
-                // Define the goal end state with a velocity of 0.0 and the calculated end rotation
+                // Define the goal end state with a velocity of 0.0 and the calculated end
+                // rotation
                 new GoalEndState(0.0, endRotation));
     }
 
-    public static Supplier<Command> GoToSource() {
+    public static Command GoToSource() {
 
-        return () -> AutoBuilder.pathfindThenFollowPath(
+        return AutoBuilder.pathfindThenFollowPath(
                 generatePath(
                                 PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1), 0),
-                                sourceChooser.getClosestSourcePose())
+                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), -Units.inchesToMeters(12), 0))
                         .get(),
                 FINDINGCONSTRAINTS);
     }
 
-    public static Supplier<Command> GoToSource(Side side) {
+    public static Command GoToSource(Side side) {
 
-        return () -> AutoBuilder.pathfindThenFollowPath(
+        return AutoBuilder.pathfindThenFollowPath(
                 generatePath(
                                 PoseUtil.offsetPose(
                                         (side == Side.RIGHT)
@@ -403,12 +449,63 @@ public class RobotContainer {
                                                 : SourceLocations.SOURCE_LEFT,
                                         -Units.feetToMeters(1),
                                         0),
-                                (side == Side.RIGHT) ? SourceLocations.SOURCE_RIGHT : SourceLocations.SOURCE_LEFT)
+                                PoseUtil.offsetPose(
+                                        (side == Side.RIGHT)
+                                                ? SourceLocations.SOURCE_RIGHT
+                                                : SourceLocations.SOURCE_LEFT,
+                                        -Units.inchesToMeters(12),
+                                        0))
                         .get(),
                 FINDINGCONSTRAINTS);
     }
 
     public void transition() {
         elevator.setElevatorHeight(0);
+    }
+
+    public Supplier<Command> ElevatorUp() {
+        return () -> {
+            Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
+            if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
+                    .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
+                return ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Run elevator command
+            }
+            while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
+                    .getCoralStatus(currentLevel)) { // Loop to find free level
+                currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
+            }
+            Level freeLevel = currentLevel; // Set free level
+            return ElevatorFactory.elevator(elevator, freeLevel); // Run elevator command
+        };
+    }
+
+    public Supplier<Command> Outtake() {
+        return () -> outtake.outtakeOutCmd(true); // Run outtake command
+    }
+
+    public Supplier<Command> ElevatorDown() {
+        return () -> ElevatorFactory.elevatorIntake(elevator); // Run elevator intake command
+    }
+
+    public Supplier<Command> Intake() {
+        return () -> outtake.outtakeInCmd(true); // Run intake command
+    }
+
+    public Supplier<Command> FillReefSlot() {
+        return () -> Commands.run(() -> {
+            Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
+            if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel, true)
+                    .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
+                reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
+                        .setCoralStatus(PRIORITY_LEVEL, true); // Set coral status to true
+            } else {
+                while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel, true)
+                        .getCoralStatus(currentLevel)) { // Loop to find free level
+                    currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
+                }
+                reef.getclosestBranch(AutoBuilder.getCurrentPose(), currentLevel, true)
+                        .setCoralStatus(currentLevel, true); // Set coral status to true
+            }
+        });
     }
 }

@@ -80,9 +80,7 @@ public class DynamicAuto extends Command {
         }
 
         // Schedule the next command based on the current state (going to reef or source)
-        currentCommand = ((goingToReef)
-                        ? RobotContainer.GoToReef(true, true).get()
-                        : RobotContainer.GoToSource().get())
+        currentCommand = ((goingToReef) ? RobotContainer.GoToReef(true, true).get() : RobotContainer.GoToSource())
                 .andThen(() -> {
                     System.out.println("[DynamicAutoV2] Finished path to " + (goingToReef ? "REEF" : "SOURCE"));
                     goingToReef = !goingToReef; // Toggle the state after completion

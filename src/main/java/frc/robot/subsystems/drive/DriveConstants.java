@@ -121,7 +121,7 @@ public class DriveConstants {
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF)); // MapleSim configuration
     public static final PathConstraints PATHCONSTRAINTS = new PathConstraints(
-            MAX_SPEED * 0.5, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
+            MAX_SPEED * 0.25, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
     public static final PathConstraints FINDINGCONSTRAINTS = new PathConstraints(
-            MAX_SPEED * 0.95, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
+            MAX_SPEED * 0.5, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
 }
