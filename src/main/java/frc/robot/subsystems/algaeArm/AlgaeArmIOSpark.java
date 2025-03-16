@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class AlgaeArmIOSpark implements AlgaeArmIO {
     private SparkMax rollerMotor;
     private SparkMax pivotMotor;
-    // private SparkMax pivotFollowMotor;
+    private SparkMax pivotFollowMotor;
     private AbsoluteEncoder throughBore;
     private SparkClosedLoopController pivotController;
 
@@ -24,7 +24,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
 
         rollerMotor = new SparkMax(AlgaeArmConstants.ROLLER_MOTOR_CANID, MotorType.kBrushless);
         pivotMotor = new SparkMax(AlgaeArmConstants.PIVOT_MOTOR_CANID, MotorType.kBrushless);
-        // pivotFollowMotor = new SparkMax(AlgaeArmConstants.FOLLOW_MOTOR_CANID, MotorType.kBrushless);
+        pivotFollowMotor = new SparkMax(AlgaeArmConstants.FOLLOW_MOTOR_CANID, MotorType.kBrushless);
 
         throughBore = pivotMotor.getAbsoluteEncoder();
 
@@ -55,11 +55,11 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
                 () -> pivotMotor.configure(
                         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
         followConfig.follow(pivotMotor, true);
-        //     tryUntilOk(
-        //             pivotFollowMotor,
-        //             5,
-        //             () -> pivotFollowMotor.configure(
-        //                     followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        tryUntilOk(
+                pivotFollowMotor,
+                5,
+                () -> pivotFollowMotor.configure(
+                        followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
     @Override

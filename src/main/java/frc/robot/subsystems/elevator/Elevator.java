@@ -15,6 +15,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -22,6 +23,8 @@ public class Elevator extends SubsystemBase {
     boolean manual = false;
     /** Creates a new Elevator. */
     private final ElevatorIO io;
+
+    private final RobotContainer robotContainer;
 
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
@@ -44,9 +47,10 @@ public class Elevator extends SubsystemBase {
                     state -> Logger.recordOutput("Elevator/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
 
-    public Elevator(ElevatorIO io) {
+    public Elevator(ElevatorIO io, RobotContainer robotContainer) {
         SmartDashboard.putData("Elevator PID", controller);
         this.io = io;
+        this.robotContainer = robotContainer;
         io.init();
     }
 
@@ -67,7 +71,10 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setElevatorHeight(double height) {
-        controller.setGoal(height);
+        if ((height > inputs.elevatorHeight) && !robotContainer.hasCoral()) {
+        } else {
+            controller.setGoal(height);
+        }
     }
 
     public void setElevatorVolts(double volts) {

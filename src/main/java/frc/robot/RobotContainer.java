@@ -47,7 +47,6 @@ import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.autonomous.DynamicAuto;
-import frc.robot.commands.autonomous.DynamicAutoBeta;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -72,6 +71,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.PoseUtil;
+import frc.robot.util.RoaringUtils.DeadzoneUtils;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
@@ -103,7 +103,6 @@ public class RobotContainer {
     // height
 
     private static DynamicAuto dynamicAuto; // Dynamic auto command
-    private static DynamicAutoBeta dynamicAutoBeta; // Dynamic auto beta command
 
     private static SwerveDriveSimulation driveSimulation = null; // Swerve drive simulation
 
@@ -143,7 +142,7 @@ public class RobotContainer {
                         new VisionIOPhotonVision(
                                 VisionConstants.CAMERA_1_NAME, VisionConstants.robotToCamera1)); // Initialize vision
                 // subsystem
-                this.elevator = new Elevator(new ElevatorIOSpark()); // Initialize elevator subsystem
+                this.elevator = new Elevator(new ElevatorIOSpark(), this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake
                 // subsystem
                 this.remover = new Remover(new RemoverIOSpark());
@@ -178,7 +177,7 @@ public class RobotContainer {
                 // vision
                 // subsystem
 
-                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
+                this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
 
@@ -193,7 +192,7 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {}); // Initialize drive subsystem
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}); // Initialize vision subsystem
-                this.elevator = new Elevator(new ElevatorIO() {}); // Initialize elevator subsystem
+                this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
 
@@ -201,7 +200,6 @@ public class RobotContainer {
             }
         }
         dynamicAuto = new DynamicAuto(reef, sourceChooser, drive); // Initialize dynamic auto command
-        dynamicAutoBeta = new DynamicAutoBeta(reef, drive, elevator, outtake);
         autoReqs = Set.of(drive, elevator, outtake);
         // Initialize dynamic auto beta command
 
@@ -262,7 +260,10 @@ public class RobotContainer {
 
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+                drive,
+                () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.02),
+                () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.02),
+                () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02)));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -433,7 +434,7 @@ public class RobotContainer {
 
         return AutoBuilder.pathfindThenFollowPath(
                 generatePath(
-                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1), 0),
+                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1.5), 0),
                                 PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), -Units.inchesToMeters(12), 0))
                         .get(),
                 FINDINGCONSTRAINTS);
@@ -447,7 +448,7 @@ public class RobotContainer {
                                         (side == Side.RIGHT)
                                                 ? SourceLocations.SOURCE_RIGHT
                                                 : SourceLocations.SOURCE_LEFT,
-                                        -Units.feetToMeters(1),
+                                        -Units.feetToMeters(1.5),
                                         0),
                                 PoseUtil.offsetPose(
                                         (side == Side.RIGHT)
@@ -507,5 +508,9 @@ public class RobotContainer {
                         .setCoralStatus(currentLevel, true); // Set coral status to true
             }
         });
+    }
+
+    public boolean hasCoral() {
+        return outtake.isLoaded();
     }
 }

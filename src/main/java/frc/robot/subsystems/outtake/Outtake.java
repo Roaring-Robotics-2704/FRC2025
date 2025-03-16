@@ -71,6 +71,10 @@ public class Outtake extends SubsystemBase {
                 () -> canReverse);
     }
 
+    public boolean isLoaded() {
+        return outtakeInputs.outtakeLoaded;
+    }
+
     // public Command manualOuttakeCMD() {
     //     return new RunCommand(() -> outtake.setSpeed(OUTTAKE_SPEED))
     //             .repeatedly()
