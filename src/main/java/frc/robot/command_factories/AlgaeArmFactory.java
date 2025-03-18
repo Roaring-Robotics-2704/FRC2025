@@ -7,7 +7,7 @@ package frc.robot.command_factories;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.algaeArm.AlgaeArm;
 import frc.robot.subsystems.algaeArm.AlgaeArmConstants;
 
@@ -21,7 +21,13 @@ public class AlgaeArmFactory {
      * @return the command to move the arm to the intake position
      */
     public static Command AlgaeArmIntake(AlgaeArm arm) {
-        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INTAKE_POSITION), arm);
+        return Commands.run(
+                        () -> {
+                            arm.setPivotAngle(AlgaeArmConstants.INTAKE_POSITION);
+                            arm.runRollers(-0.25);
+                        },
+                        arm)
+                .finallyDo(() -> arm.runRollers(0));
     }
 
     /**
@@ -31,7 +37,17 @@ public class AlgaeArmFactory {
      * @return the command to hold the arm in the hold position
      */
     public static Command AlgaeArmHold(AlgaeArm arm) {
-        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.HOLD_POSITION), arm);
+        return Commands.run(() -> arm.setPivotAngle(AlgaeArmConstants.HOLD_POSITION), arm);
+    }
+
+    public static Command AlgaeArmRelease(AlgaeArm arm) {
+        return Commands.run(
+                        () -> {
+                            arm.setPivotAngle(AlgaeArmConstants.HOLD_POSITION);
+                            arm.runRollers(1);
+                        },
+                        arm)
+                .finallyDo(() -> arm.runRollers(0));
     }
 
     /**
@@ -41,7 +57,7 @@ public class AlgaeArmFactory {
      * @return the command to move the arm to the inside position
      */
     public static Command AlgaeArmInside(AlgaeArm arm) {
-        return new RunCommand(() -> arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
+        return Commands.run(() -> arm.setPivotAngle(AlgaeArmConstants.INSIDE_POSITION), arm);
     }
 
     /**
@@ -51,7 +67,7 @@ public class AlgaeArmFactory {
      * @return the command to manually move the arm up
      */
     public static Command manualAlgaeArmUp(AlgaeArm arm) {
-        return new RunCommand(() -> arm.runVolts(Volts.of(4)), arm)
+        return Commands.run(() -> arm.runVolts(Volts.of(4)), arm)
                 .repeatedly()
                 .finallyDo(() -> arm.runVolts(Volts.zero()));
     }
@@ -63,7 +79,7 @@ public class AlgaeArmFactory {
      * @return the command to manually move the arm down
      */
     public static Command manualAlgaeArmDown(AlgaeArm arm) {
-        return new RunCommand(() -> arm.runVolts(Volts.of(-4)), arm)
+        return Commands.run(() -> arm.runVolts(Volts.of(-4)), arm)
                 .repeatedly()
                 .finallyDo(() -> arm.runVolts(Volts.zero()));
     }
@@ -75,7 +91,7 @@ public class AlgaeArmFactory {
      * @return the command to manually run the rollers inward
      */
     public static Command manualAlgaeRollerIn(AlgaeArm arm) {
-        return new RunCommand(() -> arm.runRollers(0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
+        return Commands.run(() -> arm.runRollers(0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
     }
 
     /**
@@ -85,6 +101,6 @@ public class AlgaeArmFactory {
      * @return the command to manually run the rollers outward
      */
     public static Command manualAlgaeRollerOut(AlgaeArm arm) {
-        return new RunCommand(() -> arm.runRollers(-0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
+        return Commands.run(() -> arm.runRollers(-0.5), arm).repeatedly().finallyDo(() -> arm.runRollers(0));
     }
 }

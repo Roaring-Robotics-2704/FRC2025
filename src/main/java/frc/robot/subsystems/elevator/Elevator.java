@@ -34,7 +34,7 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.ELEVATOR_KP,
             ElevatorConstants.ELEVATOR_KI,
             ElevatorConstants.ELEVATOR_KD,
-            new TrapezoidProfile.Constraints(3, 0.5));
+            new TrapezoidProfile.Constraints(3, 1));
 
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);

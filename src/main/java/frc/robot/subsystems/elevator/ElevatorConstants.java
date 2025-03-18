@@ -47,7 +47,7 @@ public class ElevatorConstants {
     public static final double MAX_HEIGHT = Units.inchesToMeters(74); // simulation only
     public static final double L1_HEIGHT = Units.inchesToMeters(20) - OFFSET;
     public static final double L2_HEIGHT = Units.inchesToMeters(33) - OFFSET;
-    public static final double L3_HEIGHT = Units.inchesToMeters(47) - OFFSET;
+    public static final double L3_HEIGHT = Units.inchesToMeters(46.5) - OFFSET;
     public static final double L4_HEIGHT = Units.inchesToMeters(70) - OFFSET;
     public static final double INTAKE_HEIGHT = Units.inchesToMeters(0.25);
 }

@@ -15,6 +15,8 @@ import static frc.robot.subsystems.drive.DriveConstants.FRONT_LEFT_DRIVE_CAN_ID;
 import static frc.robot.subsystems.drive.DriveConstants.FRONT_LEFT_TURN_CAN_ID;
 import static frc.robot.subsystems.drive.DriveConstants.FRONT_RIGHT_DRIVE_CAN_ID;
 import static frc.robot.subsystems.drive.DriveConstants.FRONT_RIGHT_TURN_CAN_ID;
+import static frc.robot.subsystems.drive.DriveConstants.MAX_ACCELERATION;
+import static frc.robot.subsystems.drive.DriveConstants.MAX_SPEED;
 import static frc.robot.subsystems.drive.DriveConstants.ODOMETRY_FREQUENCY;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_CURRENT_LIMIT;
 import static frc.robot.subsystems.drive.DriveConstants.TURN_ENCODER_INVERTED;
@@ -136,6 +138,7 @@ public class ModuleIOSpark implements ModuleIO {
                 .appliedOutputPeriodMs(20)
                 .busVoltagePeriodMs(20)
                 .outputCurrentPeriodMs(20);
+        driveConfig.closedLoop.maxMotion.maxAcceleration(MAX_ACCELERATION).maxVelocity(MAX_SPEED);
         tryUntilOk(
                 driveSpark,
                 5,
@@ -236,7 +239,11 @@ public class ModuleIOSpark implements ModuleIO {
     public void setDriveVelocity(double velocityRadPerSec) {
         double ffVolts = DRIVE_KS * Math.signum(velocityRadPerSec) + DRIVE_KV * velocityRadPerSec;
         driveController.setReference(
-                velocityRadPerSec, ControlType.kVelocity, ClosedLoopSlot.kSlot0, ffVolts, ArbFFUnits.kVoltage);
+                velocityRadPerSec,
+                ControlType.kMAXMotionVelocityControl,
+                ClosedLoopSlot.kSlot0,
+                ffVolts,
+                ArbFFUnits.kVoltage);
     }
 
     @Override

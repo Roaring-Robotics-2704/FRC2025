@@ -135,6 +135,34 @@ public class RoaringUtils {
                 return _angle;
             }
         }
+
+        public static double WrapAngleDegrees360(double _angle) {
+
+            if (_angle == 360) { // Handle this case separately to avoid floating point errors with the floor
+                // after the division in the case below
+                return 0.0;
+            } else if (_angle > 360) {
+                return _angle - 360 * Math.floor(_angle / 360);
+            } else if (_angle < 0.0) {
+                return _angle + 360 * (Math.floor((-_angle) / 360) + 1);
+            } else {
+                return _angle;
+            }
+        }
+
+        public static double WrapAngleDegrees180(double _angle) {
+
+            if (_angle == 180) { // Handle this case separately to avoid floating point errors with the floor
+                // after the division in the case below
+                return 0.0;
+            } else if (_angle > 180) {
+                return _angle - 180 * Math.floor(_angle / 180);
+            } else if (_angle < 0.0) {
+                return _angle + 180 * (Math.floor((-_angle) / 180) + 1);
+            } else {
+                return _angle;
+            }
+        }
     }
 
     public class POVDirections {

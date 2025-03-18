@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.algaeArm;
 
+import static frc.robot.subsystems.algaeArm.AlgaeArmConstants.INSIDE_POSITION;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -11,7 +13,7 @@ public interface AlgaeArmIO {
     @AutoLog
     class AlgaeArmIOInputs {
 
-        public double algaePivotPositionDeg = 0.0;
+        public double algaePivotPositionDeg = INSIDE_POSITION;
         public double algaePivotVelocity = 0.0;
         public double algaePivotAppliedVolts = 0.0;
         public double algaePivotAmps = 0.0;

@@ -150,23 +150,24 @@ public class Reef {
         double minDistance = Double.MAX_VALUE; // Initialize minimum distance
         for (Branch branch : branches) { // Iterate through branches
             double distance = PoseUtil.getDistance(pose, branch.getPose()); // Get distance to branch
-            try {
-                System.out.println("Face: " + branch.getFace().getName() + " Side: " + branch.getSide() + " Distance: "
-                        + distance); // Print face, side, and distance
-            } catch (Exception e) {
-                System.out.println("Error getting face name: " + e.getMessage()); // Print error message
-            }
+            // try {
+            //     System.out.println("Face: " + branch.getFace().getName() + " Side: " + branch.getSide() + " Distance:
+            // "
+            //             + distance); // Print face, side, and distance
+            // } catch (Exception e) {
+            //     System.out.println("Error getting face name: " + e.getMessage()); // Print error message
+            // }
             if (distance < minDistance) { // If distance is less than minimum distance
                 minDistance = distance; // Set minimum distance
                 closestBranch = branch; // Set closest branch
             }
         }
-        try {
-            System.out.println("Face: " + closestBranch.getFace().getName() + " Side: "
-                    + closestBranch.getSide()); // Print closest face and side
-        } catch (Exception e) {
-            System.out.println("Error getting face name: " + e.getMessage()); // Print error message
-        }
+        // try {
+        //     System.out.println("Face: " + closestBranch.getFace().getName() + " Side: "
+        //             + closestBranch.getSide()); // Print closest face and side
+        // } catch (Exception e) {
+        //     System.out.println("Error getting face name: " + e.getMessage()); // Print error message
+        // }
         return closestBranch; // Return closest branch
     }
 

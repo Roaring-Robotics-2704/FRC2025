@@ -36,6 +36,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
         driveConfig.inverted(true);
         driveConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(40).voltageCompensation(12.0);
         driveConfig.absoluteEncoder.positionConversionFactor(360).velocityConversionFactor(360);
+        driveConfig.absoluteEncoder.zeroCentered(true).inverted(true);
 
         driveConfig
                 .signals
@@ -54,7 +55,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
                 5,
                 () -> pivotMotor.configure(
                         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-        followConfig.follow(pivotMotor, true);
+        followConfig.follow(pivotMotor, false);
         tryUntilOk(
                 pivotFollowMotor,
                 5,
