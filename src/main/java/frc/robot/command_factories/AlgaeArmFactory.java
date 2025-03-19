@@ -24,7 +24,7 @@ public class AlgaeArmFactory {
         return Commands.run(
                         () -> {
                             arm.setPivotAngle(AlgaeArmConstants.INTAKE_POSITION);
-                            arm.runRollers(-0.25);
+                            arm.runRollers(-0.5);
                         },
                         arm)
                 .finallyDo(() -> arm.runRollers(0));

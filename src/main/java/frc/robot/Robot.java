@@ -97,6 +97,7 @@ public class Robot extends LoggedRobot {
         SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
         Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
         SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
+        SmartDashboard.putBoolean("Manual Mode", robotContainer.isManual());
         // Return to normal thread priority
         Threads.setCurrentThreadPriority(false, 10);
     }

@@ -71,7 +71,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setElevatorHeight(double height) {
-        if ((height > inputs.elevatorHeight) && !robotContainer.hasCoral()) {
+        if (!RobotContainer.isManual()) {
+            if (((height > inputs.elevatorHeight) && !robotContainer.hasCoral())) {
+            } else {
+                controller.setGoal(height);
+            }
         } else {
             controller.setGoal(height);
         }

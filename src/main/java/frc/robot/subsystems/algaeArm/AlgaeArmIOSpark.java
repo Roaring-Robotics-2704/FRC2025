@@ -33,6 +33,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
         // Configure drive motor
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         SparkMaxConfig followConfig = new SparkMaxConfig();
+        SparkMaxConfig rollerConfig = new SparkMaxConfig();
         driveConfig.inverted(true);
         driveConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(40).voltageCompensation(12.0);
         driveConfig.absoluteEncoder.positionConversionFactor(360).velocityConversionFactor(360);
@@ -49,6 +50,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
         driveConfig.absoluteEncoder.inverted(true);
         // driveConfig.closedLoop.positionWrappingEnabled(true).positionWrappingInputRange(-360, 360);
         // driveConfig.closedLoop.maxMotion.maxAcceleration(0.5).maxVelocity(0.5);
+        rollerConfig.idleMode(IdleMode.kBrake);
 
         tryUntilOk(
                 pivotMotor,
@@ -61,6 +63,11 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
                 5,
                 () -> pivotFollowMotor.configure(
                         followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        tryUntilOk(
+                rollerMotor,
+                5,
+                () -> rollerMotor.configure(
+                        rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
     }
 
     @Override

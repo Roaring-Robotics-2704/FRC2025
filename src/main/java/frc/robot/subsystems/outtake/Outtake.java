@@ -4,14 +4,17 @@
 
 package frc.robot.subsystems.outtake;
 
+import static frc.robot.subsystems.outtake.OuttakeConstants.ALIGN_SPEED;
 import static frc.robot.subsystems.outtake.OuttakeConstants.INTAKE_SPEED;
 import static frc.robot.subsystems.outtake.OuttakeConstants.OUTTAKE_SPEED;
 import static frc.robot.subsystems.outtake.OuttakeConstants.REVERSE_SPEED;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.elevator.Elevator;
 
 public class Outtake extends SubsystemBase {
@@ -31,7 +34,11 @@ public class Outtake extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         outtake.updateInputs(outtakeInputs);
-        canReverse = (elevator.getHeight() <= OuttakeConstants.NO_REVERSE_HEIGHT);
+        if (RobotContainer.isManual()) {
+            canReverse = true;
+        } else {
+            canReverse = (elevator.getHeight() <= OuttakeConstants.NO_REVERSE_HEIGHT);
+        }
     }
 
     public Command outtakeOutCmd(
@@ -50,14 +57,16 @@ public class Outtake extends SubsystemBase {
     public Command outtakeInCmd(boolean useSensor) {
 
         return Commands.either(
-                new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
-                        .repeatedly()
-                        .until(() -> outtakeInputs.outtakeLoaded)
-                        .finallyDo(() -> outtake.setSpeed(0)),
-                new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
-                        .repeatedly()
-                        .finallyDo(() -> outtake.setSpeed(0)),
-                () -> useSensor);
+                        new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                                .repeatedly()
+                                .until(() -> outtakeInputs.outtakeLoaded)
+                                .finallyDo(() -> outtake.setSpeed(0)),
+                        new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED))
+                                .repeatedly()
+                                .finallyDo(() -> outtake.setSpeed(0)),
+                        () -> useSensor)
+                .andThen(Commands.either(
+                        alignCoral(), new PrintCommand("Outtake is in manual mode"), () -> !RobotContainer.isManual()));
     }
 
     public Command outtakeReverseCMD() { // Runs outtake motor with set times and speeds (Go to OuttakeConstants.java to
@@ -85,4 +94,13 @@ public class Outtake extends SubsystemBase {
     //     return new RunCommand(() -> outtake.setSpeed(INTAKE_SPEED)).repeatedly().finallyDo(() ->
     // outtake.setSpeed(0));
     // }
+    public Command alignCoral() {
+        return Commands.run(() -> outtake.setSpeed(-ALIGN_SPEED))
+                .repeatedly()
+                .until(() -> !outtakeInputs.outtakeLoaded)
+                .andThen(Commands.run(() -> outtake.setSpeed(ALIGN_SPEED))
+                        .repeatedly()
+                        .until(() -> outtakeInputs.outtakeLoaded))
+                .finallyDo(() -> outtake.setSpeed(0));
+    }
 }

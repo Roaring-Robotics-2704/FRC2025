@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.auto.reef.Branch.Level;
@@ -100,7 +101,7 @@ public class RobotContainer {
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
     private AlgaeArm algaeArm;
-    private boolean manualControls = false;
+    private static boolean manualControls = false;
     private Set<Subsystem> autoReqs;
 
     private static Reef reef = new Reef(); // Reef object
@@ -115,7 +116,7 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller; // Xbox controller
-    private final CommandXboxController controller2; // Joystick
+    private final CommandGenericHID controller2; // Joystick
 
     // ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
@@ -126,7 +127,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize Controller
         controller = new CommandXboxController(DRIVE_CONTROLLER); // Initialize Xbox controller
-        controller2 = new CommandXboxController(BB_PORT);
+        controller2 = new CommandGenericHID(BB_PORT);
 
         heightChooser.setDefaultOption("L4", Level.L4); // Set default height option
         heightChooser.addOption("L3", Level.L3); // Add L3 option
@@ -323,33 +324,59 @@ public class RobotContainer {
         controller.x().whileTrue(Commands.defer(GoToSource(Side.LEFT), autoReqs));
         controller.b().whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs));
 
-        controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
-        controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
+        // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
+        controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), autoReqs));
+        // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
+        controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), autoReqs));
+
         controller.rightBumper().whileTrue(outtake.outtakeReverseCMD());
 
-        controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
-        controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator, Level.L2));
-        controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator, Level.L1));
-        controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator, Level.L3));
-        controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-        controller2.y().whileTrue(dynamicAutoBeta);
+        // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
+        controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
 
-        // controller2.leftBumper().whileTrue(AlgaeArmFactory.AlgaeArmInside(algaeArm));
+        // controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator, Level.L2));
+        controller2.povLeft().or(controller2.povRight()).whileTrue(ElevatorFactory.elevatorL2(elevator));
+
+        // controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator, Level.L1));
+        controller2.povUpLeft().or(controller2.povDownRight()).whileTrue(ElevatorFactory.elevatorL1(elevator));
+
+        // controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator, Level.L3));
+        controller2.povUpRight().or(controller2.povDownLeft()).whileTrue(ElevatorFactory.elevatorL3(elevator));
+
+        // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        controller2.button(7).whileTrue(ElevatorFactory.elevatorIntake(elevator));
+
+        // controller2.y().whileTrue(dynamicAutoBeta);
+
+        // // controller2.leftBumper().whileTrue(AlgaeArmFactory.AlgaeArmInside(algaeArm));
+        // controller2
+        //         .leftBumper()
+        //         .whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm))
+        //         .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
+        controller2.button(6).whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
+        // .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
+
+        // controller2
+        //         .rightBumper()
+        //         .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
+        //         .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
         controller2
-                .leftBumper()
-                .whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm))
-                .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
-        controller2
-                .rightBumper()
+                .button(8)
                 .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
                 .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
+        controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
+            manualControls = !manualControls;
+        }));
+
         // if (!COMPETITION) {
         //     controller.povUp().onTrue(ElevatorFactory.elevatorDynamicTest(elevator, controller.povUp()));
         //     controller.povDown().onTrue(ElevatorFactory.elevatorQuasistaticTest(elevator, controller.povDown()));
         // }
 
-        controller2.b().whileTrue(remover.ArmOut());
-        controller2.x().whileTrue(remover.ArmIn());
+        // controller2.b().whileTrue(remover.ArmOut());
+        // controller2.x().whileTrue(remover.ArmIn());
+        controller2.button(3).whileTrue(remover.ArmOut());
+        controller2.button(5).whileTrue(remover.ArmIn());
     }
 
     /**
@@ -543,5 +570,10 @@ public class RobotContainer {
 
     public boolean hasCoral() {
         return outtake.isLoaded();
+    }
+
+    public static boolean isManual() {
+        Boolean manual = manualControls;
+        return manual;
     }
 }
