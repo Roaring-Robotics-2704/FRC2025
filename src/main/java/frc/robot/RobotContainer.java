@@ -219,11 +219,11 @@ public class RobotContainer {
                 new WaitCommand(2),
                 Commands.defer(Outtake(), autoReqs),
                 new PrintCommand("Outtaked coral"),
-                Commands.defer(FillReefSlot(), autoReqs),
-                new PrintCommand("Filled Reef Slot"),
+                // Commands.defer(FillReefSlot(), autoReqs),
+                // new PrintCommand("Filled Reef Slot"),
                 Commands.defer(ElevatorDown(), autoReqs),
                 new PrintCommand("Elevator Down"),
-                Commands.defer(GoToSource(Side.LEFT), autoReqs).asProxy(),
+                Commands.defer(GoToSource(), autoReqs).asProxy(),
                 new PrintCommand("Aligned to source"),
                 Commands.defer(Intake(), autoReqs));
         dynamicAutoSingle = Commands.sequence(
@@ -491,8 +491,8 @@ public class RobotContainer {
 
         return () -> AutoBuilder.pathfindThenFollowPath(
                 generatePath(
-                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), Units.feetToMeters(1.5), 0),
-                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), -Units.inchesToMeters(9), 0))
+                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), -Units.feetToMeters(1.5), 0),
+                                PoseUtil.offsetPose(sourceChooser.getClosestSourcePose(), -Units.inchesToMeters(6), 0))
                         .get(),
                 FINDINGCONSTRAINTS);
     }
@@ -511,7 +511,7 @@ public class RobotContainer {
                                                 (side == Side.RIGHT)
                                                         ? SourceLocations.SOURCE_RIGHT
                                                         : SourceLocations.SOURCE_LEFT,
-                                                -Units.inchesToMeters(9),
+                                                -Units.inchesToMeters(6),
                                                 0))
                                 .get(),
                         FINDINGCONSTRAINTS)

@@ -16,10 +16,10 @@ public final class Constants {
     public static final Boolean FieldRelative = true;
 
     // General Constants
-    public static final double DRIVE_SPEED = 0.40;
+    public static final double DRIVE_SPEED = 0.5;
     public static final double TURN_SPEED = 0.5;
 
-    public static final Boolean COMPETITION = false;
+    public static final Boolean COMPETITION = true;
     public static final Mode SIM_MODE = Mode.SIM;
     public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
 

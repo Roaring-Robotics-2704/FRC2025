@@ -3,7 +3,6 @@ package frc.robot.auto.reef;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Robot;
 import frc.robot.auto.reef.Branch.Level;
 import frc.robot.auto.reef.Branch.Side;
@@ -19,7 +18,6 @@ import java.util.List;
 public class Reef {
     // Array to hold the six faces of the reef
     static Face[] faces = new Face[6]; // Array to hold the six faces of the reef
-    private static SendableChooser<Face> chooser = new SendableChooser<>(); // Chooser for selecting a face
 
     /** Private constructor to initialize the faces with their respective positions and orientations. */
     public Reef() {

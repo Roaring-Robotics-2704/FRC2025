@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -125,5 +126,8 @@ public class DriveConstants {
     public static final PathConstraints PATHCONSTRAINTS = new PathConstraints(
             MAX_SPEED * 0.25, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
     public static final PathConstraints FINDINGCONSTRAINTS = new PathConstraints(
-            MAX_SPEED * 0.5, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
+            MAX_SPEED * Constants.DRIVE_SPEED,
+            2,
+            Units.degreesToRadians(540),
+            Units.degreesToRadians(720)); // Finding constraints
 }

@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
@@ -67,23 +68,29 @@ public class DriveCommands {
                     // Get linear velocity
                     Translation2d linearVelocity =
                             getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+                    Logger.recordOutput("DriveCommand/FullLinearVelocity", linearVelocity);
                     linearVelocity = linearVelocity.times(Constants.DRIVE_SPEED);
+                    Logger.recordOutput("DriveCommand/LinearVelocity", linearVelocity);
                     // Apply rotation deadband
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * Constants.TURN_SPEED;
+                    Logger.recordOutput("DriveCommand/InitialAngularVelocity", omega);
 
                     // Square rotation value for more precise control
                     omega = Math.copySign(omega * omega, omega);
+                    Logger.recordOutput("DriveCommand/OptimizedAngularVelocity", omega);
 
                     // Convert to field relative speeds & send command
                     ChassisSpeeds speeds = new ChassisSpeeds(
                             linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                             linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                             omega * drive.getMaxAngularSpeedRadPerSec());
+                    Logger.recordOutput("DriveCommand/RobotRelativeSpeeds", speeds);
                     boolean isFlipped = DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red;
                     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                             speeds,
                             isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
+                    Logger.recordOutput("DriveCommand/FieldRelativeSpeeds", speeds);
                     drive.runVelocity(speeds);
                 },
                 drive);
