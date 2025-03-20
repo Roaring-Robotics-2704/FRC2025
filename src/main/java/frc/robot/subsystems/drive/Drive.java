@@ -54,8 +54,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-    private final SwerveSetpointGenerator setpointGenerator;
-    private SwerveSetpoint previousSetpoint;
+    // private final SwerveSetpointGenerator setpointGenerator;
+    // private SwerveSetpoint previousSetpoint;
 
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
     private final SysIdRoutine sysId;
@@ -119,19 +119,14 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                         null, null, null, state -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(voltage -> runCharacterization(voltage.in(Volts)), null, local()));
 
-        setpointGenerator = new SwerveSetpointGenerator(
-                ppconfig, // The robot configuration. This is the same config used for generating
-                // trajectories and running path following commands.
-                Units.rotationsToRadians(10.0) // The max rotation velocity of a swerve module in radians per second.
-                // This should probably be stored in your Constants file
-                );
+        // setpointGenerator = new SwerveSetpointGenerator(
+        //         ppconfig, // The robot configuration. This is the same config used for generating
+        //         // trajectories and running path following commands.
+        //         Units.rotationsToRadians(10.0) // The max rotation velocity of a swerve module in radians per second.
+        //         // This should probably be stored in your Constants file
+        //         );
 
         // Initialize the previous setpoint to the robot's current speeds & module
-        // states
-        ChassisSpeeds currentSpeeds = getChassisSpeeds(); // Method to get current robot-relative chassis speeds
-        SwerveModuleState[] currentStates = getModuleStates(); // Method to get the current swerve module states
-        previousSetpoint =
-                new SwerveSetpoint(currentSpeeds, currentStates, DriveFeedforwards.zeros(ppconfig.numModules));
     }
 
     private Drive local() {
@@ -209,12 +204,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     public void runVelocity(ChassisSpeeds speeds) {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
-        previousSetpoint = setpointGenerator.generateSetpoint(
-                previousSetpoint, // The previous setpoint
-                speeds, // The desired target speeds
-                0.02 // The loop time of the robot code, in seconds
-                );
-        SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
+        // previousSetpoint = setpointGenerator.generateSetpoint(
+        //         previousSetpoint, // The previous setpoint
+        //         speeds, // The desired target speeds
+        //         0.02 // The loop time of the robot code, in seconds
+        //         );
+        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
 
         // Log unoptimized setpoints
@@ -235,12 +230,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         speeds = new ChassisSpeeds().minus(speeds);
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
-        previousSetpoint = setpointGenerator.generateSetpoint(
-                previousSetpoint, // The previous setpoint
-                speeds, // The desired target speeds
-                0.02 // The loop time of the robot code, in seconds
-                );
-        SwerveModuleState[] setpointStates = previousSetpoint.moduleStates();
+        // previousSetpoint = setpointGenerator.generateSetpoint(
+        //         previousSetpoint, // The previous setpoint
+        //         speeds, // The desired target speeds
+        //         0.02 // The loop time of the robot code, in seconds
+        //         );
+        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
 
         // Log unoptimized setpoints

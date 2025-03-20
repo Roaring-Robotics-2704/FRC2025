@@ -299,7 +299,7 @@ public class RobotContainer {
                 drive,
                 () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.02),
                 () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.02),
-                () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02)));
+                () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02)).withName("Joystick Drive"));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -320,9 +320,9 @@ public class RobotContainer {
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        controller.a().whileTrue(Commands.defer(GoToReef(false, false), autoReqs));
-        controller.x().whileTrue(Commands.defer(GoToSource(Side.LEFT), autoReqs));
-        controller.b().whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs));
+        controller.a().whileTrue(Commands.defer(GoToReef(false, false), autoReqs).withName("Auto Align Reef"));
+        controller.x().whileTrue(Commands.defer(GoToSource(Side.LEFT), autoReqs).withName("Auto Align Source Left"));
+        controller.b().whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs).withName("Auto Align Source Right"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
         controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), autoReqs));
