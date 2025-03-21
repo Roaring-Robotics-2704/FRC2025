@@ -213,7 +213,7 @@ public class RobotContainer {
         autoReqs = Set.of(drive, elevator, outtake);
         dynamicAutoBeta = Commands.repeatingSequence(
                 Commands.defer(GoToReef(true, false), autoReqs),
-                new PrintCommand("Reef sligned"),
+                new PrintCommand("Reef aligned"),
                 Commands.defer(ElevatorUp(), autoReqs),
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(2),
@@ -223,12 +223,12 @@ public class RobotContainer {
                 // new PrintCommand("Filled Reef Slot"),
                 Commands.defer(ElevatorDown(), autoReqs),
                 new PrintCommand("Elevator Down"),
-                Commands.defer(GoToSource(), autoReqs).asProxy(),
+                Commands.defer(GoToSource(), autoReqs),
                 new PrintCommand("Aligned to source"),
                 Commands.defer(Intake(), autoReqs));
         dynamicAutoSingle = Commands.sequence(
                 Commands.defer(GoToReef(true, false), autoReqs),
-                new PrintCommand("Reef sligned"),
+                new PrintCommand("Reef aligned"),
                 Commands.defer(ElevatorUp(), autoReqs),
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(2),
@@ -296,10 +296,11 @@ public class RobotContainer {
 
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive,
-                () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.02),
-                () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.02),
-                () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02)).withName("Joystick Drive"));
+                        drive,
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.02),
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.02),
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02))
+                .withName("Joystick Drive"));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -320,9 +321,13 @@ public class RobotContainer {
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        controller.a().whileTrue(Commands.defer(GoToReef(false, false), autoReqs).withName("Auto Align Reef"));
+        controller
+                .a()
+                .whileTrue(Commands.defer(GoToReef(false, false), autoReqs).withName("Auto Align Reef"));
         controller.x().whileTrue(Commands.defer(GoToSource(Side.LEFT), autoReqs).withName("Auto Align Source Left"));
-        controller.b().whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs).withName("Auto Align Source Right"));
+        controller
+                .b()
+                .whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs).withName("Auto Align Source Right"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
         controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), autoReqs));
@@ -431,26 +436,26 @@ public class RobotContainer {
     public Supplier<Command> GoToReef(Boolean useVision, Boolean targetSource) {
         return () -> AutoBuilder.pathfindThenFollowPath(
                         generatePath(
-                                        PoseUtil.offsetPose(
-                                                reef.getclosestBranch(
-                                                                (targetSource
-                                                                        ? sourceChooser.getClosestSourcePose()
-                                                                        : AutoBuilder.getCurrentPose()),
-                                                                heightChooser.getSelected(),
-                                                                useVision)
-                                                        .getPose(),
-                                                -Units.feetToMeters(1),
-                                                0),
-                                        PoseUtil.offsetPose(
-                                                reef.getclosestBranch(
-                                                                (targetSource
-                                                                        ? sourceChooser.getClosestSourcePose()
-                                                                        : AutoBuilder.getCurrentPose()),
-                                                                heightChooser.getSelected(),
-                                                                useVision)
-                                                        .getPose(),
-                                                -Units.inchesToMeters(0),
-                                                0))
+                                PoseUtil.offsetPose(
+                                        reef.getclosestBranch(
+                                                        (targetSource
+                                                                ? sourceChooser.getClosestSourcePose()
+                                                                : AutoBuilder.getCurrentPose()),
+                                                        heightChooser.getSelected(),
+                                                        useVision)
+                                                .getPose(),
+                                        -Units.feetToMeters(1),
+                                        0),
+                                PoseUtil.offsetPose(
+                                        reef.getclosestBranch(
+                                                        (targetSource
+                                                                ? sourceChooser.getClosestSourcePose()
+                                                                : AutoBuilder.getCurrentPose()),
+                                                        heightChooser.getSelected(),
+                                                        useVision)
+                                                .getPose(),
+                                        -Units.inchesToMeters(0),
+                                        0))
                                 .get(),
                         FINDINGCONSTRAINTS)
                 .finallyDo(() -> drive.stop());

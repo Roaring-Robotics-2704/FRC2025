@@ -10,6 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface AlgaeArmIO {
+    /**
+     * Represents the input data for the Algae Arm subsystem. This class contains various sensor readings and state
+     * information related to the Algae Arm's pivot and roller mechanisms.
+     */
     @AutoLog
     class AlgaeArmIOInputs {
 
