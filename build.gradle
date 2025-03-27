@@ -12,6 +12,9 @@ java {
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
+// Define custom source sets for main and test directories
+
+
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
@@ -57,7 +60,7 @@ deploy {
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 
 // Set to true to use debug for JNI.
-wpi.java.debugJni = false
+wpi.java.debugJni = true
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
@@ -103,6 +106,10 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+
+    // Include test classes in the classpath
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 }
 
 // Simulation configuration (e.g. environment variables).
@@ -113,6 +120,7 @@ test {
 // is the standard WPILib behavior).
 wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation().defaultEnabled = true
+
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib

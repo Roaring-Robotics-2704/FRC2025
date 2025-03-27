@@ -34,7 +34,7 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.ELEVATOR_KP,
             ElevatorConstants.ELEVATOR_KI,
             ElevatorConstants.ELEVATOR_KD,
-            new TrapezoidProfile.Constraints(3, 1));
+            new TrapezoidProfile.Constraints(3, 10)); // 2.97,54.36
 
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
@@ -64,7 +64,7 @@ public class Elevator extends SubsystemBase {
         visualization.update(inputs.elevatorHeight);
         io.runVolts(Volts.of(MathUtil.clamp(
                 controller.calculate(inputs.elevatorHeight) + feedforward.calculate(controller.getSetpoint().velocity),
-                -MAX_ELEVATOR_VOLTAGE,
+                (controller.getGoal().position < 1.0) ? -0.5 : -6,
                 MAX_ELEVATOR_VOLTAGE)));
 
         // This method will be called once per scheduler run
@@ -103,5 +103,9 @@ public class Elevator extends SubsystemBase {
 
     public double getHeight() {
         return inputs.elevatorHeight;
+    }
+
+    public boolean isL1() {
+        return Math.abs(inputs.elevatorHeight - ElevatorConstants.L1_HEIGHT) <= ElevatorConstants.HEIGHT_TOLERANCE;
     }
 }

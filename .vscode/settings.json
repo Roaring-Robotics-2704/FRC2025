@@ -9,5 +9,13 @@
     "connectionId": "mmarchjr",
     "projectKey": "mmarchjr_FRC2025"
   },
-  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx16G -Xms100m -Xlog:disable"
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx64G -Xms100m -Xlog:disable",
+  "java.debug.settings.stepping.skipClasses": [
+    
+
+  ],
+  "java.project.sourcePaths": [
+    "src/main/java",
+    "src/test/java"
+]
 }

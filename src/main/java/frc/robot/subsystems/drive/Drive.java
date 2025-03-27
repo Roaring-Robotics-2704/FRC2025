@@ -5,6 +5,8 @@ import static frc.robot.subsystems.drive.DriveConstants.DRIVE_BASE_RADIUS;
 import static frc.robot.subsystems.drive.DriveConstants.MAX_SPEED;
 import static frc.robot.subsystems.drive.DriveConstants.moduleTranslations;
 
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -16,6 +18,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.vision.Vision;
 import java.util.concurrent.locks.Lock;
@@ -44,6 +48,10 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     public static final Lock odometryLock = new ReentrantLock();
+    static AutoFactory factory;
+    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
 
     @SuppressWarnings("FieldMayBeFinal")
     private GyroIO gyroIO;
@@ -81,6 +89,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         modules[3] = new Module(brModuleIO, 3);
 
         local().ppconfig = DriveConstants.ppConfig;
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
         // try {
         // local().ppconfig = RobotConfig.fromGUISettings();
         // } catch (IOException | ParseException e) {
@@ -103,6 +112,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 local().ppconfig,
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 local());
+        factory = new AutoFactory(local()::getPose, local()::resetOdometry, local()::followTrajectory, true, local());
         Pathfinding.setPathfinder(new LocalADStar());
         PathPlannerLogging.setLogActivePathCallback(
                 activePath -> Logger.recordOutput("Odometry/Trajectory", activePath.toArray(Pose2d[]::new)));
@@ -116,11 +126,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 new SysIdRoutine.Mechanism(voltage -> runCharacterization(voltage.in(Volts)), null, local()));
 
         // setpointGenerator = new SwerveSetpointGenerator(
-        //         ppconfig, // The robot configuration. This is the same config used for generating
-        //         // trajectories and running path following commands.
-        //         Units.rotationsToRadians(10.0) // The max rotation velocity of a swerve module in radians per second.
-        //         // This should probably be stored in your Constants file
-        //         );
+        // ppconfig, // The robot configuration. This is the same config used for
+        // generating
+        // // trajectories and running path following commands.
+        // Units.rotationsToRadians(10.0) // The max rotation velocity of a swerve
+        // module in radians per second.
+        // // This should probably be stored in your Constants file
+        // );
 
         // Initialize the previous setpoint to the robot's current speeds & module
     }
@@ -201,10 +213,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
         // previousSetpoint = setpointGenerator.generateSetpoint(
-        //         previousSetpoint, // The previous setpoint
-        //         speeds, // The desired target speeds
-        //         0.02 // The loop time of the robot code, in seconds
-        //         );
+        // previousSetpoint, // The previous setpoint
+        // speeds, // The desired target speeds
+        // 0.02 // The loop time of the robot code, in seconds
+        // );
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
 
@@ -227,10 +239,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         // Calculate module setpoints
         speeds = ChassisSpeeds.discretize(speeds, 0.02);
         // previousSetpoint = setpointGenerator.generateSetpoint(
-        //         previousSetpoint, // The previous setpoint
-        //         speeds, // The desired target speeds
-        //         0.02 // The loop time of the robot code, in seconds
-        //         );
+        // previousSetpoint, // The previous setpoint
+        // speeds, // The desired target speeds
+        // 0.02 // The loop time of the robot code, in seconds
+        // );
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_SPEED);
 
@@ -358,5 +370,24 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     /** Returns the maximum angular speed in radians per sec. */
     public double getMaxAngularSpeedRadPerSec() {
         return MAX_SPEED / DRIVE_BASE_RADIUS;
+    }
+
+    public AutoFactory getFactory() {
+        return factory;
+    }
+
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + xController.calculate(pose.getX(), sample.x),
+                sample.vy + yController.calculate(pose.getY(), sample.y),
+                sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds, Robot.isRedAlliance() ? getRotation().plus(new Rotation2d(Math.PI)) : getRotation());
+        // Apply the generated speeds
+        runVelocity(speeds);
     }
 }

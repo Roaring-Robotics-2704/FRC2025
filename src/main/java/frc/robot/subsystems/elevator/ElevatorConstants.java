@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class ElevatorConstants {
     private ElevatorConstants() {}
 
-    public static final double MAX_ELEVATOR_VOLTAGE = 10;
+    public static final double HEIGHT_TOLERANCE = 0.2;
+    public static final double MAX_ELEVATOR_VOLTAGE = 12;
 
     // Motor IDs
     public static final int ELEVATOR_MOTOR_1 = 12;
@@ -30,15 +31,15 @@ public class ElevatorConstants {
     // Mass
     public static final double CARRIAGE_MASS = Units.lbsToKilograms(15);
     // PID Constants
-    public static final double ELEVATOR_KP = 36; // 37.052;
+    public static final double ELEVATOR_KP = 10.5; // 36
     public static final double ELEVATOR_KI = 0;
     public static final double ELEVATOR_KD = 0; // 3.1904;
 
     // Feedforward Constants
-    public static final double kS = 0.0;
-    public static final double kG = 0.7; // 0.5; // 1.2676;
-    public static final double kV = 2.2;
-    public static final double kA = 0.9; // 1; // 0.23908;
+    public static final double kS = 0.2;
+    public static final double kG = 1.1; // 0.5; // 1.2676;
+    public static final double kV = 3;
+    public static final double kA = 0.6; // 1; // 0.23908;
 
     // Heights
     public static final double OFFSET = Units.inchesToMeters(18);
@@ -46,8 +47,8 @@ public class ElevatorConstants {
     public static final double MIN_HEIGHT = Units.inchesToMeters(0); // simulation only
     public static final double MAX_HEIGHT = Units.inchesToMeters(74); // simulation only
     public static final double L1_HEIGHT = Units.inchesToMeters(20) - OFFSET;
-    public static final double L2_HEIGHT = Units.inchesToMeters(33) - OFFSET;
-    public static final double L3_HEIGHT = Units.inchesToMeters(46.5) - OFFSET;
-    public static final double L4_HEIGHT = Units.inchesToMeters(70) - OFFSET;
-    public static final double INTAKE_HEIGHT = Units.inchesToMeters(0.25);
+    public static final double L2_HEIGHT = Units.inchesToMeters(31) - OFFSET;
+    public static final double L3_HEIGHT = Units.inchesToMeters(46) - OFFSET;
+    public static final double L4_HEIGHT = Units.inchesToMeters(69) - OFFSET;
+    public static final double INTAKE_HEIGHT = Units.inchesToMeters(-0.25);
 }

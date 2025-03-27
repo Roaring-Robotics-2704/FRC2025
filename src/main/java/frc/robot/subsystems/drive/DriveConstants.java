@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -94,9 +93,9 @@ public class DriveConstants {
     public static final double TURN_MAX_INPUT = 2 * Math.PI; // Radians
 
     // PathPlanner configuration
-    public static final double ROBOT_MASS = 49.215; // Robot mass in kilograms
+    public static final double ROBOT_MASS = Units.lbsToKilograms(135.16); // Robot mass in kilograms
     public static final double ROBOT_MOI = 6.883; // Moment of inertia TODO Change this
-    public static final double WHEEL_COF = 1.2; // Coefficient of friction
+    public static final double WHEEL_COF = 1; // Coefficient of friction
     public static final RobotConfig ppConfig = new RobotConfig(
             ROBOT_MASS,
             ROBOT_MOI,
@@ -124,10 +123,7 @@ public class DriveConstants {
                     KilogramSquareMeters.of(0.02),
                     WHEEL_COF)); // MapleSim configuration
     public static final PathConstraints PATHCONSTRAINTS = new PathConstraints(
-            MAX_SPEED * 0.25, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
+            MAX_SPEED * 0.5, 0.5, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Path constraints
     public static final PathConstraints FINDINGCONSTRAINTS = new PathConstraints(
-            MAX_SPEED * Constants.DRIVE_SPEED,
-            2,
-            Units.degreesToRadians(540),
-            Units.degreesToRadians(720)); // Finding constraints
+            MAX_SPEED * 0.8, 2, Units.degreesToRadians(540), Units.degreesToRadians(720)); // Finding constraints
 }

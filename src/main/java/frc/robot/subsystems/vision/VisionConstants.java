@@ -63,4 +63,5 @@ public class VisionConstants {
     public static final double LINEAR_STD_DEV_MEGATAG_2_FACTOR = 0.5; // More stable than full 3D solve
     public static final double ANGULAR_STD_DEV_MEGATAG_2_FACTOR =
             Double.POSITIVE_INFINITY; // No rotation data available
+    public static final int[] disabledtags = new int[] {21, 17};
 }
