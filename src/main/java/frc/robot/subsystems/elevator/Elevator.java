@@ -64,7 +64,7 @@ public class Elevator extends SubsystemBase {
         visualization.update(inputs.elevatorHeight);
         io.runVolts(Volts.of(MathUtil.clamp(
                 controller.calculate(inputs.elevatorHeight) + feedforward.calculate(controller.getSetpoint().velocity),
-                (inputs.elevatorHeight < 5.0) ? -0.5 : -6,
+                (controller.getGoal().position < 5.0) ? -0.5 : -6,
                 MAX_ELEVATOR_VOLTAGE)));
 
         // This method will be called once per scheduler run

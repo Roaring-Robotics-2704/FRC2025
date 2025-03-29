@@ -238,7 +238,7 @@ public class Reef {
     // branch
     private static final Pose2d B_RIGHT = new Pose2d(5.778, 4.19, Rotation2d.fromDegrees(180)); // Pose of back right
     // branch
-    private static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(120)); // Pose of back right
+    private static final Pose2d BR_LEFT = new Pose2d(4.992, 2.828, Rotation2d.fromDegrees(121)); // Pose of back right
     // left branch
     private static final Pose2d BR_RIGHT = new Pose2d(5.276, 2.992, Rotation2d.fromDegrees(120)); // Pose of back right
     // right branch

@@ -214,6 +214,12 @@ public class RobotContainer {
         }
         // auto = new Autos(drive, outtake, elevator, remover);
         dynamicAutoBeta = Commands.sequence(
+                // AutoBuilder.followPath(generatePath(
+                //                 getPose(),
+                //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
+                // false)
+                //                         .getPose())
+                //         .get()),
                 Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
                 new PrintCommand("Reef aligned"),
                 Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
@@ -230,6 +236,12 @@ public class RobotContainer {
                 new PrintCommand("Aligned to source"),
                 outtake.outtakeInCmd(true),
                 Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
+                // AutoBuilder.followPath(generatePath(
+                //                 getPose(),
+                //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
+                // false)
+                //                         .getPose())
+                //         .get()),
                 new PrintCommand("Reef aligned"),
                 Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
                 new PrintCommand("Elevator Up"),
@@ -252,7 +264,7 @@ public class RobotContainer {
         // Initialize dynamic auto beta command
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // Initialize
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices"); // Initialize
         // auto
         // chooser
         // if (Boolean.FALSE.equals(Constants.COMPETITION)) {
@@ -284,8 +296,9 @@ public class RobotContainer {
         // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
         // // reverse option
         // }
-        autoChooser.addOption("Dynamic Auto", Commands.deferredProxy(() -> dynamicAutoBeta)); // Add dynamic auto option
-        autoChooser.addOption("Dynamic Auto Single", dynamicAutoSingle);
+        autoChooser.addDefaultOption(
+                "2 Coral Auto", Commands.deferredProxy(() -> dynamicAutoBeta)); // Add dynamic auto option
+        autoChooser.addOption("1 Coral Auto", dynamicAutoSingle);
         // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); //
         // Add dynamic auto beta
         // option
@@ -294,7 +307,7 @@ public class RobotContainer {
         arbPoseChooser.setDefaultOption("Center", new Pose2d(7.25, 4, Rotation2d.k180deg));
         arbPoseChooser.addOption("Left", new Pose2d(7.25, 6, Rotation2d.k180deg));
         arbPoseChooser.addOption("Right", new Pose2d(7.25, 2, Rotation2d.k180deg));
-        SmartDashboard.putData(arbPoseChooser);
+        SmartDashboard.putData("Backup side chooser", arbPoseChooser);
         configureButtonBindings(); // Configure button bindings
     }
 
@@ -352,7 +365,7 @@ public class RobotContainer {
         // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
         controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
 
-        controller.rightBumper().whileTrue(outtake.outtakeReverseCMD());
+        controller.y().whileTrue(outtake.outtakeReverseCMD());
 
         // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
         controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
@@ -404,8 +417,12 @@ public class RobotContainer {
 
         // controller2.b().whileTrue(remover.ArmOut());
         // controller2.x().whileTrue(remover.ArmIn());
-        controller2.button(3).whileTrue(remover.ArmOut());
-        controller2.button(5).whileTrue(remover.ArmIn());
+        controller2
+                .button(3)
+                .whileTrue(Commands.either(remover.ArmOut(), remover.L3Algae(elevator, drive), () -> isManual()));
+        controller2
+                .button(5)
+                .whileTrue(Commands.either(remover.ArmIn(), remover.L2Algae(elevator, drive), () -> isManual()));
     }
 
     /**

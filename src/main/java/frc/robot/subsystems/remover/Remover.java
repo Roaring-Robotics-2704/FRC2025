@@ -37,13 +37,15 @@ public class Remover extends SubsystemBase {
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
                 .withTimeout(0.5)
+                .andThen(Commands.runOnce(() -> removerIO.setRemoverRollerSpeed(0)))
                 .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 
     public Command ArmInAuto() { // TODO add elevator controls
         return new RunCommand(() -> removerIO.setRemoverRollerSpeed(-RemoverConstants.ROLLER_SPEED))
                 .repeatedly()
-                .withTimeout(0.5)
+                .withTimeout(0.75)
+                .andThen(Commands.runOnce(() -> removerIO.setRemoverRollerSpeed(0)))
                 .finallyDo(() -> removerIO.setRemoverRollerSpeed(0));
     }
 
@@ -52,20 +54,22 @@ public class Remover extends SubsystemBase {
                 ElevatorFactory.elevatorL4(elevator).withTimeout(0.25),
                 ArmOutAuto(),
                 ElevatorFactory.ElevatorAlgaeL3(elevator).withTimeout(0.2),
-                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-0.25, 0, 0)), drive)
+                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-0.5, 0, 0)), drive)
                         .repeatedly()
                         .withTimeout(0.5),
+                Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds()), drive),
                 ArmInAuto());
     }
 
     public Command L2Algae(Elevator elevator, Drive drive) {
         return Commands.sequence(
-                ElevatorFactory.elevatorL3(elevator),
-                ArmOut().repeatedly().withTimeout(0.5),
-                ElevatorFactory.ElevatorAlgaeL2(elevator),
-                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-0.25, 0, 0)), drive)
+                ElevatorFactory.elevatorL3(elevator).withTimeout(0.25),
+                ArmOutAuto(),
+                ElevatorFactory.ElevatorAlgaeL2(elevator).withTimeout(0.2),
+                Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-0.5, 0, 0)), drive)
                         .repeatedly()
-                        .withTimeout(0.5),
-                ArmIn().repeatedly().withTimeout(0.5));
+                        .withTimeout(0.75),
+                Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds()), drive),
+                ArmInAuto());
     }
 }
