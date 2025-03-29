@@ -49,13 +49,13 @@ public class Remover extends SubsystemBase {
 
     public Command L3Algae(Elevator elevator, Drive drive) {
         return Commands.sequence(
-                ElevatorFactory.elevatorL4(elevator),
-                ArmOut().repeatedly().withTimeout(0.5),
-                ElevatorFactory.ElevatorAlgaeL3(elevator),
+                ElevatorFactory.elevatorL4(elevator).withTimeout(0.25),
+                ArmOutAuto(),
+                ElevatorFactory.ElevatorAlgaeL3(elevator).withTimeout(0.2),
                 Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-0.25, 0, 0)), drive)
                         .repeatedly()
                         .withTimeout(0.5),
-                ArmIn().repeatedly().withTimeout(0.5));
+                ArmInAuto());
     }
 
     public Command L2Algae(Elevator elevator, Drive drive) {

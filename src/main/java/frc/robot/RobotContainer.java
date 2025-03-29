@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -103,7 +102,6 @@ public class RobotContainer {
     private Remover remover;
     private AlgaeArm algaeArm;
     private static boolean manualControls = false;
-    private Set<Subsystem> autoReqs;
     private Autos auto;
 
     private static Reef reef = new Reef(); // Reef object
@@ -214,42 +212,42 @@ public class RobotContainer {
                 break;
             }
         }
-        autoReqs = Set.of(drive, elevator, outtake);
         // auto = new Autos(drive, outtake, elevator, remover);
         dynamicAutoBeta = Commands.sequence(
-                Commands.defer(GoToReef(true, false), autoReqs).withName("Auto Reef Align"),
+                Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
                 new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), autoReqs).withName("Auto Elevator Up"),
+                Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(0.25),
-                Commands.defer(() -> outtake.outtakeOutCmd(true), autoReqs),
+                Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
+                // Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
                 new PrintCommand("Outtaked coral"),
                 // Commands.defer(FillReefSlot(), autoReqs),
                 // new PrintCommand("Filled Reef Slot"),
                 ElevatorFactory.elevatorIntake(elevator),
                 new PrintCommand("Elevator Down"),
-                Commands.defer(GoToSource(), autoReqs).withName("Auto Source Align"),
+                Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Source Align"),
                 new PrintCommand("Aligned to source"),
                 outtake.outtakeInCmd(true),
-                Commands.defer(GoToReef(true, false), autoReqs).withName("Auto Reef Align"),
+                Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
                 new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), autoReqs).withName("Auto Elevator Up"),
+                Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(0.75),
-                Commands.defer(() -> outtake.outtakeOutCmd(true), autoReqs),
+                Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
                 new PrintCommand("Outtaked coral"),
                 // Commands.defer(FillReefSlot(), autoReqs),
                 // new PrintCommand("Filled Reef Slot"),
                 ElevatorFactory.elevatorIntake(elevator));
         dynamicAutoSingle = Commands.sequence(
-                Commands.defer(GoToReef(true, false), autoReqs),
+                Commands.defer(GoToReef(true, false), Set.of(drive)),
                 new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), autoReqs),
+                Commands.defer(ElevatorUp(), Set.of(elevator)),
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(2),
                 Outtake(),
                 new PrintCommand("Outtaked coral"),
-                Commands.defer(ElevatorDown(), autoReqs),
+                Commands.defer(ElevatorDown(), Set.of(elevator)),
                 new PrintCommand("Elevator Down"));
         // Initialize dynamic auto beta command
 
@@ -258,35 +256,35 @@ public class RobotContainer {
         // auto
         // chooser
         // if (Boolean.FALSE.equals(Constants.COMPETITION)) {
-        //     // Set up SysId routines
-        //     autoChooser.addOption(
-        //             "Drive Wheel Radius Characterization",
-        //             DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius
-        //     // characterization option
-        //     autoChooser.addOption(
-        //             "Drive Simple FF Characterization",
-        //             DriveCommands.feedforwardCharacterization(drive)); // Add feedforward
-        //     // characterization option
-        //     autoChooser.addOption(
-        //             "Drive SysId (Quasistatic Forward)",
-        //             drive.sysIdQuasistatic(Sus.Direction.kForward)); // Add SysId
-        //     // quasistatic forward
-        //     // option
-        //     autoChooser.addOption(
-        //             "Drive SysId (Quasistatic Reverse)",
-        //             drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId
-        //     // quasistatic reverse
-        //     // option
-        //     autoChooser.addOption(
-        //             "Drive SysId (Dynamic Forward)",
-        //             drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic
-        //     // forward option
-        //     autoChooser.addOption(
-        //             "Drive SysId (Dynamic Reverse)",
-        //             drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
-        //     // reverse option
+        // // Set up SysId routines
+        // autoChooser.addOption(
+        // "Drive Wheel Radius Characterization",
+        // DriveCommands.wheelRadiusCharacterization(drive)); // Add wheel radius
+        // // characterization option
+        // autoChooser.addOption(
+        // "Drive Simple FF Characterization",
+        // DriveCommands.feedforwardCharacterization(drive)); // Add feedforward
+        // // characterization option
+        // autoChooser.addOption(
+        // "Drive SysId (Quasistatic Forward)",
+        // drive.sysIdQuasistatic(Sus.Direction.kForward)); // Add SysId
+        // // quasistatic forward
+        // // option
+        // autoChooser.addOption(
+        // "Drive SysId (Quasistatic Reverse)",
+        // drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)); // Add SysId
+        // // quasistatic reverse
+        // // option
+        // autoChooser.addOption(
+        // "Drive SysId (Dynamic Forward)",
+        // drive.sysIdDynamic(SysIdRoutine.Direction.kForward)); // Add SysId dynamic
+        // // forward option
+        // autoChooser.addOption(
+        // "Drive SysId (Dynamic Reverse)",
+        // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)); // Add SysId dynamic
+        // // reverse option
         // }
-        autoChooser.addOption("Dynamic Auto", dynamicAutoBeta); // Add dynamic auto option
+        autoChooser.addOption("Dynamic Auto", Commands.deferredProxy(() -> dynamicAutoBeta)); // Add dynamic auto option
         autoChooser.addOption("Dynamic Auto Single", dynamicAutoSingle);
         // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); //
         // Add dynamic auto beta
@@ -344,18 +342,15 @@ public class RobotContainer {
         // .y()
         // .whileTrue(new RunCommand(() -> DriveCommands.goToReef(reef,
         // buttonBoard.getSelectedBranchSide())));
-        controller
-                .a()
-                .whileTrue(Commands.defer(GoToReef(false, false), autoReqs).withName("Auto Align Reef"));
-        controller.x().whileTrue(Commands.defer(GoToSource(Side.LEFT), autoReqs).withName("Auto Align Source Left"));
-        controller
-                .b()
-                .whileTrue(Commands.defer(GoToSource(Side.RIGHT), autoReqs).withName("Auto Align Source Right"));
+        controller.leftBumper().whileTrue(Commands.defer(GoToReef(Side.LEFT), Set.of(drive)));
+        controller.rightBumper().whileTrue(Commands.defer(GoToReef(Side.RIGHT), Set.of(drive)));
+        controller.a().whileTrue(Commands.defer(GoToReef(false, false), Set.of(drive)));
+        controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
-        controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), autoReqs));
+        controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), Set.of(outtake)));
         // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
-        controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), autoReqs));
+        controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
 
         controller.rightBumper().whileTrue(outtake.outtakeReverseCMD());
 
@@ -622,5 +617,25 @@ public class RobotContainer {
 
     public void enableVisionUpdates(boolean enable) {
         vision.enableUpdates(enable);
+    }
+
+    public Supplier<Command> GoToReef(Side side) {
+        return () -> AutoBuilder.pathfindThenFollowPath(
+                        generatePath(
+                                        PoseUtil.offsetPose(
+                                                reef.getclosestFace(AutoBuilder.getCurrentPose())
+                                                        .getBranch(side)
+                                                        .getPose(),
+                                                -Units.feetToMeters(1),
+                                                0),
+                                        PoseUtil.offsetPose(
+                                                reef.getclosestFace(AutoBuilder.getCurrentPose())
+                                                        .getBranch(side)
+                                                        .getPose(),
+                                                -Units.inchesToMeters(0),
+                                                0))
+                                .get(),
+                        FINDINGCONSTRAINTS)
+                .finallyDo(() -> drive.stop());
     }
 }

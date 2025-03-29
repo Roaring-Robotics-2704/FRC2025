@@ -1,5 +1,7 @@
 package frc.robot.subsystems.algaeArm;
 
+import edu.wpi.first.math.util.Units;
+
 public class AlgaeArmConstants {
     public static final int PIVOT_MOTOR_CANID = 21;
     public static final int ROLLER_MOTOR_CANID = 23;
@@ -20,7 +22,7 @@ public class AlgaeArmConstants {
     public static final double KV = 0; // 0.00036869;
 
     // Arm positions
-    public static final double INTAKE_POSITION = 36;
-    public static final double HOLD_POSITION = 55;
-    public static final double INSIDE_POSITION = 95;
+    public static final double INTAKE_POSITION = Units.degreesToRadians(36);
+    public static final double HOLD_POSITION = Units.degreesToRadians(55);
+    public static final double INSIDE_POSITION = Units.degreesToRadians(95);
 }

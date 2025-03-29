@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class ElevatorConstants {
     private ElevatorConstants() {}
 
-    public static final double HEIGHT_TOLERANCE = 0.2;
+    public static final double HEIGHT_TOLERANCE = Units.inchesToMeters(2);
     public static final double MAX_ELEVATOR_VOLTAGE = 12;
 
     // Motor IDs
@@ -33,7 +33,7 @@ public class ElevatorConstants {
     // PID Constants
     public static final double ELEVATOR_KP = 10.5; // 36
     public static final double ELEVATOR_KI = 0;
-    public static final double ELEVATOR_KD = 0; // 3.1904;
+    public static final double ELEVATOR_KD = 0.4; // 3.1904;
 
     // Feedforward Constants
     public static final double kS = 0.2;

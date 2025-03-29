@@ -59,7 +59,7 @@ public class AlgaeArmIOSim implements AlgaeArmIO {
     @Override
     public void updateInputs(AlgaeArmIOInputs inputs) {
         m_armSim.update(0.02);
-        inputs.algaePivotPositionDeg = Units.radiansToDegrees(m_armSim.getAngleRads());
+        inputs.algaePivotPosition = m_armSim.getAngleRads();
         inputs.algaePivotVelocity = m_encoderSim.getRate();
         inputs.algaeRollerVelocity = 0;
         inputs.algaePivotAppliedVolts = 0;

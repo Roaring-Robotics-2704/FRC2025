@@ -38,7 +38,7 @@ public class AlgaeArm extends SubsystemBase {
 
     public AlgaeArm(AlgaeArmIO algaeArmIO) {
         this.algaeArmIO = algaeArmIO;
-        goal = inputs.algaePivotPositionDeg;
+        goal = inputs.algaePivotPosition;
     }
 
     /** Creates a new algaeArm. */
@@ -49,7 +49,7 @@ public class AlgaeArm extends SubsystemBase {
         algaeArmIO.updateInputs(inputs);
         if (controller.getGoal().position != goal) controller.setGoal(goal);
         double requestedVoltage = MathUtil.clamp(
-                controller.calculate(inputs.algaePivotPositionDeg)
+                controller.calculate(inputs.algaePivotPosition)
                         + feedforward.calculate(controller.getSetpoint().position, controller.getSetpoint().velocity),
                 -10,
                 10);
@@ -57,7 +57,7 @@ public class AlgaeArm extends SubsystemBase {
         Logger.recordOutput("Arm/Setpoint", controller.getSetpoint().position);
         Logger.recordOutput("Arm/RequestedVoltage", requestedVoltage);
         algaeArmIO.setAlgaeArmVoltage(requestedVoltage);
-        Logger.recordOutput("Arm/Measured", inputs.algaePivotPositionDeg);
+        Logger.recordOutput("Arm/Measured", inputs.algaePivotPosition);
         Logger.recordOutput("Arm/Voltage", inputs.algaePivotAppliedVolts);
         Logger.recordOutput("Arm/Velocity", inputs.algaePivotVelocity);
         Logger.recordOutput("Arm/Current", inputs.algaePivotAmps);

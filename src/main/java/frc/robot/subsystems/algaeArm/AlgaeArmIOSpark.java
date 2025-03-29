@@ -36,7 +36,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
         SparkMaxConfig rollerConfig = new SparkMaxConfig();
         driveConfig.inverted(true);
         driveConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(40).voltageCompensation(12.0);
-        driveConfig.absoluteEncoder.positionConversionFactor(360).velocityConversionFactor(360);
+        driveConfig.absoluteEncoder.positionConversionFactor(2 * Math.PI).velocityConversionFactor(2 * Math.PI);
         driveConfig.absoluteEncoder.zeroCentered(true).inverted(true);
 
         driveConfig
@@ -87,7 +87,7 @@ public class AlgaeArmIOSpark implements AlgaeArmIO {
 
     @Override
     public void updateInputs(AlgaeArmIOInputs inputs) {
-        inputs.algaePivotPositionDeg = throughBore.getPosition();
+        inputs.algaePivotPosition = throughBore.getPosition();
         inputs.algaePivotVelocity = throughBore.getVelocity();
         inputs.algaeRollerVelocity = rollerMotor.getEncoder().getVelocity();
         inputs.algaePivotAppliedVolts = pivotMotor.getAppliedOutput();
