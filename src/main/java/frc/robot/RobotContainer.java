@@ -48,7 +48,6 @@ import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
 import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.command_factories.ElevatorFactory;
-import frc.robot.commands.autonomous.Autos;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.subsystems.algaeArm.AlgaeArm;
 import frc.robot.subsystems.algaeArm.AlgaeArmIO;
@@ -76,6 +75,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.DashboardSwitch;
 import frc.robot.util.PoseUtil;
 import frc.robot.util.RoaringUtils.DeadzoneUtils;
 import java.util.Set;
@@ -102,12 +102,12 @@ public class RobotContainer {
     private Remover remover;
     private AlgaeArm algaeArm;
     private static boolean manualControls = false;
-    private Autos auto;
 
     private static Reef reef = new Reef(); // Reef object
     private static SourceChooser sourceChooser = new SourceChooser(); // Source chooser object
     private static SendableChooser<Level> heightChooser = new SendableChooser<>(); // Sendable chooser for selecting
     private static SendableChooser<Pose2d> arbPoseChooser = new SendableChooser<>();
+    private static DashboardSwitch autoAlgaeSwitch = new DashboardSwitch(); // Switch for auto algae mode
     // height
 
     private static Command dynamicAutoBeta;
@@ -226,7 +226,10 @@ public class RobotContainer {
                 new PrintCommand("Elevator Up"),
                 new WaitCommand(0.25),
                 Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
-                // Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
+                Commands.either(
+                        Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
+                        new PrintCommand("No algae removal"),
+                        autoAlgaeSwitch::get),
                 new PrintCommand("Outtaked coral"),
                 // Commands.defer(FillReefSlot(), autoReqs),
                 // new PrintCommand("Filled Reef Slot"),
@@ -259,6 +262,10 @@ public class RobotContainer {
                 new WaitCommand(2),
                 Outtake(),
                 new PrintCommand("Outtaked coral"),
+                Commands.either(
+                        Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
+                        new PrintCommand("No algae removal"),
+                        autoAlgaeSwitch::get),
                 Commands.defer(ElevatorDown(), Set.of(elevator)),
                 new PrintCommand("Elevator Down"));
         // Initialize dynamic auto beta command
@@ -308,6 +315,7 @@ public class RobotContainer {
         arbPoseChooser.addOption("Left", new Pose2d(7.25, 6, Rotation2d.k180deg));
         arbPoseChooser.addOption("Right", new Pose2d(7.25, 2, Rotation2d.k180deg));
         SmartDashboard.putData("Backup side chooser", arbPoseChooser);
+        SmartDashboard.putData("Auto Algae", autoAlgaeSwitch);
         configureButtonBindings(); // Configure button bindings
     }
 
