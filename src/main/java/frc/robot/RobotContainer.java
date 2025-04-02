@@ -220,7 +220,7 @@ public class RobotContainer {
                 // false)
                 //                         .getPose())
                 //         .get()),
-                Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
+                Commands.defer(GoToReef(false, false), Set.of(drive)).withName("Auto Reef Align"),
                 new PrintCommand("Reef aligned"),
                 Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
                 new PrintCommand("Elevator Up"),
@@ -306,6 +306,17 @@ public class RobotContainer {
         autoChooser.addDefaultOption(
                 "2 Coral Auto", Commands.deferredProxy(() -> dynamicAutoBeta)); // Add dynamic auto option
         autoChooser.addOption("1 Coral Auto", dynamicAutoSingle);
+        autoChooser.addOption(
+                "Leave",
+                Commands.sequence(
+                        Commands.runOnce(() -> vision.enableUpdates(false)),
+                        Commands.defer(
+                                        () -> AutoBuilder.followPath(
+                                                generatePath(getPose(), PoseUtil.offsetPose(getPose(), 1, 0))
+                                                        .get()),
+                                        Set.of(drive))
+                                .finallyDo(() -> vision.enableUpdates(true)),
+                        Commands.runOnce(() -> vision.enableUpdates(true))));
         // autoChooser.addOption("Dynamic Auto Beta", dynamicAutoBeta.repeatedly()); //
         // Add dynamic auto beta
         // option

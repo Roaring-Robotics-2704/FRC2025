@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.auto.reef.Reef;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Elastic;
 import frc.robot.util.SystemTimeValidReader;
 import java.lang.reflect.Field;
@@ -49,6 +51,7 @@ public class Robot extends LoggedRobot {
     private final RobotContainer robotContainer;
     private final Field2d autofield = new Field2d();
     private final Field2d telefield = new Field2d();
+    private Reef reef = new Reef();
     LoggedPowerDistribution pdh;
 
     private double autoStart;
@@ -169,6 +172,12 @@ public class Robot extends LoggedRobot {
         Logger.recordOutput("BatteryVoltage", RobotController.getBatteryVoltage());
         SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
         SmartDashboard.putBoolean("Manual Mode", RobotContainer.isManual());
+        SmartDashboard.putBoolean("Has Tag", Vision.hasTag());
+        try {
+            SmartDashboard.putString(
+                    "Reef Face", reef.getclosestFace(robotContainer.getPose()).getName());
+        } finally {
+        }
 
         // Check CAN status
         var canStatus = RobotController.getCANStatus();

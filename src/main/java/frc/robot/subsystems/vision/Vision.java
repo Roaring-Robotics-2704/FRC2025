@@ -24,7 +24,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
@@ -37,6 +36,7 @@ public class Vision extends SubsystemBase {
     private final VisionIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
     private boolean sendEstimates = true;
+    private static boolean hasTag = false;
 
     public Vision(VisionConsumer consumer, VisionIO... io) {
         this.consumer = consumer;
@@ -144,7 +144,6 @@ public class Vision extends SubsystemBase {
                             observation.timestamp(),
                             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
                 }
-                SmartDashboard.putBoolean("Has target", !allTagPoses.isEmpty());
             }
 
             // Log camera datadata
@@ -167,6 +166,7 @@ public class Vision extends SubsystemBase {
         }
 
         // Log summary data
+        hasTag = (!allRobotPosesAccepted.isEmpty() || !allTagPoses.isEmpty());
         Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
         Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[allRobotPoses.size()]));
         Logger.recordOutput(
@@ -185,5 +185,9 @@ public class Vision extends SubsystemBase {
 
     public void enableUpdates(boolean send) {
         sendEstimates = send;
+    }
+
+    public static boolean hasTag() {
+        return hasTag;
     }
 }
