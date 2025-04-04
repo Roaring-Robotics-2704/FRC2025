@@ -312,7 +312,7 @@ public class RobotContainer {
                         Commands.runOnce(() -> vision.enableUpdates(false)),
                         Commands.defer(
                                         () -> AutoBuilder.followPath(
-                                                generatePath(getPose(), PoseUtil.offsetPose(getPose(), 1, 0))
+                                                generatePathNoflip(getPose(), PoseUtil.offsetPose(getPose(), 1, 0))
                                                         .get()),
                                         Set.of(drive))
                                 .finallyDo(() -> vision.enableUpdates(true)),
@@ -438,10 +438,16 @@ public class RobotContainer {
         // controller2.x().whileTrue(remover.ArmIn());
         controller2
                 .button(3)
-                .whileTrue(Commands.either(remover.ArmOut(), remover.L3Algae(elevator, drive), () -> isManual()));
+                .onTrue(Commands.either(
+                        remover.ArmOut(),
+                        remover.L3Algae(elevator, drive).andThen(remover.ArmInAuto()),
+                        () -> isManual()));
         controller2
                 .button(5)
-                .whileTrue(Commands.either(remover.ArmIn(), remover.L2Algae(elevator, drive), () -> isManual()));
+                .onTrue(Commands.either(
+                        remover.ArmIn(),
+                        remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
+                        () -> isManual()));
     }
 
     /**
@@ -559,6 +565,40 @@ public class RobotContainer {
                 // Define the goal end state with a velocity of 0.0 and the calculated end
                 // rotation
                 new GoalEndState(0.0, endRotation));
+    }
+
+    /**
+     * Generates a path from a starting pose to an ending pose using PathPlanner.
+     *
+     * @param start The starting pose of the path.
+     * @param end The ending pose of the path.
+     * @return A Supplier that generates a PathPlannerPath with the calculated waypoints and constraints.
+     */
+    public static Supplier<PathPlannerPath> generatePathNoflip(Pose2d start, Pose2d end) {
+        // Calculate the starting rotation based on the direction from start to end
+        Rotation2d startRotation = new Rotation2d(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()));
+
+        // Use the rotation of the end pose as the end rotation
+        Rotation2d endRotation = end.getRotation();
+
+        // Return a supplier that generates a PathPlannerPath with the calculated
+        // waypoints and constraints
+        PathPlannerPath path = new PathPlannerPath(
+                // Create waypoints from the start and end poses with the calculated rotations
+                PathPlannerPath.waypointsFromPoses(
+                        new Pose2d(start.getTranslation(), startRotation),
+                        new Pose2d(end.getTranslation(), endRotation)),
+                // Use predefined path constraints
+                PATHCONSTRAINTS,
+                // Define the ideal starting state with a velocity of 0.5 and the calculated end
+                // rotation
+                new IdealStartingState(0.5, endRotation),
+                // Define the goal end state with a velocity of 0.0 and the calculated end
+                // rotation
+                new GoalEndState(0.0, endRotation));
+
+        path.preventFlipping = true;
+        return () -> path;
     }
 
     public static Supplier<Command> GoToSource() {

@@ -1,8 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -152,6 +154,7 @@ public class Robot extends LoggedRobot {
 
         // Configure brownout voltage
         RobotController.setBrownoutVoltage(6.0);
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
         robotContainer = new RobotContainer();
     }
@@ -215,6 +218,11 @@ public class Robot extends LoggedRobot {
     @Override
     @SuppressWarnings("CallToPrintStackTrace")
     public void disabledPeriodic() {
+        try {
+            autofield.setRobotPose(robotContainer.getPose());
+            telefield.setRobotPose(robotContainer.getPose());
+        } finally {
+        }
 
         // String newAutoName;
         // newAutoName = robotContainer.getAutonomousCommand().getName();

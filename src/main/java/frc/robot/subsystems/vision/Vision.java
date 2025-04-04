@@ -37,6 +37,7 @@ public class Vision extends SubsystemBase {
     private final Alert[] disconnectedAlerts;
     private boolean sendEstimates = true;
     private static boolean hasTag = false;
+    private static boolean[] cameraEnabled;
 
     public Vision(VisionConsumer consumer, VisionIO... io) {
         this.consumer = consumer;
@@ -53,6 +54,10 @@ public class Vision extends SubsystemBase {
         for (int i = 0; i < inputs.length; i++) {
             disconnectedAlerts[i] =
                     new Alert("Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+        }
+        cameraEnabled = new boolean[inputs.length];
+        for (int i = 0; i < cameraEnabled.length; i++) {
+            cameraEnabled[i] = true;
         }
     }
 
@@ -185,6 +190,9 @@ public class Vision extends SubsystemBase {
 
     public void enableUpdates(boolean send) {
         sendEstimates = send;
+    }
+    public void enableCamera(boolean enabled, int camera) {
+        ;
     }
 
     public static boolean hasTag() {
