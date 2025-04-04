@@ -214,6 +214,7 @@ public class RobotContainer {
         }
         // auto = new Autos(drive, outtake, elevator, remover);
         dynamicAutoBeta = Commands.sequence(
+                Commands.runOnce(() -> vision.enableCamera(false, 1)),
                 // AutoBuilder.followPath(generatePath(
                 //                 getPose(),
                 //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
@@ -231,6 +232,7 @@ public class RobotContainer {
                         new PrintCommand("No algae removal"),
                         autoAlgaeSwitch::get),
                 new PrintCommand("Outtaked coral"),
+                Commands.runOnce(() -> vision.enableCamera(true, 1)),
                 // Commands.defer(FillReefSlot(), autoReqs),
                 // new PrintCommand("Filled Reef Slot"),
                 ElevatorFactory.elevatorIntake(elevator),
@@ -304,7 +306,9 @@ public class RobotContainer {
         // // reverse option
         // }
         autoChooser.addDefaultOption(
-                "2 Coral Auto", Commands.deferredProxy(() -> dynamicAutoBeta)); // Add dynamic auto option
+                "2 Coral Auto",
+                Commands.deferredProxy(() -> dynamicAutoBeta)
+                        .finallyDo(() -> vision.enableCamera(true, 1))); // Add dynamic auto option
         autoChooser.addOption("1 Coral Auto", dynamicAutoSingle);
         autoChooser.addOption(
                 "Leave",
@@ -439,13 +443,13 @@ public class RobotContainer {
         controller2
                 .button(3)
                 .onTrue(Commands.either(
-                        remover.ArmOut(),
+                        remover.ArmOutAuto(),
                         remover.L3Algae(elevator, drive).andThen(remover.ArmInAuto()),
                         () -> isManual()));
         controller2
                 .button(5)
                 .onTrue(Commands.either(
-                        remover.ArmIn(),
+                        remover.ArmInAuto(),
                         remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
                         () -> isManual()));
     }

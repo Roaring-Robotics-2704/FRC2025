@@ -143,7 +143,7 @@ public class Vision extends SubsystemBase {
                 }
 
                 // Send vision observation
-                if (sendEstimates) {
+                if (sendEstimates && cameraEnabled[cameraIndex]) {
                     consumer.accept(
                             observation.pose().toPose2d(),
                             observation.timestamp(),
@@ -164,6 +164,11 @@ public class Vision extends SubsystemBase {
             Logger.recordOutput(
                     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
                     robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+            if (cameraEnabled[cameraIndex]) {
+                Logger.recordOutput("Vision/Camera" + cameraIndex, "Enabled");
+            } else {
+                Logger.recordOutput("Vision/Camera" + cameraIndex, "Disabled");
+            }
             allTagPoses.addAll(tagPoses);
             allRobotPoses.addAll(robotPoses);
             allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -191,8 +196,9 @@ public class Vision extends SubsystemBase {
     public void enableUpdates(boolean send) {
         sendEstimates = send;
     }
+
     public void enableCamera(boolean enabled, int camera) {
-        ;
+        cameraEnabled[camera] = enabled;
     }
 
     public static boolean hasTag() {
