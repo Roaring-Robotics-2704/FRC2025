@@ -11,6 +11,6 @@ public class RemoverConstants {
     public static final double LOWER_HEIGHT =
             ElevatorConstants.L2_HEIGHT + Units.inchesToMeters(-1); // TODO: Change this to the correct value
     public static final double UPPER_HEIGHT =
-            ElevatorConstants.L3_HEIGHT + Units.inchesToMeters(0); // TODO: Change this to the correct value
+            ElevatorConstants.L3_HEIGHT + Units.inchesToMeters(-3); // TODO: Change this to the correct value
     public static final double HEIGHT_OFFSET = -Units.inchesToMeters(1); // TODO: Change this to the correct value
 }
