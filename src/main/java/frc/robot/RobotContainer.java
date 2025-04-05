@@ -237,9 +237,11 @@ public class RobotContainer {
                 // new PrintCommand("Filled Reef Slot"),
                 ElevatorFactory.elevatorIntake(elevator),
                 new PrintCommand("Elevator Down"),
+                Commands.runOnce(() -> vision.enableCamera(false, 0)),
                 Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Source Align"),
                 new PrintCommand("Aligned to source"),
                 outtake.outtakeInCmd(true),
+                Commands.runOnce(() -> vision.enableCamera(true, 0)),
                 Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
                 // AutoBuilder.followPath(generatePath(
                 //                 getPose(),
@@ -306,9 +308,10 @@ public class RobotContainer {
         // // reverse option
         // }
         autoChooser.addDefaultOption(
-                "2 Coral Auto",
-                Commands.deferredProxy(() -> dynamicAutoBeta)
-                        .finallyDo(() -> vision.enableCamera(true, 1))); // Add dynamic auto option
+                "2 Coral Auto", Commands.deferredProxy(() -> dynamicAutoBeta).finallyDo(() -> {
+                    vision.enableCamera(true, 1);
+                    vision.enableCamera(true, 0);
+                })); // Add dynamic auto option
         autoChooser.addOption("1 Coral Auto", dynamicAutoSingle);
         autoChooser.addOption(
                 "Leave",

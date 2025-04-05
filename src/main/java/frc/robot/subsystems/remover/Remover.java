@@ -12,7 +12,7 @@ import frc.robot.subsystems.elevator.Elevator;
 public class Remover extends SubsystemBase {
     private RemoverIO removerIO;
 
-    private RemoverIOInputsAutoLogged removerIOInputsAutoLogged = new RemoverIOInputsAutoLogged();
+    // private RemoverIOInputsAutoLogged removerIOInputsAutoLogged = new RemoverIOInputsAutoLogged();
 
     public Remover(RemoverIO removerIO) {
         this.removerIO = removerIO;
@@ -20,7 +20,7 @@ public class Remover extends SubsystemBase {
 
     @Override
     public void periodic() {
-        removerIO.updateInputs(removerIOInputsAutoLogged);
+        // removerIO.updateInputs(removerIOInputsAutoLogged);
     }
 
     public Command ArmOut() { // TODO add elevator controls
