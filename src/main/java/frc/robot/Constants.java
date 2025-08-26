@@ -16,8 +16,8 @@ public final class Constants {
     public static final Boolean FieldRelative = true;
 
     // General Constants
-    public static final double DRIVE_SPEED = 0.25;
-    public static final double TURN_SPEED = 0.5;
+    public static final double DRIVE_SPEED = 0.6;
+    public static final double TURN_SPEED = 0.55;
 
     public static final Boolean COMPETITION = true;
     public static final Mode SIM_MODE = Mode.SIM;
@@ -36,9 +36,9 @@ public final class Constants {
 
     public static final int RECHECK_SECONDS = 12;
 
-
     /**
      * Returns the points scored for a given elevator level, depending on whether it's autonomous period.
+     *
      * @param level The elevator level
      * @param isAuto True if in autonomous (first 15 seconds), false otherwise
      * @return Points scored
@@ -58,16 +58,14 @@ public final class Constants {
         }
     }
 
-    /**
-     * Returns the points scored for a given elevator level (teleop, not autonomous).
-     */
+    /** Returns the points scored for a given elevator level (teleop, not autonomous). */
     public static int getPointsForLevel(Level level) {
         return getPointsForLevel(level, false);
     }
 
     /**
-     * Returns the estimated time (in seconds) to raise the elevator to a given level.
-     * These values should be tuned to your robot's actual performance.
+     * Returns the estimated time (in seconds) to raise the elevator to a given level. These values should be tuned to
+     * your robot's actual performance.
      */
     public static double getElevatorTimeForLevel(Level level) {
         switch (level) {

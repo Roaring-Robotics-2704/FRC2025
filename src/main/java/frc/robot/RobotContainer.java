@@ -37,8 +37,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.auto.reef.Branch.Level;
@@ -46,13 +44,9 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
-import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.algaeArm.AlgaeArm;
-import frc.robot.subsystems.algaeArm.AlgaeArmIO;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSim;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSpark;
+import frc.robot.subsystems.climb.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -100,7 +94,7 @@ public class RobotContainer {
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
-    private AlgaeArm algaeArm;
+    Climber climber;
     private static boolean manualControls = false;
 
     private static Reef reef = new Reef(); // Reef object
@@ -154,7 +148,6 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIOSpark(), this); // Initialize elevator
                 // subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
                 // subsystem
                 this.remover = new Remover(new RemoverIOSpark());
                 break;
@@ -190,7 +183,6 @@ public class RobotContainer {
 
                 this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
                 this.remover = new Remover(new RemoverIO() {});
 
                 break;
@@ -207,71 +199,72 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
-                this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
 
                 break;
             }
         }
+
+        climber = new Climber(); // Initialize climber subsystem
         // auto = new Autos(drive, outtake, elevator, remover);
-        dynamicAutoBeta = Commands.sequence(
-                Commands.runOnce(() -> vision.enableCamera(false, 1)),
-                // AutoBuilder.followPath(generatePath(
-                //                 getPose(),
-                //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
-                // false)
-                //                         .getPose())
-                //         .get()),
-                Commands.defer(GoToReef(false, false), Set.of(drive)).withName("Auto Reef Align"),
-                new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
-                new PrintCommand("Elevator Up"),
-                new WaitCommand(0.25),
-                Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
-                Commands.either(
-                        Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
-                        new PrintCommand("No algae removal"),
-                        autoAlgaeSwitch::get),
-                new PrintCommand("Outtaked coral"),
-                Commands.runOnce(() -> vision.enableCamera(true, 1)),
-                // Commands.defer(FillReefSlot(), autoReqs),
-                // new PrintCommand("Filled Reef Slot"),
-                ElevatorFactory.elevatorIntake(elevator),
-                new PrintCommand("Elevator Down"),
-                Commands.runOnce(() -> vision.enableCamera(false, 0)),
-                Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Source Align"),
-                new PrintCommand("Aligned to source"),
-                outtake.outtakeInCmd(true),
-                Commands.runOnce(() -> vision.enableCamera(true, 0)),
-                Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
-                // AutoBuilder.followPath(generatePath(
-                //                 getPose(),
-                //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
-                // false)
-                //                         .getPose())
-                //         .get()),
-                new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
-                new PrintCommand("Elevator Up"),
-                new WaitCommand(0.75),
-                Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
-                new PrintCommand("Outtaked coral"),
-                // Commands.defer(FillReefSlot(), autoReqs),
-                // new PrintCommand("Filled Reef Slot"),
-                ElevatorFactory.elevatorIntake(elevator));
-        dynamicAutoSingle = Commands.sequence(
-                Commands.defer(GoToReef(true, false), Set.of(drive)),
-                new PrintCommand("Reef aligned"),
-                Commands.defer(ElevatorUp(), Set.of(elevator)),
-                new PrintCommand("Elevator Up"),
-                new WaitCommand(2),
-                Outtake(),
-                new PrintCommand("Outtaked coral"),
-                Commands.either(
-                        Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
-                        new PrintCommand("No algae removal"),
-                        autoAlgaeSwitch::get),
-                Commands.defer(ElevatorDown(), Set.of(elevator)),
-                new PrintCommand("Elevator Down"));
+        // dynamicAutoBeta = Commands.sequence(
+        //         Commands.runOnce(() -> vision.enableCamera(false, 1)),
+        //         // AutoBuilder.followPath(generatePath(
+        //         //                 getPose(),
+        //         //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
+        //         // false)
+        //         //                         .getPose())
+        //         //         .get()),
+        //         Commands.defer(GoToReef(false, false), Set.of(drive)).withName("Auto Reef Align"),
+        //         new PrintCommand("Reef aligned"),
+        //         Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
+        //         new PrintCommand("Elevator Up"),
+        //         new WaitCommand(0.25),
+        //         Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
+        //         Commands.either(
+        //                 Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
+        //                 new PrintCommand("No algae removal"),
+        //                 autoAlgaeSwitch::get),
+        //         new PrintCommand("Outtaked coral"),
+        //         Commands.runOnce(() -> vision.enableCamera(true, 1)),
+        //         // Commands.defer(FillReefSlot(), autoReqs),
+        //         // new PrintCommand("Filled Reef Slot"),
+        //         ElevatorFactory.elevatorIntake(elevator),
+        //         new PrintCommand("Elevator Down"),
+        //         Commands.runOnce(() -> vision.enableCamera(false, 0)),
+        //         Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Source Align"),
+        //         new PrintCommand("Aligned to source"),
+        //         outtake.outtakeInCmd(true),
+        //         Commands.runOnce(() -> vision.enableCamera(true, 0)),
+        //         Commands.defer(GoToReef(true, false), Set.of(drive)).withName("Auto Reef Align"),
+        //         // AutoBuilder.followPath(generatePath(
+        //         //                 getPose(),
+        //         //                 reef.getclosestBranch(AutoBuilder.getCurrentPose(), heightChooser.getSelected(),
+        //         // false)
+        //         //                         .getPose())
+        //         //         .get()),
+        //         new PrintCommand("Reef aligned"),
+        //         Commands.defer(ElevatorUp(), Set.of(elevator)).withName("Auto Elevator Up"),
+        //         new PrintCommand("Elevator Up"),
+        //         new WaitCommand(0.75),
+        //         Commands.defer(() -> outtake.outtakeOutCmd(true), Set.of(outtake)),
+        //         new PrintCommand("Outtaked coral"),
+        //         // Commands.defer(FillReefSlot(), autoReqs),
+        //         // new PrintCommand("Filled Reef Slot"),
+        //         ElevatorFactory.elevatorIntake(elevator));
+        // dynamicAutoSingle = Commands.sequence(
+        //         Commands.defer(GoToReef(true, false), Set.of(drive)),
+        //         new PrintCommand("Reef aligned"),
+        //         Commands.defer(ElevatorUp(), Set.of(elevator)),
+        //         new PrintCommand("Elevator Up"),
+        //         new WaitCommand(2),
+        //         Outtake(),
+        //         new PrintCommand("Outtaked coral"),
+        //         Commands.either(
+        //                 Commands.defer(() -> remover.L3Algae(elevator, drive), Set.of(remover)),
+        //                 new PrintCommand("No algae removal"),
+        //                 autoAlgaeSwitch::get),
+        //         Commands.defer(ElevatorDown(), Set.of(elevator)),
+        //         new PrintCommand("Elevator Down"));
         // Initialize dynamic auto beta command
 
         // Set up auto routines
@@ -343,11 +336,11 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        NamedCommands.registerCommand("Elevator L4", ElevatorFactory.elevatorL4(elevator));
-        NamedCommands.registerCommand("Elevator L3", ElevatorFactory.elevatorL3(elevator));
-        NamedCommands.registerCommand("Elevator L2", ElevatorFactory.elevatorL2(elevator));
-        NamedCommands.registerCommand("Elevator L1", ElevatorFactory.elevatorL1(elevator));
-        NamedCommands.registerCommand("Elevator Intake", ElevatorFactory.elevatorIntake(elevator));
+        // NamedCommands.registerCommand("Elevator L4", ElevatorFactory.elevatorL4(elevator));
+        // NamedCommands.registerCommand("Elevator L3", ElevatorFactory.elevatorL3(elevator));
+        // NamedCommands.registerCommand("Elevator L2", ElevatorFactory.elevatorL2(elevator));
+        // NamedCommands.registerCommand("Elevator L1", ElevatorFactory.elevatorL1(elevator));
+        // NamedCommands.registerCommand("Elevator Intake", ElevatorFactory.elevatorIntake(elevator));
 
         NamedCommands.registerCommand("Intake", outtake.outtakeInCmd(true));
         NamedCommands.registerCommand("Outtake", outtake.outtakeOutCmd(true));
@@ -394,22 +387,25 @@ public class RobotContainer {
         controller.y().whileTrue(outtake.outtakeReverseCMD());
 
         // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
-        controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
+        controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.manualElevatorUp(elevator));
 
-        // controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator,
-        // Level.L2));
-        controller2.povLeft().or(controller2.povRight()).whileTrue(ElevatorFactory.elevatorL2(elevator));
+        // controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
 
-        // controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator,
-        // Level.L1));
-        controller2.povUpLeft().or(controller2.povDownRight()).whileTrue(ElevatorFactory.elevatorL1(elevator));
+        // // controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator,
+        // // Level.L2));
+        // controller2.povLeft().or(controller2.povRight()).whileTrue(ElevatorFactory.elevatorL2(elevator));
 
-        // controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator,
-        // Level.L3));
-        controller2.povUpRight().or(controller2.povDownLeft()).whileTrue(ElevatorFactory.elevatorL3(elevator));
+        // // controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator,
+        // // Level.L1));
+        // controller2.povUpLeft().or(controller2.povDownRight()).whileTrue(ElevatorFactory.elevatorL1(elevator));
 
-        // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-        controller2.button(7).whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        // // controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator,
+        // // Level.L3));
+        // controller2.povUpRight().or(controller2.povDownLeft()).whileTrue(ElevatorFactory.elevatorL3(elevator));
+        controller2.povUpRight().or(controller2.povDownLeft()).whileTrue(ElevatorFactory.manualElevatorDown(elevator));
+
+        // // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        // controller2.button(7).whileTrue(ElevatorFactory.elevatorIntake(elevator));
 
         // controller2.y().whileTrue(dynamicAutoBeta);
 
@@ -419,17 +415,14 @@ public class RobotContainer {
         // .leftBumper()
         // .whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm))
         // .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
-        controller2.button(6).whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
+        controller2.button(6).whileTrue(climber.climbDownCommand());
         // .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
 
         // controller2
         // .rightBumper()
         // .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
         // .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
-        controller2
-                .button(8)
-                .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
-                .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
+        controller2.button(8).whileTrue(climber.climbUpCommand());
         controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
             manualControls = !manualControls;
         }));
@@ -443,18 +436,18 @@ public class RobotContainer {
 
         // controller2.b().whileTrue(remover.ArmOut());
         // controller2.x().whileTrue(remover.ArmIn());
-        controller2
-                .button(3)
-                .onTrue(Commands.either(
-                        remover.ArmOutAuto(),
-                        remover.L3Algae(elevator, drive).andThen(remover.ArmInAuto()),
-                        () -> isManual()));
-        controller2
-                .button(5)
-                .onTrue(Commands.either(
-                        remover.ArmInAuto(),
-                        remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
-                        () -> isManual()));
+        // controller2
+        //         .button(3)
+        //         .onTrue(Commands.either(
+        //                 remover.ArmOutAuto(),
+        //                 remover.L3Algae(elevator, drive).andThen(remover.ArmInAuto()),
+        //                 () -> isManual()));
+        // controller2
+        //         .button(5)
+        //         .onTrue(Commands.either(
+        //                 remover.ArmInAuto(),
+        //                 remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
+        //                 () -> isManual()));
     }
 
     /**
@@ -640,32 +633,32 @@ public class RobotContainer {
     }
 
     public void transition() {
-        elevator.setElevatorHeight(0);
+        // elevator.setElevatorHeight(0);
     }
 
-    public Supplier<Command> ElevatorUp() {
-        return () -> {
-            Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
-            if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
-                    .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
-                return ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Run elevator command
-            }
-            while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
-                    .getCoralStatus(currentLevel)) { // Loop to find free level
-                currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
-            }
-            Level freeLevel = currentLevel; // Set free level
-            return ElevatorFactory.elevator(elevator, freeLevel); // Run elevator command
-        };
-    }
+    //     public Supplier<Command> ElevatorUp() {
+    //         return () -> {
+    //             Level currentLevel = PRIORITY_LEVEL; // Set current level to priority level
+    //             if (!reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
+    //                     .getCoralStatus(PRIORITY_LEVEL)) { // Check if coral status is false
+    //                 return ElevatorFactory.elevator(elevator, PRIORITY_LEVEL); // Run elevator command
+    //             }
+    //             while (reef.getclosestBranch(AutoBuilder.getCurrentPose(), PRIORITY_LEVEL, true)
+    //                     .getCoralStatus(currentLevel)) { // Loop to find free level
+    //                 currentLevel = Reef.getLesserLevel(currentLevel); // Get lesser level
+    //             }
+    //             Level freeLevel = currentLevel; // Set free level
+    //             return ElevatorFactory.elevator(elevator, freeLevel); // Run elevator command
+    //         };
+    //     }
 
     public Command Outtake() {
         return outtake.outtakeOutCmd(true);
     }
 
-    public Supplier<Command> ElevatorDown() {
-        return () -> ElevatorFactory.elevatorIntake(elevator); // Run elevator intake command
-    }
+    //     public Supplier<Command> ElevatorDown() {
+    //         return () -> ElevatorFactory.elevatorIntake(elevator); // Run elevator intake command
+    //     }
 
     public Supplier<Command> Intake() {
         return () -> outtake.outtakeInCmd(true); // Run intake command

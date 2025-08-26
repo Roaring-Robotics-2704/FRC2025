@@ -5,14 +5,8 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.elevator.ElevatorConstants.MAX_ELEVATOR_VOLTAGE;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotContainer;
@@ -30,14 +24,14 @@ public class Elevator extends SubsystemBase {
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-    private ProfiledPIDController controller = new ProfiledPIDController(
-            ElevatorConstants.ELEVATOR_KP,
-            ElevatorConstants.ELEVATOR_KI,
-            ElevatorConstants.ELEVATOR_KD,
-            new TrapezoidProfile.Constraints(3, 10)); // 2.97,54.36
+    // private ProfiledPIDController controller = new ProfiledPIDController(
+    //         ElevatorConstants.ELEVATOR_KP,
+    //         ElevatorConstants.ELEVATOR_KI,
+    //         ElevatorConstants.ELEVATOR_KD,
+    //         new TrapezoidProfile.Constraints(3, 10)); // 2.97,54.36
 
-    private ElevatorFeedforward feedforward = new ElevatorFeedforward(
-            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+    // private ElevatorFeedforward feedforward = new ElevatorFeedforward(
+    //         ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
 
     private SysIdRoutine sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -48,7 +42,7 @@ public class Elevator extends SubsystemBase {
             new SysIdRoutine.Mechanism(this::setElevatorVolts, null, local()));
 
     public Elevator(ElevatorIO io, RobotContainer robotContainer) {
-        SmartDashboard.putData("Elevator PID", controller);
+        // SmartDashboard.putData("Elevator PID", controller);
         this.io = io;
         this.robotContainer = robotContainer;
         io.init();
@@ -58,28 +52,29 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         this.io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
-        Logger.recordOutput("Elevator/Goal", controller.getGoal().position);
+        // Logger.recordOutput("Elevator/Goal", controller.getGoal().position);
         Logger.recordOutput("Elevator/Height", inputs.elevatorHeight);
-        Logger.recordOutput("Elevator/Setpoint", controller.getSetpoint().position);
-        visualization.update(inputs.elevatorHeight);
-        io.runVolts(Volts.of(MathUtil.clamp(
-                controller.calculate(inputs.elevatorHeight) + feedforward.calculate(controller.getSetpoint().velocity),
-                (controller.getGoal().position < 5.0) ? -0.5 : -6,
-                MAX_ELEVATOR_VOLTAGE)));
+        // Logger.recordOutput("Elevator/Setpoint", controller.getSetpoint().position);
+        // visualization.update(inputs.elevatorHeight);
+        // io.runVolts(Volts.of(MathUtil.clamp(
+        //         controller.calculate(inputs.elevatorHeight) +
+        // feedforward.calculate(controller.getSetpoint().velocity),
+        //         (controller.getGoal().position < 5.0) ? -0.5 : -6,
+        //         MAX_ELEVATOR_VOLTAGE)));
 
         // This method will be called once per scheduler run
     }
 
-    public void setElevatorHeight(double height) {
-        if (!RobotContainer.isManual()) {
-            if (((height > inputs.elevatorHeight) && !robotContainer.hasCoral())) {
-            } else {
-                controller.setGoal(height);
-            }
-        } else {
-            controller.setGoal(height);
-        }
-    }
+    // public void setElevatorHeight(double height) {
+    //     // if (!RobotContainer.isManual()) {
+    //     //     if (((height > inputs.elevatorHeight) && !robotContainer.hasCoral())) {
+    //     //     } else {
+    //     //         controller.setGoal(height);
+    //     //     }
+    //     // } else {
+    //     //     controller.setGoal(height);
+    //     // }
+    // }
 
     public void setElevatorVolts(double volts) {
         io.runVolts(Volts.of(volts));

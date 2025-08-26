@@ -11,7 +11,6 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.outtake.Outtake;
@@ -47,11 +46,11 @@ public class Autos {
     public void initEvents() {
         factory.bind("intake", outtake.outtakeInCmd(true));
         factory.bind("outtake", outtake.outtakeOutCmd(true));
-        factory.bind("elevatorL4", ElevatorFactory.elevatorL4(elevator));
-        factory.bind("elevatorL3", ElevatorFactory.elevatorL3(elevator));
-        factory.bind("elevatorL2", ElevatorFactory.elevatorL2(elevator));
-        factory.bind("elevatorL1", ElevatorFactory.elevatorL1(elevator));
-        factory.bind("elevatorIntake", ElevatorFactory.elevatorIntake(elevator));
+        // factory.bind("elevatorL4", ElevatorFactory.elevatorL4(elevator));
+        // factory.bind("elevatorL3", ElevatorFactory.elevatorL3(elevator));
+        // factory.bind("elevatorL2", ElevatorFactory.elevatorL2(elevator));
+        // factory.bind("elevatorL1", ElevatorFactory.elevatorL1(elevator));
+        // factory.bind("elevatorIntake", ElevatorFactory.elevatorIntake(elevator));
         factory.bind("armOut", remover.ArmOutAuto());
         factory.bind("armIn", remover.ArmInAuto());
     }

@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.outtake;
 
-import static frc.robot.subsystems.elevator.ElevatorConstants.L2_HEIGHT;
 import static frc.robot.subsystems.outtake.OuttakeConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,8 +66,7 @@ public class Outtake extends SubsystemBase {
                                 .finallyDo(() -> outtake.setSpeed(0)),
                         () -> useSensor)
                 .andThen(Commands.either(
-                        Commands.deadline(
-                                alignCoral(), Commands.run(() -> elevator.setElevatorHeight(L2_HEIGHT), elevator)),
+                        Commands.deadline(alignCoral()),
                         new PrintCommand("Outtake is in manual mode"),
                         () -> !RobotContainer.isManual()));
     }

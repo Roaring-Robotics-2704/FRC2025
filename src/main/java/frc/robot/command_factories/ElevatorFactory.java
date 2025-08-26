@@ -11,10 +11,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.auto.reef.Branch.Level;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.remover.RemoverConstants;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -34,20 +31,20 @@ public class ElevatorFactory {
      * @param level the target level
      * @return the command to move the elevator to the specified level
      */
-    public static Command elevator(Elevator elevator, Level level) {
-        switch (level) {
-            case L1:
-                return elevatorL1(elevator); // Move to level 1
-            case L2:
-                return elevatorL2(elevator); // Move to level 2
-            case L3:
-                return elevatorL3(elevator); // Move to level 3
-            case L4:
-                return elevatorL4(elevator); // Move to level 4
-            default:
-                return elevatorL3(elevator); // Default to level 3
-        }
-    }
+    // public static Command elevator(Elevator elevator, Level level) {
+    //     switch (level) {
+    //         case L1:
+    //             return elevatorL1(elevator); // Move to level 1
+    //         case L2:
+    //             return elevatorL2(elevator); // Move to level 2
+    //         case L3:
+    //             return elevatorL3(elevator); // Move to level 3
+    //         case L4:
+    //             return elevatorL4(elevator); // Move to level 4
+    //         default:
+    //             return elevatorL3(elevator); // Default to level 3
+    //     }
+    // }
 
     /**
      * Creates a command to move the elevator to level 1.
@@ -55,11 +52,11 @@ public class ElevatorFactory {
      * @param elevator the Elevator instance
      * @return the command to move the elevator to level 1
      */
-    public static Command elevatorL1(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L1_HEIGHT + driverOffset), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to level 1
-    }
+    // public static Command elevatorL1(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L1_HEIGHT + driverOffset), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to level 1
+    // }
 
     /**
      * Creates a command to move the elevator to level 2.
@@ -67,11 +64,11 @@ public class ElevatorFactory {
      * @param elevator the Elevator instance
      * @return the command to move the elevator to level 2
      */
-    public static Command elevatorL2(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L2_HEIGHT + driverOffset), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to level 2
-    }
+    // public static Command elevatorL2(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L2_HEIGHT + driverOffset), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to level 2
+    // }
 
     /**
      * Creates a command to move the elevator to level 3.
@@ -79,11 +76,11 @@ public class ElevatorFactory {
      * @param elevator the Elevator instance
      * @return the command to move the elevator to level 3
      */
-    public static Command elevatorL3(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L3_HEIGHT + driverOffset), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to level 3
-    }
+    // public static Command elevatorL3(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L3_HEIGHT + driverOffset), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to level 3
+    // }
 
     /**
      * Creates a command to move the elevator to level 4.
@@ -91,11 +88,11 @@ public class ElevatorFactory {
      * @param elevator the Elevator instance
      * @return the command to move the elevator to level 4
      */
-    public static Command elevatorL4(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L4_HEIGHT + driverOffset), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to level 4
-    }
+    // public static Command elevatorL4(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.L4_HEIGHT + driverOffset), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to level 4
+    // }
 
     /**
      * Creates a command to move the elevator to the intake position.
@@ -103,23 +100,23 @@ public class ElevatorFactory {
      * @param elevator the Elevator instance
      * @return the command to move the elevator to the intake position
      */
-    public static Command elevatorIntake(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.INTAKE_HEIGHT), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to intake position
-    }
+    // public static Command elevatorIntake(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(ElevatorConstants.INTAKE_HEIGHT), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to intake position
+    // }
 
-    public static Command ElevatorAlgaeL3(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(RemoverConstants.UPPER_HEIGHT), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to hold position
-    }
+    // public static Command ElevatorAlgaeL3(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(RemoverConstants.UPPER_HEIGHT), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to hold position
+    // }
 
-    public static Command ElevatorAlgaeL2(Elevator elevator) {
-        return new RunCommand(() -> elevator.setElevatorHeight(RemoverConstants.LOWER_HEIGHT), elevator)
-                .repeatedly()
-                .withTimeout(1); // Set height to hold position
-    }
+    // public static Command ElevatorAlgaeL2(Elevator elevator) {
+    //     return new RunCommand(() -> elevator.setElevatorHeight(RemoverConstants.LOWER_HEIGHT), elevator)
+    //             .repeatedly()
+    //             .withTimeout(1); // Set height to hold position
+    // }
 
     /**
      * Creates a command to manually move the elevator up.
