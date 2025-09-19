@@ -191,6 +191,7 @@ public class Vision extends SubsystemBase {
     public void enableUpdates(boolean send) {
         sendEstimates = send;
     }
+
     public void enableCamera(boolean enabled, int camera) {
         ;
     }

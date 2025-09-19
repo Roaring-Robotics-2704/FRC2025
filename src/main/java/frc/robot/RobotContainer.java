@@ -46,13 +46,9 @@ import frc.robot.auto.reef.Branch.Side;
 import frc.robot.auto.reef.Reef;
 import frc.robot.auto.source.SourceChooser;
 import frc.robot.auto.source.SourceChooser.SourceLocations;
-import frc.robot.command_factories.AlgaeArmFactory;
 import frc.robot.command_factories.ElevatorFactory;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.subsystems.algaeArm.AlgaeArm;
-import frc.robot.subsystems.algaeArm.AlgaeArmIO;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSim;
-import frc.robot.subsystems.algaeArm.AlgaeArmIOSpark;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -100,7 +96,7 @@ public class RobotContainer {
     private Elevator elevator; // Elevator subsystem
     private Outtake outtake; // Outtake subsystem
     private Remover remover;
-    private AlgaeArm algaeArm;
+    private Climber climber = new Climber();
     private static boolean manualControls = false;
 
     private static Reef reef = new Reef(); // Reef object
@@ -154,7 +150,6 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIOSpark(), this); // Initialize elevator
                 // subsystem
                 this.outtake = new Outtake(new OuttakeIOSpark(), elevator); // Initialize outtake
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSpark());
                 // subsystem
                 this.remover = new Remover(new RemoverIOSpark());
                 break;
@@ -190,7 +185,6 @@ public class RobotContainer {
 
                 this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
-                this.algaeArm = new AlgaeArm(new AlgaeArmIOSim());
                 this.remover = new Remover(new RemoverIO() {});
 
                 break;
@@ -207,7 +201,6 @@ public class RobotContainer {
                 this.elevator = new Elevator(new ElevatorIO() {}, this); // Initialize elevator subsystem
                 this.outtake = new Outtake(new OuttakeIO() {}, elevator); // Initialize outtake subsystem
                 this.remover = new Remover(new RemoverIO() {});
-                this.algaeArm = new AlgaeArm(new AlgaeArmIO() {});
 
                 break;
             }
@@ -412,17 +405,13 @@ public class RobotContainer {
         // .leftBumper()
         // .whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm))
         // .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
-        controller2.button(6).whileTrue(AlgaeArmFactory.AlgaeArmIntake(algaeArm));
         // .onFalse(AlgaeArmFactory.AlgaeArmHold(algaeArm));
 
         // controller2
         // .rightBumper()
         // .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
         // .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
-        controller2
-                .button(8)
-                .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
-                .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
+
         controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
             manualControls = !manualControls;
         }));
@@ -448,6 +437,8 @@ public class RobotContainer {
                         remover.ArmIn(),
                         remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
                         () -> isManual()));
+        controller.povUp().whileTrue(climber.climb(0.5));
+        controller.povDown().whileTrue(climber.climb(-0.5));
     }
 
     /**
