@@ -113,7 +113,7 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller; // Xbox controller
-    private final CommandGenericHID controller2; // Joystick
+//     private final CommandGenericHID controller2; // Joystick
 
     // ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
@@ -124,7 +124,7 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize Controller
         controller = new CommandXboxController(DRIVE_CONTROLLER); // Initialize Xbox controller
-        controller2 = new CommandGenericHID(BB_PORT);
+        // controller2 = new CommandGenericHID(BB_PORT);
 
         heightChooser.setDefaultOption("L4", Level.L4); // Set default height option
         heightChooser.addOption("L3", Level.L3); // Add L3 option
@@ -347,7 +347,7 @@ public class RobotContainer {
                 .withName("Joystick Drive"));
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        //controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
@@ -369,13 +369,13 @@ public class RobotContainer {
         // buttonBoard.getSelectedBranchSide())));
         controller.leftBumper().whileTrue(Commands.defer(GoToReef(Side.LEFT), Set.of(drive)));
         controller.rightBumper().whileTrue(Commands.defer(GoToReef(Side.RIGHT), Set.of(drive)));
-        controller.a().whileTrue(Commands.defer(GoToReef(false, false), Set.of(drive)));
-        controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
+        //controller.a().whileTrue(Commands.defer(GoToReef(false, false), Set.of(drive)));
+        //controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
-        controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), Set.of(outtake)));
+        controller.rightTrigger().whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), Set.of(outtake)));
         // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
-        controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
+        controller.leftTrigger().whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
 
         controller.y().whileTrue(outtake.outtakeReverseCMD());
 
