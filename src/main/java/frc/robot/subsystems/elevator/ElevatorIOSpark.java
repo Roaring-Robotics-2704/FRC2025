@@ -25,8 +25,9 @@ public class ElevatorIOSpark implements ElevatorIO {
     private final SparkMax leftElevatorMotor;
     private final SparkMax rightElevatorMotor;
     private final AnalogPotentiometer elevatorEncoder = new AnalogPotentiometer(ElevatorConstants.ANALOG_INPUT);
-    private double offset = 0;
     private double previousHeight = 0.0;
+    private double permOffset = 0.002;
+    private double offset = 0;
 
     public ElevatorIOSpark() {
         leftElevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_1, MotorType.kBrushless);
@@ -46,7 +47,6 @@ public class ElevatorIOSpark implements ElevatorIO {
                 5,
                 () -> rightElevatorMotor.configure(
                         driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-        offset = getHeight().in(Meters);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     private Distance getHeight() {
 
-        return Meters.of((elevatorEncoder.get() * Units.inchesToMeters(120)) - offset);
+        return Meters.of((elevatorEncoder.get() * Units.inchesToMeters(120)) - offset + permOffset);
     }
 
     private double getVelocity() {
@@ -92,5 +92,9 @@ public class ElevatorIOSpark implements ElevatorIO {
 
         double deltaTime = 0.02; // Assuming this method is called every 20ms
         return (currentHeight - prevHeight) / deltaTime;
+    }
+
+    public void setOffset(double offset) {
+        this.offset = offset;
     }
 }

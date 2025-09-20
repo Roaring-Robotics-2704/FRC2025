@@ -28,4 +28,7 @@ public interface ElevatorIO {
 
     default void init() {}
     ;
+
+    default void setOffset(double offset) {}
+    ;
 }

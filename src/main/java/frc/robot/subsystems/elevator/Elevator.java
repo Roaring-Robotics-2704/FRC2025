@@ -10,6 +10,7 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.MAX_ELEVATOR_VOLTA
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +30,11 @@ public class Elevator extends SubsystemBase {
     private final ElevatorVisualization visualization = new ElevatorVisualization();
 
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+    private double median = 0;
+    private double medianCount = 0;
+    private boolean hasRanCalibration = false;
+
+    MedianFilter filter = new MedianFilter(20);
 
     private ProfiledPIDController controller = new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_KP,
@@ -66,8 +72,16 @@ public class Elevator extends SubsystemBase {
                 controller.calculate(inputs.elevatorHeight) + feedforward.calculate(controller.getSetpoint().velocity),
                 (controller.getGoal().position < 5.0) ? -0.5 : -6,
                 MAX_ELEVATOR_VOLTAGE)));
-
+        if (!hasRanCalibration && (medianCount < 21)) {
+            median = filter.calculate(getHeight());
+            medianCount += 1;
+        }
+        if (medianCount >= 21) {
+            hasRanCalibration = true;
+            io.setOffset(median);
+        }
         // This method will be called once per scheduler run
+
     }
 
     public void setElevatorHeight(double height) {

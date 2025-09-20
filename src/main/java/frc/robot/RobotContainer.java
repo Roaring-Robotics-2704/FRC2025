@@ -113,7 +113,8 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller; // Xbox controller
-//     private final CommandGenericHID controller2; // Joystick
+    private final CommandGenericHID controller2; // Joystick
+    //     private final CommandGenericHID controller2; // Joystick
 
     // ButtonBoard buttonBoard = new ButtonBoard(reef); // Button board
 
@@ -124,6 +125,8 @@ public class RobotContainer {
     public RobotContainer() {
         // Initialize Controller
         controller = new CommandXboxController(DRIVE_CONTROLLER); // Initialize Xbox controller
+        controller2 = new CommandGenericHID(BB_PORT);
+
         // controller2 = new CommandGenericHID(BB_PORT);
 
         heightChooser.setDefaultOption("L4", Level.L4); // Set default height option
@@ -341,13 +344,13 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                         drive,
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.02),
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.02),
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.02))
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.002),
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.002),
+                        () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.002))
                 .withName("Joystick Drive"));
 
         // Switch to X pattern when X button is pressed
-        //controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.CURRENT_MODE == Constants.Mode.SIM
@@ -361,6 +364,10 @@ public class RobotContainer {
 
         controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
+        controller2.button(2).whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), Set.of(outtake)));
+        // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
+        controller2.button(4).whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
+
         // controller.a().whileTrue(new RunCommand(() ->
         // DriveCommands.goToSource(sourceChooser)));
         // controller
@@ -369,15 +376,33 @@ public class RobotContainer {
         // buttonBoard.getSelectedBranchSide())));
         controller.leftBumper().whileTrue(Commands.defer(GoToReef(Side.LEFT), Set.of(drive)));
         controller.rightBumper().whileTrue(Commands.defer(GoToReef(Side.RIGHT), Set.of(drive)));
-        //controller.a().whileTrue(Commands.defer(GoToReef(false, false), Set.of(drive)));
-        //controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
+        // controller.a().whileTrue(Commands.defer(GoToReef(false, false), Set.of(drive)));
+        // controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
-        controller.rightTrigger().whileTrue(Commands.defer(() -> outtake.outtakeOutCmd(!manualControls), Set.of(outtake)));
+        controller.rightTrigger().whileTrue(outtake.outtakeOutCmd(true));
         // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
-        controller.leftTrigger().whileTrue(Commands.defer(() -> outtake.outtakeInCmd(!manualControls), Set.of(outtake)));
+        controller.leftTrigger().whileTrue(outtake.outtakeInCmd(true));
 
-        controller.y().whileTrue(outtake.outtakeReverseCMD());
+        // controller.y().whileTrue(outtake.outtakeReverseCMD());
+
+        // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
+        controller.y().whileTrue(ElevatorFactory.elevatorL4(elevator));
+
+        // controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator,
+        // Level.L2));
+        controller.b().whileTrue(ElevatorFactory.elevatorL2(elevator));
+
+        // controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator,
+        // Level.L1));
+        controller.a().whileTrue(ElevatorFactory.elevatorL1(elevator));
+
+        // controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator,
+        // Level.L3));
+        controller.x().whileTrue(ElevatorFactory.elevatorL3(elevator));
+
+        // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        controller.leftTrigger().whileTrue(ElevatorFactory.elevatorIntake(elevator));
 
         // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
         controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
@@ -397,6 +422,10 @@ public class RobotContainer {
         // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
         controller2.button(7).whileTrue(ElevatorFactory.elevatorIntake(elevator));
 
+        controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
+            manualControls = !manualControls;
+        }));
+
         // controller2.y().whileTrue(dynamicAutoBeta);
 
         // //
@@ -412,9 +441,9 @@ public class RobotContainer {
         // .whileTrue(AlgaeArmFactory.AlgaeArmRelease(algaeArm))
         // .onFalse(AlgaeArmFactory.AlgaeArmInside(algaeArm));
 
-        controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
-            manualControls = !manualControls;
-        }));
+        // controller2.button(1).debounce(1).onTrue(Commands.runOnce(() -> {
+        //     manualControls = !manualControls;
+        // }));
 
         // if (!COMPETITION) {
         // controller.povUp().onTrue(ElevatorFactory.elevatorDynamicTest(elevator,
@@ -425,6 +454,19 @@ public class RobotContainer {
 
         // controller2.b().whileTrue(remover.ArmOut());
         // controller2.x().whileTrue(remover.ArmIn());
+        // controller2
+        //         .button(3)
+        //         .onTrue(Commands.either(
+        //                 remover.ArmOut(),
+        //                 remover.L3Algae(elevator, drive).andThen(remover.ArmInAuto()),
+        //                 () -> isManual()));
+        // controller2
+        //         .button(5)
+        //         .onTrue(Commands.either(
+        //                 remover.ArmIn(),
+        //                 remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
+        //                 () -> isManual()));
+
         controller2
                 .button(3)
                 .onTrue(Commands.either(
@@ -437,6 +479,8 @@ public class RobotContainer {
                         remover.ArmIn(),
                         remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
                         () -> isManual()));
+        controller.povUp().whileTrue(climber.climb(0.5));
+        controller.povDown().whileTrue(climber.climb(-0.5));
         controller.povUp().whileTrue(climber.climb(0.5));
         controller.povDown().whileTrue(climber.climb(-0.5));
     }
@@ -704,5 +748,9 @@ public class RobotContainer {
                                 .get(),
                         FINDINGCONSTRAINTS)
                 .finallyDo(() -> drive.stop());
+    }
+
+    public Elevator getElevator() {
+        return elevator;
     }
 }
