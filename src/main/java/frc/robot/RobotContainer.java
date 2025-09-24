@@ -120,6 +120,7 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser; // Auto chooser
+    private final LoggedDashboardChooser<Boolean> TestModeChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -134,6 +135,10 @@ public class RobotContainer {
         heightChooser.addOption("L2", Level.L2); // Add L2 option
         heightChooser.addOption("L1", Level.L1); // Add L1 option
         SmartDashboard.putData("Height Chooser", heightChooser);
+
+        TestModeChooser = new LoggedDashboardChooser<>("Test Mode?");
+        TestModeChooser.addDefaultOption("Deactivated", false);
+        TestModeChooser.addOption("Activated", true);
 
         switch (Constants.CURRENT_MODE) {
             case REAL: {
@@ -380,29 +385,29 @@ public class RobotContainer {
         // controller.y().whileTrue(Commands.defer(GoToSource(), Set.of(drive)).withName("Auto Align Source"));
 
         // controller2.rightTrigger().whileTrue(outtake.outtakeOutCmd(!manualControls));
-        controller.rightTrigger().whileTrue(outtake.outtakeOutCmd(true));
+        controller.rightTrigger().whileTrue(TestMode(outtake.outtakeOutCmd(true)));
         // controller2.leftTrigger().whileTrue(outtake.outtakeInCmd(!manualControls));
-        controller.leftTrigger().whileTrue(outtake.outtakeInCmd(true));
+        controller.leftTrigger().whileTrue(TestMode(outtake.outtakeInCmd(true)));
 
         // controller.y().whileTrue(outtake.outtakeReverseCMD());
 
         // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
-        controller.y().whileTrue(ElevatorFactory.elevatorL4(elevator));
+        controller.y().whileTrue(TestMode(ElevatorFactory.elevatorL4(elevator)));
 
         // controller2.povRight().whileTrue(ElevatorFactory.elevator(elevator,
         // Level.L2));
-        controller.b().whileTrue(ElevatorFactory.elevatorL2(elevator));
+        controller.b().whileTrue(TestMode(ElevatorFactory.elevatorL2(elevator)));
 
         // controller2.povDown().whileTrue(ElevatorFactory.elevator(elevator,
         // Level.L1));
-        controller.a().whileTrue(ElevatorFactory.elevatorL1(elevator));
+        controller.a().whileTrue(TestMode(ElevatorFactory.elevatorL1(elevator)));
 
         // controller2.povLeft().whileTrue(ElevatorFactory.elevator(elevator,
         // Level.L3));
-        controller.x().whileTrue(ElevatorFactory.elevatorL3(elevator));
+        controller.x().whileTrue(TestMode(ElevatorFactory.elevatorL3(elevator)));
 
         // controller2.a().whileTrue(ElevatorFactory.elevatorIntake(elevator));
-        controller.leftTrigger().whileTrue(ElevatorFactory.elevatorIntake(elevator));
+        controller.leftTrigger().whileTrue(TestMode(ElevatorFactory.elevatorIntake(elevator)));
 
         // controller2.povUp().whileTrue(ElevatorFactory.elevator(elevator, Level.L4));
         controller2.povUp().or(controller2.povDown()).whileTrue(ElevatorFactory.elevatorL4(elevator));
@@ -479,8 +484,6 @@ public class RobotContainer {
                         remover.ArmIn(),
                         remover.L2Algae(elevator, drive).andThen(remover.ArmInAuto()),
                         () -> isManual()));
-        controller.povUp().whileTrue(climber.climb(0.5));
-        controller.povDown().whileTrue(climber.climb(-0.5));
         controller.povUp().whileTrue(climber.climb(0.5));
         controller.povDown().whileTrue(climber.climb(-0.5));
     }
@@ -752,5 +755,9 @@ public class RobotContainer {
 
     public Elevator getElevator() {
         return elevator;
+    }
+
+    public Command TestMode(Command command) {
+        return Commands.either(command, Commands.none(), TestModeChooser::get);
     }
 }
