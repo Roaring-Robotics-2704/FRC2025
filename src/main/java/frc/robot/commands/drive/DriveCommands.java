@@ -29,12 +29,13 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-    private static final double DEADBAND = 0.1;
+    private static final double DEADBAND = 0.08;
     private static final double ANGLE_KP = 5.0;
     private static final double ANGLE_KD = 0.4;
     private static final double ANGLE_MAX_VELOCITY = 8.0;
@@ -62,17 +63,23 @@ public class DriveCommands {
 
     /** Field relative drive command using two joysticks (controlling linear and angular velocities). */
     public static Command joystickDrive(
-            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+            Drive drive,
+            DoubleSupplier xSupplier,
+            DoubleSupplier ySupplier,
+            DoubleSupplier omegaSupplier,
+            BooleanSupplier testMode) {
         return Commands.run(
                 () -> {
+                    Double speedMultiplier =
+                            testMode.getAsBoolean() ? Constants.TEST_DRIVE_SPEED : Constants.DRIVE_SPEED;
                     // Get linear velocity
                     Translation2d linearVelocity =
                             getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
                     Logger.recordOutput("DriveCommand/FullLinearVelocity", linearVelocity);
-                    linearVelocity = linearVelocity.times(Constants.DRIVE_SPEED);
+                    linearVelocity = linearVelocity.times(speedMultiplier);
                     Logger.recordOutput("DriveCommand/LinearVelocity", linearVelocity);
                     // Apply rotation deadband
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * Constants.TURN_SPEED;
+                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * speedMultiplier;
                     Logger.recordOutput("DriveCommand/InitialAngularVelocity", omega);
 
                     // Square rotation value for more precise control

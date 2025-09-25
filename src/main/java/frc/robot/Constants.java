@@ -16,8 +16,10 @@ public final class Constants {
     public static final Boolean FieldRelative = true;
 
     // General Constants
-    public static final double DRIVE_SPEED = 0.5;
-    public static final double TURN_SPEED = 0.5;
+    public static final double DRIVE_SPEED = 0.5; // 0.5, 0.7
+    public static final double TURN_SPEED = 0.5; // 0.5
+    public static final double TEST_DRIVE_SPEED = 1;
+    public static final double TEST_TURN_SPEED = 0.4;
 
     public static final Boolean COMPETITION = true;
     public static final Mode SIM_MODE = Mode.SIM;

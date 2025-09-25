@@ -73,7 +73,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.DashboardSwitch;
 import frc.robot.util.PoseUtil;
-import frc.robot.util.RoaringUtils.DeadzoneUtils;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
@@ -349,9 +348,10 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                         drive,
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftY(), 0.002),
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getLeftX(), 0.002),
-                        () -> -DeadzoneUtils.LinearDeadband(controller.getRightX(), 0.002))
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getRightX(),
+                        TestModeChooser::get)
                 .withName("Joystick Drive"));
 
         // Switch to X pattern when X button is pressed
